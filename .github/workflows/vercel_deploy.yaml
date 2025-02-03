@@ -17,6 +17,7 @@ jobs:
 
       - name: Cache npm and Next.js build cache
         uses: actions/cache@v4
+        id: cache
         with:
           path: |
             ~/.npm
@@ -26,7 +27,10 @@ jobs:
             main-build-cache-${{ hashFiles('**/package-lock.json') }}-
 
       - name: Install dependencies
-        run: npm install
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          echo "installing dependencies for build"
+          npm install
 
       - name: Build project
         run: npm run build
@@ -39,7 +43,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install Vercel CLI
+      - name: Cache global npm packages
+        uses: actions/cache@v4
+        id: cache-vercel-cli
+        with:
+          path: ~/.npm-global
+          key: vercel-cli-cache-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+          restore-keys: |
+            vercel-cli-cache-${{ hashFiles('**/package-lock.json') }}-
+
+      - name: Install Vercel CLI (only if cache miss)
+        if: steps.cache-vercel-cli.outputs.cache-hit != 'true'  # Run only if cache miss
         run: npm install -g vercel
 
       - name: Deploy to Vercel
