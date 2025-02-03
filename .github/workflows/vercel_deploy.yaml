@@ -41,17 +41,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Cache global npm packages
-        uses: actions/cache@v4
-        id: cache-vercel-cli
-        with:
-          path: ~/.npm-global
-          key: vercel-cli-cache-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
-          restore-keys: |
-            vercel-cli-cache-${{ hashFiles('**/package-lock.json') }}-
-
-      - name: Install Vercel CLI (only if cache miss)
-        if: steps.cache-vercel-cli.outputs.cache-hit != 'true'
+      - name: Install Vercel CLI
         run: npm install -g vercel
 
       - name: Deploy to Vercel
