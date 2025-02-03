@@ -1,12 +1,12 @@
-name: Vercel Deployment
+name: Tests
 
 on:
   push:
     branches:
-      - deploy
+      - main
   pull_request:
     branches:
-      - deploy
+      - main
 
 jobs:
   build:
@@ -14,7 +14,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
+      
       - name: Cache npm and Next.js build cache
         uses: actions/cache@v4
         with:
@@ -24,26 +24,26 @@ jobs:
           key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
-
+      
       - name: Install dependencies
         run: npm install
 
       - name: Build project
         run: npm run build
-
-  # After build is successful, deploy to Vercel
-  deploy:
+  
+  # After build is successful, run tests on code
+  test:
     runs-on: ubuntu-latest
     needs: build
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+      
+      - name: Install dependencies
+        run: npm install
 
-      - name: Install Vercel CLI
-        run: npm install -g vercel
+      - name: Run tests
+        run: npm run test
 
-      - name: Deploy to Vercel
-        run: |
-          echo "deploying to Vercel..."
-          vercel --token=${{ secrets.VERCEL_TOKEN }} --prod --confirm
-          echo "deployment complete"
+      - name: Run linter
+        run: npm run lint
