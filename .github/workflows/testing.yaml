@@ -12,27 +12,27 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout respository
+      - name: Checkout repository
         uses: actions/checkout@v3
       
       - name: Install dependencies
-        uses: npm install
+        run: npm install
 
       - name: Build project
-        uses: npm run build
+        run: npm run build
   
   # After build is successful, run tests on code
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout respository
+      - name: Checkout repository
         uses: actions/checkout@v3
       
       - name: Install dependencies
-        uses: npm install
+        run: npm install
 
       - name: Run tests
-        uses: npm run test
+        run: npm run test
 
       - name: Run linter
-        uses: npm run lint
+        run: npm run lint
