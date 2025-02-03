@@ -12,14 +12,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Cache Vercel CLI
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-npm-vercel
-          restore-keys: |
-            ${{ runner.os }}-npm-
-
       - name: Install Vercel CLI
         run: npm install -g vercel
 
