@@ -3,7 +3,7 @@ name: Vercel Deployment
 on:
   push:
     branches:
-      - main
+      - deploy
 
 jobs:
   deploy:
@@ -24,4 +24,7 @@ jobs:
         run: npm install -g vercel
 
       - name: Deploy to Vercel
-        run: vercel --token=${{ secrets.VERCEL_TOKEN }} --prod --confirm
+        run: |
+          echo "deploying to Vercel..."
+          vercel --token=${{ secrets.VERCEL_TOKEN }} --prod --confirm
+          echo "deployment complete"
