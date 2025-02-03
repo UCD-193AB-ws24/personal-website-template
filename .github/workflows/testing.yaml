@@ -24,9 +24,7 @@ jobs:
             main-build-cache-${{ hashFiles('**/package-lock.json') }}-
       
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          echo "installing dependencies for build"
           npm install
 
       - name: Build project
@@ -52,9 +50,7 @@ jobs:
             main-build-cache-${{ hashFiles('**/package-lock.json') }}-
 
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          echo "installing dependencies for test"
           npm install
 
       - name: Run tests

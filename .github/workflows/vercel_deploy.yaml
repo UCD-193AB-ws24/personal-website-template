@@ -53,7 +53,7 @@ jobs:
             vercel-cli-cache-${{ hashFiles('**/package-lock.json') }}-
 
       - name: Install Vercel CLI (only if cache miss)
-        if: steps.cache-vercel-cli.outputs.cache-hit != 'true'  # Run only if cache miss
+        if: steps.cache-vercel-cli.outputs.cache-hit != 'true'
         run: npm install -g vercel
 
       - name: Deploy to Vercel
