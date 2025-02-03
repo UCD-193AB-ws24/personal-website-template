@@ -4,10 +4,27 @@ on:
   push:
     branches:
       - deploy
+  pull_request:
+    branches:
+      - deploy
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout respository
+        uses: actions/checkout@v3
+      
+      - name: Install dependencies
+        uses: npm install
+
+      - name: Build project
+        uses: npm run build
+
+  # After build is sucessful, deploy to Vercel
   deploy:
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3

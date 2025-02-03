@@ -1,0 +1,38 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout respository
+        uses: actions/checkout@v3
+      
+      - name: Install dependencies
+        uses: npm install
+
+      - name: Build project
+        uses: npm run build
+  
+  # After build is successful, run tests on code
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout respository
+        uses: actions/checkout@v3
+      
+      - name: Install dependencies
+        uses: npm install
+
+      - name: Run tests
+        uses: npm run test
+
+      - name: Run linter
+        uses: npm run lint
