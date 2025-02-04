@@ -1,15 +1,34 @@
 import { ReactNode } from "react";
+import { useDraggable } from '@dnd-kit/core';
 
-type SidebarItem = {
-  name: string,
-  description: string,
-  icon: ReactNode,
-  type: string
+interface SidebarItemProps {
+  name: string;
+  description: string;
+  icon: ReactNode;
+  type: string;
 }
 
-const SidebarItem = ({ name, description, icon, type }: SidebarItem) => {
+export default function SidebarItem({ name, description, icon, type }: SidebarItemProps) {
+  const uniqueId = `${type}-${Date.now()}`;
+
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: uniqueId,
+    data: { type },
+  });
+
+  const style = {
+    transform: transform
+      ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
+      : undefined,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
   return (
     <div
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      style={style}
       className="flex items-start p-3 bg-white rounded-lg shadow-sm cursor-pointer hover:bg-gray-200"
     >
       <div className="mr-3 text-blue-500">{icon}</div>
@@ -19,7 +38,5 @@ const SidebarItem = ({ name, description, icon, type }: SidebarItem) => {
       </div>
     </div>
   );
-};
-
-export default SidebarItem;
+}
 
