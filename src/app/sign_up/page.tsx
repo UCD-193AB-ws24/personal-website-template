@@ -1,3 +1,6 @@
+import SignUpForm from "./signupForm"
+import "../css/signup.css"
+
 
 export default function SignUp() {
     return (
@@ -38,6 +41,8 @@ export default function SignUp() {
 
             <div>
                 <h1>Sign Up</h1>
+
+                <SignUpForm />
             </div>
         </div>
     );
