@@ -37,6 +37,28 @@ export default function SignUpForm() {
     }
   };
 
+  const handleSignUpWithGoogle = async (e: { preventDefault: () => void; }) => {
+    e.preventDefault();
+    setError("");
+    setSuccess(false);
+
+    try {
+      await signInWithGoogle();
+      setSuccess(true);
+      setEmail("");
+      setPassword("");
+      setUsername("");
+      router.push("/setusername");
+    } catch (err) {
+      setSuccess(false);
+      if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError("An unknown error occurred.");
+      }
+    }
+  };
+
   return (
     <div>
 
@@ -75,7 +97,7 @@ export default function SignUpForm() {
       </div>
 
       <div className="center">
-        <button onClick={signInWithGoogle} className="google-btn">
+        <button onClick={handleSignUpWithGoogle} className="google-btn">
           Sign Up with Google
         </button>
       </div>
