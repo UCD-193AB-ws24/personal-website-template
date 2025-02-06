@@ -49,7 +49,7 @@ export default function Editor() {
 
   const renderOverlayContent = (activeType: string | null) => {
     switch (activeType) {
-      case 'textbox':
+      case 'textBlock':
         return <DraggableResizableTextbox />;
       default:
         return null;
@@ -57,7 +57,7 @@ export default function Editor() {
   }
 
   const renderComponent = (comp: ComponentItem) => {
-    if (comp.type === 'textbox') {
+    if (comp.type === 'textBlock') {
       return (
         <DraggableResizableTextbox
           key={comp.id}
