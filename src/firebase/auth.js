@@ -37,6 +37,7 @@ export const signUpWithEmail = async (email, username, password) => {
 
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     console.log("User signed up:", userCredential.user);
+    localStorage.setItem("username", username);
 
     await setDoc(doc(db, "users", userCredential.user.uid), {
       username,
@@ -120,6 +121,8 @@ export const signUserOut = async () => {
   try {
     await signOut(auth);
     console.log("User signed out");
+    localStorage.removeItem("email");
+    localStorage.removeItem("username");
   } catch (error) {
     console.error("Error signing out:", error);
     throw error;
