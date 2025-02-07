@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Rnd } from 'react-rnd';
+import { Rnd, DraggableData, ResizableDelta, Position } from 'react-rnd';
+import { ResizeDirection } from "re-resizable";
 
 import type { ComponentItem } from '@customTypes/componentTypes';
 
@@ -26,13 +27,21 @@ export default function SectionTitleTextbox({
   const [size, setSize] = useState(initialSize);
   const [text, setText] = useState("Type section title here...");
 
-  const handleDragStop = (e: any, d: any) => {
+  // TODO: this is the same code in ./DraggableResizableTextbox.tsx. extract it out to a separate file (perhaps in ../utils/)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleDragStop = (e: any, d: DraggableData) => {
     const newPos = findBestFreeSpot({ x: d.x, y: d.y }, size, components, id);
     setPosition(newPos);
     updateComponent(id, newPos, size);
   };
 
-  const handleResizeStop = (e: any, direction: any, ref: any, delta: any, newPos: any) => {
+  const handleResizeStop = (
+    e: MouseEvent | TouchEvent,
+    direction: ResizeDirection,
+    ref: HTMLElement,
+    delta: ResizableDelta,
+    newPos: Position
+  ) => {
     const newSize = {
       width: ref.offsetWidth,
       height: ref.offsetHeight,

@@ -13,4 +13,14 @@ export interface ComponentItem {
   type: string;
   position: Position;
   size: Size;
+  initialX?: number;
+  initialY?: number;
+  initialSize?: Size;
+  components?: ComponentItem[];
+  updateComponent?: (
+    id: string,
+    newPos: { x: number; y: number },
+    newSize: { width: number; height: number }
+  ) => void;
 }
+
