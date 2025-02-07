@@ -52,3 +52,6 @@ jobs:
           echo "deploying to Vercel..."
           vercel --token=${{ secrets.VERCEL_TOKEN }} --prod --confirm
           echo "deployment complete"
+        env:
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
