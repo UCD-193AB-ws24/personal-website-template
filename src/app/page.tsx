@@ -193,7 +193,7 @@ export default function Home() {
 
         <div className="mt-16 p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm sm:p-8 dark:bg-gray-800 dark:border-gray-700">
 					<h3 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">
-            Who it's for
+            Who it&apos;s for
 					</h3>
           <div className="flex justify-center">
             <div className="grid justify-start pl-16 pr-16 gap-x-8" style={{gridTemplateColumns: "auto minmax(0, 1fr)"}}>
