@@ -33,7 +33,7 @@ jobs:
       - name: Build project
         run: npm run build
         env:
-          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
 
   # After build is successful, deploy to Vercel
@@ -52,3 +52,6 @@ jobs:
           echo "deploying to Vercel..."
           vercel --token=${{ secrets.VERCEL_TOKEN }} --prod --confirm
           echo "deployment complete"
+        env:
+          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
