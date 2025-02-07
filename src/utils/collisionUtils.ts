@@ -1,34 +1,40 @@
-import type { ComponentItem, Position, Size } from '@customTypes/componentTypes';
+import type {
+  ComponentItem,
+  Position,
+  Size,
+} from "@customTypes/componentTypes";
 
 // TODO: collision detection on drops is still buggy for components placed on top half of another
 export const isColliding = (
   newPos: Position,
   newSize: Size,
   components: ComponentItem[],
-  activeComponentId: string
+  activeComponentId: string,
 ): boolean => {
+  const buffer = 5;
+
   return components.some((comp) => {
     if (comp.id === activeComponentId) return false;
 
     const rect1 = {
-      x: newPos.x,
-      y: newPos.y,
-      right: newPos.x + newSize.width,
-      bottom: newPos.y + newSize.height,
+      left: newPos.x - buffer,
+      top: newPos.y - buffer,
+      right: newPos.x + newSize.width + buffer,
+      bottom: newPos.y + newSize.height + buffer,
     };
 
     const rect2 = {
-      x: comp.position.x,
-      y: comp.position.y,
-      right: comp.position.x + comp.size.width,
-      bottom: comp.position.y + comp.size.height,
+      left: comp.position.x - buffer,
+      top: comp.position.y - buffer,
+      right: comp.position.x + comp.size.width + buffer,
+      bottom: comp.position.y + comp.size.height + buffer,
     };
 
     return (
-      rect1.x < rect2.right &&
-      rect1.right > rect2.x &&
-      rect1.y < rect2.bottom &&
-      rect1.bottom > rect2.y
+      rect1.left < rect2.right &&
+      rect1.right > rect2.left &&
+      rect1.top < rect2.bottom &&
+      rect1.bottom > rect2.top
     );
   });
 };
@@ -51,7 +57,7 @@ export const findBestFreeSpot = (
   startPos: Position,
   newSize: Size,
   components: ComponentItem[],
-  activeComponentId: string
+  activeComponentId: string,
 ): Position => {
   if (!isColliding(startPos, newSize, components, activeComponentId)) {
     return startPos;
