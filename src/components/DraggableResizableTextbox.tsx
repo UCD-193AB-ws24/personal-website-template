@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import { Rnd, DraggableData, ResizableDelta, Position } from 'react-rnd';
-import { ResizeDirection } from "re-resizable";
-
+import { Rnd } from 'react-rnd';
 
 import type { ComponentItem } from '@customTypes/componentTypes';
 
-import { findBestFreeSpot } from '@utils/collisionUtils';
+import { handleDragStop, handleResizeStop } from '@utils/dragResizeUtils';
 
 interface DraggableResizableTextboxProps {
   id?: string;
@@ -27,37 +25,12 @@ export default function DraggableResizableTextbox({
   const [position, setPosition] = useState({ x: initialX, y: initialY });
   const [size, setSize] = useState(initialSize);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleDragStop = (e: any, d: DraggableData) => {
-    const newPos = findBestFreeSpot({ x: d.x, y: d.y }, size, components, id);
-    setPosition(newPos);
-    updateComponent(id, newPos, size);
-  };
-
-  const handleResizeStop = (
-    e: MouseEvent | TouchEvent,
-    direction: ResizeDirection,
-    ref: HTMLElement,
-    delta: ResizableDelta,
-    newPos: Position
-  ) => {
-    const newSize = {
-      width: ref.offsetWidth,
-      height: ref.offsetHeight,
-    };
-
-    const finalPos = findBestFreeSpot(newPos, size, components, id);
-    setSize(newSize);
-    setPosition(finalPos);
-    updateComponent(id, finalPos, newSize);
-  };
-
   return (
     <Rnd
       size={{ width: size.width, height: size.height }}
       position={{ x: position.x, y: position.y }}
-      onDragStop={handleDragStop}
-      onResizeStop={handleResizeStop}
+      onDragStop={handleDragStop(id, size, components, updateComponent, setPosition)}
+      onResizeStop={handleResizeStop(id, components, updateComponent, setSize, setPosition)}
       minWidth={100}
       minHeight={50}
       bounds="parent"
