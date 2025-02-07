@@ -74,7 +74,7 @@ export default function SetUsername() {
                             type="username" 
                             placeholder="Username" 
                             value={username} 
-                            onChange={(e) => setUsername(e.target.value)} 
+                            onChange={(e) => setLocalUsername(e.target.value)} 
                             required 
                         />
                         <button type="submit">Confirm</button>

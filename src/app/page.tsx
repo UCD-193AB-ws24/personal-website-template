@@ -5,20 +5,40 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@firebase/firebaseApp"
 import { getUsername, signUserOut } from "@firebase/auth"
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 
 export default function Home() {
 
   const [user] = useAuthState(auth);
+  const [username, setUsername] = useState("");
   const router = useRouter();
+
+  useEffect(() => {
+    if (user) {
+      handleGetUsername();
+    }
+  }, [user]);
 
   const handleSignOut = async () => {
 
     try {
       await signUserOut();
+      setUsername("")
       router.push("/");
     } catch (error) {
       console.error("Error logging out:", error);
+    }
+  }
+
+  const handleGetUsername = async () => {
+
+    try {
+      const username =  await getUsername();
+      setUsername(username || "username not found");
+    } catch (error) {
+      console.error("Could not retrieve username");
+      setUsername("username not found");
     }
   }
 
@@ -63,11 +83,13 @@ export default function Home() {
       <main className="flex justify-center">
 
         <div className="flex items-center space-x-3 rtl:space-x-reverse">
-          { user && getUsername() && getUsername() !== "" ? <h2>Hi {getUsername()}!</h2> : <div></div> }
+          { user && username !== "" ? <h2>Hi {username}!</h2> : <div></div> }
 
-          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-            <Link href="/editor">Editor</Link>
-          </button>
+            <Link href="/editor">
+              <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Editor
+              </button>
+            </Link>
         </div>
         
       </main>

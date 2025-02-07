@@ -18,10 +18,30 @@ import {auth, db} from "./firebaseApp";
 let currentUsername = "";
 
 
-export const getUsername = () => {
-    const savedUsername = localStorage.getItem("username");
-  
-    return savedUsername || currentUsername;
+export const getUsername = async () => {
+  if (!auth.currentUser) {
+    console.error("No user is signed in.");
+    return null;
+  }
+
+  const userDocRef = doc(db, "users", auth.currentUser.uid);
+
+  try {
+    const userDoc = await getDoc(userDocRef);
+
+    if (!userDoc.exists()) {
+      console.log("No matching user found");
+      return null;
+    }
+
+    const userData = userDoc.data();
+    console.log("User data:", userData);
+
+    return userData.username;
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    return null;
+  }
 }
 
 
@@ -37,7 +57,6 @@ export const signUpWithEmail = async (email, username, password) => {
 
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     console.log("User signed up:", userCredential.user);
-    localStorage.setItem("username", username);
 
     await setDoc(doc(db, "users", userCredential.user.uid), {
       username,
@@ -56,14 +75,13 @@ export const signInWithEmail = async (email, password) => {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     console.log("User signed in:", userCredential.user);
 
-    const userId = userCredential.user.uid;  // Get the UID of the signed-in user
-    const userDocRef = doc(db, "users", userId); // Get a reference to the user's document in Firestore
-    const userDoc = await getDoc(userDocRef); // Fetch the user's document
+    const userId = userCredential.user.uid;
+    const userDocRef = doc(db, "users", userId);
+    const userDoc = await getDoc(userDocRef);
 
     if (userDoc.exists()) {
       const username = userDoc.data().username;
       console.log("Username retrieved:", username);
-      localStorage.setItem("username", username);
       currentUsername = username;
       return username;
     } else {
@@ -84,7 +102,6 @@ export const signInWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, provider);
     console.log("User signed in:", result.user);
-    localStorage.setItem("email", result.user.email);
 
   } catch (error) {
     console.error("Error signing in:", error);
@@ -95,6 +112,10 @@ export const signInWithGoogle = async () => {
 
 export const setUsername = async (username) => {
   try {
+    if (!auth.currentUser) {
+      throw new Error("No user is signed in.");
+    }
+
     const q = query(collection(db, "users"), where("username", "==", username));
     const querySnapshot = await getDocs(q);
 
@@ -102,18 +123,15 @@ export const setUsername = async (username) => {
       throw new Error("Username is already taken.");
     }
 
-    email = localStorage.getItem("email");
+    const email = auth.currentUser.email;
+    const userId = auth.currentUser.uid;
 
-    await setDoc(doc(db, "users", userCredential.user.uid), {
-      username,
-      email,
-    });
+    await setDoc(doc(db, "users", userId), { username, email }, { merge: true });
 
   } catch (error) {
     console.error("Error setting username:", error.message);
     throw error;
   }
-
 }
 
 
@@ -121,8 +139,6 @@ export const signUserOut = async () => {
   try {
     await signOut(auth);
     console.log("User signed out");
-    localStorage.removeItem("email");
-    localStorage.removeItem("username");
   } catch (error) {
     console.error("Error signing out:", error);
     throw error;
