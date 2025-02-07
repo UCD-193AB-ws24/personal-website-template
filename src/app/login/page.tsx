@@ -40,8 +40,6 @@ export default function LogIn() {
 
             </header>
             <div>
-                <h1>Log In</h1>
-
                 < LogInForm />
             </div>
         </div>

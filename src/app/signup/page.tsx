@@ -37,12 +37,9 @@ export default function SignUp() {
                     </div>
                 </div>
                 </nav>
-
             </header>
 
             <div>
-                <h1>Sign Up</h1>
-
                 <SignUpForm />
             </div>
         </div>

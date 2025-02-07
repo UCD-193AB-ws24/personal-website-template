@@ -63,44 +63,46 @@ export default function LogInForm() {
     <div>
 
       <div className="center">
-        <h2>Log In</h2>
+        <div className="mt-5 text-lg font-semibold">Log In</div>
       </div>
 
-      <div className="center">
-        <form onSubmit={handleSignIn}>
-            <input 
-                type="email" 
-                placeholder="Email" 
-                value={email} 
-                onChange={(e) => setEmail(e.target.value)} 
-                required 
-            />
-            <input 
-                type="password" 
-                placeholder="Password" 
-                value={password} 
-                onChange={(e) => setPassword(e.target.value)} 
-                required 
-            />
-            <button type="submit">Log In</button>
+      <div className="center flex flex-col gap-4 mt-5 max-w-md mx-auto bg-gray-100 p-10 rounded-lg">
+        <form className="grid gap-4" onSubmit={handleSignIn}>
+          <input 
+            type="email" 
+            placeholder="Email" 
+            value={email} 
+            onChange={(e) => setEmail(e.target.value)} 
+            required 
+            className="p-2 border rounded w-full"
+          />
+          <input 
+            type="password" 
+            placeholder="Password" 
+            value={password} 
+            onChange={(e) => setPassword(e.target.value)} 
+            required 
+            className="p-2 border rounded w-full"
+          />
+          <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded-md cursor-pointer hover:bg-green-600 hover:brightness-70 transition duration-200 ease-in-out">
+            Log In
+          </button>
         </form>
 
         {success && <p>Log in successful!</p>}
         {error && <p style={{ color: "red" }}>{error}</p>}
-      </div>
 
-      <div className="center">
-        <button onClick={handleSignInWithGoogle} className="google-btn">
-          Log in with Google
-        </button>
-      </div>
+        <div className="center">
+          <img onClick={handleSignInWithGoogle} src="googlelogo.png" alt="Sign in with Google" className="shadow-md hover:brightness-50 focus:outline-none transition duration-200 ease-in-out"/>
+        </div>
 
-      <div className="center">
-        <Link href="/signup">
-          Make an account
+        <Link href="/signup" className="center">
+          <button className="px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer hover:bg-blue-600 hover:brightness-70 focus:outline-none transition duration-200 ease-in-out">
+            Make an account
+          </button>
         </Link>
-      </div>
 
+      </div>
     </div>
   );
 }

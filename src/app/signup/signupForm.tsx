@@ -63,17 +63,18 @@ export default function SignUpForm() {
     <div>
 
       <div className="center">
-        <h2>Sign Up</h2>
+        <div className="mt-5 text-lg font-semibold">Sign Up</div>
       </div>
 
-      <div className="center">
-        <form onSubmit={handleSignUp}>
+      <div className="center flex flex-col gap-4 mt-5 max-w-md mx-auto bg-gray-100 p-10 rounded-lg">
+        <form className="grid gap-4" onSubmit={handleSignUp}>
             <input 
                 type="email" 
                 placeholder="Email" 
                 value={email} 
                 onChange={(e) => setEmail(e.target.value)} 
                 required 
+                className="p-2 border rounded w-full"
             />
             <input 
                 type="username" 
@@ -81,6 +82,7 @@ export default function SignUpForm() {
                 value={username} 
                 onChange={(e) => setUsername(e.target.value)} 
                 required 
+                className="p-2 border rounded w-full"
             />
             <input 
                 type="password" 
@@ -89,19 +91,18 @@ export default function SignUpForm() {
                 onChange={(e) => setPassword(e.target.value)} 
                 required 
             />
-            <button type="submit">Sign Up</button>
+            <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded-md cursor-pointer hover:bg-green-600 hover:brightness-70 transition duration-200 ease-in-out">
+              Sign Up
+            </button>
         </form>
 
         {success && <p>Sign-up successful!</p>}
         {error && <p style={{ color: "red" }}>{error}</p>}
+      
+        <div className="center">
+          <img onClick={handleSignUpWithGoogle} src="googlelogo.png" alt="Sign in with Google" className="shadow-md hover:brightness-50 focus:outline-none transition duration-200 ease-in-out"/>
+        </div>
       </div>
-
-      <div className="center">
-        <button onClick={handleSignUpWithGoogle} className="google-btn">
-          Sign Up with Google
-        </button>
-      </div>
-
     </div>
   );
 }
