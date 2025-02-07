@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react';
-import { DndContext, DragOverlay } from '@dnd-kit/core';
+import { DndContext, DragOverlay, DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import { restrictToWindowEdges } from '@dnd-kit/modifiers';
 
 import EditorDropZone from '@components/EditorDropZone';
@@ -32,11 +32,11 @@ export default function Editor() {
     setComponents(prev => prev.map(comp => comp.id === id ? { ...comp, position, size } : comp));
   };
 
-  const handleDragStart = ({ active }: any) => {
+  const handleDragStart = ({ active }: DragStartEvent) => {
     setActiveComponent({ id: String(active.id), type: active.data?.current?.type || null });
   };
 
-  const handleDragEnd = ({ active, over }: any) => {
+  const handleDragEnd = ({ active, over }: DragEndEvent) => {
     if (over?.id === 'editor-drop-zone' && active.rect.current.translated && activeComponent.id && activeComponent.type) {
       const editorBounds = over.rect;
       const draggedRect = active.rect.current.translated as DOMRect;
@@ -63,10 +63,11 @@ export default function Editor() {
     }
   }
 
-  const componentMap: Record<string, React.ComponentType<any>> = {
+  const componentMap: Record<string, React.ComponentType<Partial<ComponentItem>>> = {
     textBlock: DraggableResizableTextbox,
     sectionTitle: SectionTitleTextbox,
   };
+
   const renderComponent = (comp: ComponentItem) => {
     const Component = componentMap[comp.type];
 

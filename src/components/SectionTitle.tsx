@@ -3,7 +3,7 @@ import { Rnd } from 'react-rnd';
 
 import type { ComponentItem } from '@customTypes/componentTypes';
 
-import { findBestFreeSpot } from '@utils/collisionUtils';
+import { handleDragStop, handleResizeStop } from '@utils/dragResizeUtils';
 
 interface SectionTitleProps {
   id?: string;
@@ -26,29 +26,12 @@ export default function SectionTitleTextbox({
   const [size, setSize] = useState(initialSize);
   const [text, setText] = useState("Type section title here...");
 
-  const handleDragStop = (e: any, d: any) => {
-    const newPos = findBestFreeSpot({ x: d.x, y: d.y }, size, components, id);
-    setPosition(newPos);
-    updateComponent(id, newPos, size);
-  };
-
-  const handleResizeStop = (e: any, direction: any, ref: any, delta: any, newPos: any) => {
-    const newSize = {
-      width: ref.offsetWidth,
-      height: ref.offsetHeight,
-    };
-    const finalPos = findBestFreeSpot(newPos, size, components, id);
-    setSize(newSize);
-    setPosition(finalPos);
-    updateComponent(id, finalPos, newSize);
-  };
-
   return (
     <Rnd
       size={{ width: size.width, height: size.height }}
       position={{ x: position.x, y: position.y }}
-      onDragStop={handleDragStop}
-      onResizeStop={handleResizeStop}
+      onDragStop={handleDragStop(id, size, components, updateComponent, setPosition)}
+      onResizeStop={handleResizeStop(id, components, updateComponent, setSize, setPosition)}
       enableResizing={{ top: false, right: true, bottom: false, left: true, topRight: false, bottomRight: false, bottomLeft: false, topLeft: false }}
       minWidth={100}
       minHeight={50}
@@ -58,7 +41,7 @@ export default function SectionTitleTextbox({
       <h1
         contentEditable
         suppressContentEditableWarning
-        className="w-full h-full text-black text-2xl font-bold outline-none cursor-text"
+        className="overflow-hidden w-full h-full text-black text-2xl font-bold outline-none cursor-text"
         onBlur={(e) => setText(e.currentTarget.innerText)}
       >
         {text}
