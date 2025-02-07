@@ -79,7 +79,7 @@ export default function Editor() {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex h-screen">
+      <div className="flex h-screen text-black">
         <Sidebar />
 
         <EditorDropZone>
