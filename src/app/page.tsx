@@ -1,7 +1,48 @@
+'use client'
+
 import "./homePage.css"
 import Link from 'next/link';
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@firebase/firebaseApp"
+import { getUsername, signUserOut } from "@firebase/auth"
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+
 
 export default function Home() {
+  
+  const [user] = useAuthState(auth);
+  const [username, setUsername] = useState("");
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user) {
+      handleGetUsername();
+    }
+  }, [user]);
+
+  const handleSignOut = async () => {
+
+    try {
+      await signUserOut();
+      setUsername("")
+      router.push("/");
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  }
+
+  const handleGetUsername = async () => {
+
+    try {
+      const username =  await getUsername();
+      setUsername(username || "username not found");
+    } catch (error) {
+      console.error("Could not retrieve username");
+      setUsername("username not found");
+    }
+  }
+  
 	return (
 		<div>
 			<header>
@@ -49,25 +90,30 @@ export default function Home() {
 							className="hidden w-full md:block md:w-auto"
 							id="navbar-default"
 						>
-							<ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-								<li>
-									<a
-										href="/log_in"
-										className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
-										aria-current="page"
-									>
-										Log In
-									</a>
-								</li>
-								<li>
-									<a
-										href="/sign_up"
-										className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
-									>
-										Sign Up
-									</a>
-								</li>
-							</ul>
+              { user ? 
+                <div onClick={handleSignOut} className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent cursor-pointer">
+                  Log Out
+                </div> : 
+                <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+                  <li>
+                    <a
+                      href="/login"
+                      className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+                      aria-current="page"
+                    >
+                      Log In
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="/signup"
+                      className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+                    >
+                      Sign Up
+                    </a>
+                  </li>
+                </ul>
+              }
 						</div>
 					</div>
 				</nav>
