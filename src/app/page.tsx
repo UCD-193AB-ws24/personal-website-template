@@ -1,28 +1,27 @@
-'use client'
+'use client';
 
 import "./homePage.css"
 import Link from 'next/link';
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@firebase/firebaseApp"
-import { getUsername, signUserOut } from "@firebase/auth"
+import { signUserOut } from "@firebase/auth"
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { APIResponse } from "@customTypes/apiResponse";
 
 
 export default function Home() {
-  
   const [user] = useAuthState(auth);
   const [username, setUsername] = useState("");
   const router = useRouter();
 
   useEffect(() => {
     if (user) {
-      handleGetUsername();
+      getUsername();
     }
   }, [user]);
 
   const handleSignOut = async () => {
-
     try {
       await signUserOut();
       setUsername("")
@@ -32,14 +31,25 @@ export default function Home() {
     }
   }
 
-  const handleGetUsername = async () => {
-
+  const getUsername = async () => {
     try {
-      const username =  await getUsername();
-      setUsername(username || "username not found");
-    } catch (error) {
-      console.error("Could not retrieve username");
-      setUsername("username not found");
+      const response = await fetch("/api/user/username", {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const resBody = await response.json() as APIResponse<string>;
+
+      if (response.ok && resBody.success) {
+        setUsername(resBody.data);
+      } else {
+        throw new Error("Unknown username");
+      }
+    } catch (error: any) {
+      setUsername("Unknown");
+      router.push("/setusername")
+      console.log(error.message);
     }
   }
   
@@ -91,26 +101,31 @@ export default function Home() {
 							id="navbar-default"
 						>
               { user ? 
-                <div onClick={handleSignOut} className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent cursor-pointer">
-                  Log Out
-                </div> : 
                 <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
                   <li>
-                    <a
+                    <p>{username}</p>
+                  </li>
+                  <li onClick={handleSignOut} className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent cursor-pointer">
+                    Log Out
+                  </li> 
+                </ul> :
+                <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+                  <li>
+                    <Link
                       href="/login"
                       className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
                       aria-current="page"
                     >
                       Log In
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a
+                    <Link
                       href="/signup"
                       className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
                     >
                       Sign Up
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               }
