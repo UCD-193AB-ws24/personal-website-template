@@ -94,8 +94,13 @@ export default function Editor() {
         <Sidebar />
 
         <EditorDropZone>
-          <h1 className="text-2xl font-bold mb-4">Your Website Preview</h1>
-          {components.map(renderComponent)}
+          {components.length === 0 ? (
+            <h1 className="text-2xl font-bold mb-4 text-gray-400 text-center mt-20">
+              Drag components here to start building your site!
+            </h1>
+          ) : (
+            components.map(renderComponent)
+          )}
         </EditorDropZone>
       </div>
       <DragOverlay>
