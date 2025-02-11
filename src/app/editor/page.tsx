@@ -18,6 +18,18 @@ export default function Editor() {
   const [components, setComponents] = useState<ComponentItem[]>([]);
   const [activeComponent, setActiveComponent] = useState<{ id: string | null, type: string | null }>({ id: null, type: null });
 
+  const handleBackgroundClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Only clear active if the background (drop zone) was clicked
+    if (e.target === e.currentTarget) {
+      setActiveComponent({ id: null, type: null });
+    }
+  };
+
+  const handleComponentSelect = (id: string, type: string) => {
+    setActiveComponent({ id, type });
+  };
+
+
   const componentSizes: Record<string, { width: number; height: number }> = {
     textBlock: { width: 200, height: 150 },
     sectionTitle: { width: 350, height: 25 },
@@ -49,7 +61,6 @@ export default function Editor() {
 
       addComponent(activeComponent.type, newPos, activeComponent.id);
     }
-    setActiveComponent({ id: null, type: null });
   };
 
   const renderOverlayContent = (activeType: string | null) => {
@@ -80,6 +91,8 @@ export default function Editor() {
         initialSize={comp.size}
         components={components}
         updateComponent={updateComponent}
+        isActive={activeComponent.id === comp.id}
+        onMouseDown={() => handleComponentSelect(comp.id, comp.type)}
       />
     ) : null;
   };
@@ -93,7 +106,7 @@ export default function Editor() {
       <div className="flex h-screen text-black">
         <Sidebar />
 
-        <EditorDropZone>
+        <EditorDropZone onClick={handleBackgroundClick}>
           {components.length === 0 ? (
             <h1 className="text-2xl font-bold mb-4 text-gray-400 text-center mt-20">
               Drag components here to start building your site!
