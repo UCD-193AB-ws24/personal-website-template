@@ -1,13 +1,9 @@
 import { createUserWithEmailAndPassword, 
-  getAuth, 
   GoogleAuthProvider, 
   signInWithEmailAndPassword, 
-  signInWithPopup, 
-  signOut } from "firebase/auth";
-import { getFirestore, 
-  doc, 
+  signInWithPopup } from "firebase/auth";
+import { doc, 
   setDoc, 
-  getDoc, 
   getDocs,
   query, 
   collection, 
@@ -15,9 +11,6 @@ import { getFirestore,
 
 import {auth, db} from "./firebaseApp";
 import { APIResponse } from "@customTypes/apiResponse";
-
-let currentUsername = "";
-
 
 export const signUpWithEmail = async (email: string, username: string, password: string) => {
   try {
