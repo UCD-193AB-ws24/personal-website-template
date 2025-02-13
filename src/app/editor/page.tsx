@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DndContext, DragOverlay, DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import { restrictToWindowEdges } from '@dnd-kit/modifiers';
 
@@ -17,6 +17,28 @@ import { findBestFreeSpot } from '@utils/collisionUtils';
 export default function Editor() {
   const [components, setComponents] = useState<ComponentItem[]>([]);
   const [activeComponent, setActiveComponent] = useState<{ id: string | null, type: string | null }>({ id: null, type: null });
+
+  useEffect(() => {
+    fetchSavedComponents().then((res) => {
+      return res.json();
+    }).then((res) => {
+      const savedComponents: ComponentItem[] = [];
+      res.data.forEach((c: ComponentItem) => {
+        savedComponents.push(c);
+      })
+      setComponents(savedComponents);
+    }).catch((err) => {
+      console.log("error:", err);
+    })
+  }, []);
+
+  const fetchSavedComponents = () => {
+    return Promise.resolve(fetch("/api/db/drafts?draftNumber=1", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }));
+  }
 
   const handleBackgroundClick = (e: React.MouseEvent<HTMLDivElement>) => {
     // Only clear active if the background (drop zone) was clicked
@@ -40,6 +62,7 @@ export default function Editor() {
     setComponents(prev => [...prev, { id, type, position, size }]);
   };
 
+  // Updates a component's position and size, given by their id
   const updateComponent = (id: string, position: { x: number; y: number }, size: { width: number; height: number }) => {
     setComponents(prev => prev.map(comp => comp.id === id ? { ...comp, position, size } : comp));
   };
@@ -86,16 +109,18 @@ export default function Editor() {
       <Component
         key={comp.id}
         id={comp.id}
-        initialX={comp.position.x}
-        initialY={comp.position.y}
+        initialPos={comp.position}
         initialSize={comp.size}
         components={components}
+        content={comp?.content}
         updateComponent={updateComponent}
         isActive={activeComponent.id === comp.id}
         onMouseDown={() => handleComponentSelect(comp.id, comp.type)}
       />
     ) : null;
   };
+
+
 
   return (
     <DndContext

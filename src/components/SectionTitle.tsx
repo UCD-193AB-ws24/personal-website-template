@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import { Rnd } from 'react-rnd';
 
-import type { ComponentItem } from '@customTypes/componentTypes';
+import type { ComponentItem, Position, Size } from '@customTypes/componentTypes';
 
 import { handleDragStop, handleResizeStop } from '@utils/dragResizeUtils';
 
 interface SectionTitleProps {
   id?: string;
-  initialX?: number;
-  initialY?: number;
-  initialSize?: { width: number; height: number };
+  initialPos?: Position
+  initialSize?: Size
   components?: ComponentItem[];
   updateComponent?: (id: string, newPos: { x: number; y: number }, newSize: { width: number; height: number }) => void;
   isActive?: boolean;
@@ -18,15 +17,14 @@ interface SectionTitleProps {
 
 export default function SectionTitleTextbox({
   id = "",
-  initialX = -1,
-  initialY = -1,
+  initialPos = { x: -1, y: -1 },
   initialSize = { width: 350, height: 25 },
   components = [],
   updateComponent = () => { },
   isActive = true,
   onMouseDown: onMouseDown = () => { },
 }: SectionTitleProps) {
-  const [position, setPosition] = useState({ x: initialX, y: initialY });
+  const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
   const [text, setText] = useState("Type section title here...");
 
