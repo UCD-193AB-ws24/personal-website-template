@@ -58,7 +58,7 @@ export default function Home() {
 								alt="Profesite Logo"
 							/>
 
-							<span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
+							<span className="self-center text-2xl font-semibold whitespace-nowrap text-white">
 								Profesite
 							</span>
 						</a>
@@ -146,7 +146,7 @@ export default function Home() {
             <div className="justify-self-center md:col-start-2 md:justify-self-start space-y-4 sm:flex sm:space-y-0 sm:space-x-4 rtl:space-x-reverse">
               <Link
                 href="/editor"
-                className="w-full sm:w-auto bg-[#f08700] hover:bg-[#d67500] focus:ring-4 focus:outline-none focus:ring-orange-300 text-white rounded-xl inline-flex items-center justify-center px-6 py-4 shadow-[0_0_15px_5px_rgba(240,135,0,0.6)] hover:shadow-[0_0_20px_7px_rgba(240,135,0,0.8)] transition-all"
+                className="bg-[#f08700] hover:bg-[#d67500] text-white rounded-xl px-6 py-4 text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-[0_0_20px_5px_rgba(240,135,0,0.8)]"
               >
                 <div className="text-left rtl:text-right">
                   <div className="-mt-1 font-sans text-lg font-semibold">
@@ -215,7 +215,7 @@ export default function Home() {
           <p className="mb-4 text-white">No coding. No hassle. Just results.</p>
           <Link
             href="/editor"
-            className="w-full sm:w-auto bg-[#f08700] hover:bg-[#d67500] focus:ring-4 focus:outline-none focus:ring-orange-300 text-white rounded-xl inline-flex items-center justify-center px-6 py-4 shadow-[0_0_15px_5px_rgba(240,135,0,0.6)] hover:shadow-[0_0_20px_7px_rgba(240,135,0,0.8)] transition-all"
+            className="bg-[#f08700] hover:bg-[#d67500] text-white rounded-xl inline-flex items-center justify-center px-6 py-4 hover:scale-105 hover:shadow-[0_0_20px_7px_rgba(240,135,0,0.8)] transition-all"
           >
             <div className="text-left rtl:text-right">
               <div className="-mt-1 font-sans text-lg font-semibold">
