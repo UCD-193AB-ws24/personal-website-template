@@ -46,7 +46,7 @@ export default function Home() {
 	return (
 		<div>
 			<header>
-				<nav className="bg-white border-gray-200 dark:bg-gray-900">
+				<nav className="border-gray-200 bg-gray-900 fixed top-0 left-0 w-full z-50">
 					<div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
 						<a
 							href="."
@@ -98,7 +98,7 @@ export default function Home() {
                   <li>
                     <a
                       href="/login"
-                      className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+                      className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent transform transition-transform duration-200 scale-100 hover:scale-105"
                       aria-current="page"
                     >
                       Log In
@@ -107,7 +107,7 @@ export default function Home() {
                   <li>
                     <a
                       href="/signup"
-                      className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+                      className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent transform transition-transform duration-200 scale-100 hover:scale-105"
                     >
                       Sign Up
                     </a>
@@ -138,19 +138,18 @@ export default function Home() {
             </div>
           </div>
           <div className="md:grid md:grid-cols-subgrid md:col-span-2 md:justify-end">
-            <p className="md:col-start-2 mb-5 text-base text-gray-500 sm:text-lg dark:text-gray-400">
-              Create a stunning personal website that showcases your
-              skills, experience, and personality with no coding
-              required. Impress recruiters, clients, and connections
-              effortlessly.
+            <p className="md:col-start-2 mb-5 text-base text-gray-700 sm:text-xl tracking-wide mt-10 sm:mt-16 md:mt-24">
+              Build a personal website that's as unique as you.
+              Showcase your skills, experience, and personality with no coding required. 
+              Make a lasting impression on recruiters, clients, and connections.
             </p>
             <div className="justify-self-center md:col-start-2 md:justify-self-start space-y-4 sm:flex sm:space-y-0 sm:space-x-4 rtl:space-x-reverse">
               <Link
                 href="/editor"
-                className="w-full sm:w-auto bg-gray-800 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 text-white rounded-lg inline-flex items-center justify-center px-4 py-2.5 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700"
+                className="w-full sm:w-auto bg-[#f08700] hover:bg-[#d67500] focus:ring-4 focus:outline-none focus:ring-orange-300 text-white rounded-xl inline-flex items-center justify-center px-6 py-4 shadow-[0_0_15px_5px_rgba(240,135,0,0.6)] hover:shadow-[0_0_20px_7px_rgba(240,135,0,0.8)] transition-all"
               >
                 <div className="text-left rtl:text-right">
-                  <div className="-mt-1 font-sans text-sm font-semibold">
+                  <div className="-mt-1 font-sans text-lg font-semibold">
                     Start building
                   </div>
                 </div>
@@ -159,67 +158,67 @@ export default function Home() {
           </div>
 				</div>
 
-        <div className="p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm sm:p-8 dark:bg-gray-800 dark:border-gray-700">
-					<h3 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">
+        <div className="p-4 text-center shadow-sm sm:p-8 bg-gray-800 border-gray-700">
+					<h3 className="mb-2 text-3xl font-bold text-white">
             Why Profesite?
 					</h3>
           <div className="flex justify-center">
             <div className="grid justify-start pl-16 pr-16 gap-x-8" style={{gridTemplateColumns: "auto minmax(0, 1fr)"}}>
-              <p className="justify-self-start">Stand out</p>
-              <p className="justify-self-start">Go beyond a resume with a polished personal site</p>
-              <p className="justify-self-start">Effortless customization</p>
-              <p className="justify-self-start">Choose sleek templates and personalize within minutes</p>
-              <p className="justify-self-start">Seamless integration</p>
-              <p className="justify-self-start">Connect your portfolio, LinkedIn, and contact info</p>
+              <p className="justify-self-start text-white">Stand out</p>
+              <p className="justify-self-start text-white">Go beyond a resume with a polished personal site</p>
+              <p className="justify-self-start text-white">Effortless customization</p>
+              <p className="justify-self-start text-white">Choose sleek templates and personalize within minutes</p>
+              <p className="justify-self-start text-white">Seamless integration</p>
+              <p className="justify-self-start text-white">Connect your portfolio, LinkedIn, and contact info</p>
             </div>
           </div>
 				</div>
 
-        <div className="mt-16 p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+        <div className="mt-16 p-4 text-center bg-white border border-gray-200 shadow-sm sm:p-8 dark:bg-gray-800 dark:border-gray-700">
 					<h3 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">
             How it works
 					</h3>
           <div className="flex justify-center">
             <div className="grid justify-start pl-16 pr-16 gap-x-8" style={{gridTemplateColumns: "auto minmax(0, 1fr)"}}>
-              <p className="justify-self-start">Pick a template</p>
-              <p className="justify-self-start">Choose a design that fits your style</p>
-              <p className="justify-self-start">Customize</p>
-              <p className="justify-self-start">Add your bio, projects, and experiences</p>
-              <p className="justify-self-start">Publish and share</p>
-              <p className="justify-self-start">Launch in one click, impress instantly</p>
+              <p className="justify-self-start text-white">Pick a template</p>
+              <p className="justify-self-start text-white">Choose a design that fits your style</p>
+              <p className="justify-self-start text-white">Customize</p>
+              <p className="justify-self-start text-white">Add your bio, projects, and experiences</p>
+              <p className="justify-self-start text-white">Publish and share</p>
+              <p className="justify-self-start text-white">Launch in one click, impress instantly</p>
             </div>
           </div>
 				</div>
 
-        <div className="mt-16 p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+        <div className="mt-16 p-4 text-center bg-white border border-gray-200 shadow-sm sm:p-8 dark:bg-gray-800 dark:border-gray-700">
 					<h3 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">
             Who it&apos;s for
 					</h3>
           <div className="flex justify-center">
             <div className="grid justify-start pl-16 pr-16 gap-x-8" style={{gridTemplateColumns: "auto minmax(0, 1fr)"}}>
-              <p className="justify-self-start">Job seekers</p>
-              <p className="justify-self-start">Make a powerful first impression</p>
-              <p className="justify-self-start">Freelancers</p>
-              <p className="justify-self-start">Showcase your portfolio and services</p>
-              <p className="justify-self-start">Students and graduates</p>
-              <p className="justify-self-start">Stand out from the competition</p>
-              <p className="justify-self-start">Entrepreneurs</p>
-              <p className="justify-self-start">Build your own personal brand with credibility</p>
+              <p className="justify-self-start text-white">Job seekers</p>
+              <p className="justify-self-start text-white">Make a powerful first impression</p>
+              <p className="justify-self-start text-white">Freelancers</p>
+              <p className="justify-self-start text-white">Showcase your portfolio and services</p>
+              <p className="justify-self-start text-white">Students and graduates</p>
+              <p className="justify-self-start text-white">Stand out from the competition</p>
+              <p className="justify-self-start text-white">Entrepreneurs</p>
+              <p className="justify-self-start text-white">Build your own personal brand with credibility</p>
             </div>
           </div>
 				</div>
 
-        <div className="mt-16 p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm sm:p-8 dark:bg-gray-800 dark:border-gray-700">
-					<h3 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white">
+        <div className="mt-16 p-4 text-center bg-white border border-gray-200 shadow-sm sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+					<h3 className="mb-4 text-3xl font-bold text-white">
             Start your website today
 					</h3>
-          <p className="mb-4">No coding. No hassle. Just results</p>
+          <p className="mb-4 text-white">No coding. No hassle. Just results.</p>
           <Link
             href="/editor"
-            className="w-full sm:w-auto bg-gray-800 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 text-white rounded-lg inline-flex items-center justify-center px-4 py-2.5 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700"
+            className="w-full sm:w-auto bg-[#f08700] hover:bg-[#d67500] focus:ring-4 focus:outline-none focus:ring-orange-300 text-white rounded-xl inline-flex items-center justify-center px-6 py-4 shadow-[0_0_15px_5px_rgba(240,135,0,0.6)] hover:shadow-[0_0_20px_7px_rgba(240,135,0,0.8)] transition-all"
           >
             <div className="text-left rtl:text-right">
-              <div className="-mt-1 font-sans text-sm font-semibold">
+              <div className="-mt-1 font-sans text-lg font-semibold">
                 Create my site now
               </div>
             </div>
