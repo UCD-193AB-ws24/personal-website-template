@@ -12,7 +12,7 @@ export async function GET() {
 	}
 
 	try {
-		const userDoc = await db.collection('users').doc(user?.uid!).get();
+		const userDoc = await db.collection('users').doc(user.uid).get();
 		if (userDoc.exists) {
 			return NextResponse.json<APIResponse<string>>({
 				success: true,
