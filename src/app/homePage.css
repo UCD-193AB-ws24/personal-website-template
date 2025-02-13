@@ -2,7 +2,7 @@
 
 .perspective-text {
   color: white;
-  font-family: Arial;
+  font-family: Arial; 
   letter-spacing: -2px;
   text-transform: uppercase;
 }
@@ -36,21 +36,24 @@
 .perspective-line:nth-child(2) {
   left: 58px;
   /* background: #84cdfa; */
-  background: rgb(200,200,200);
+  /* background: rgb(200,200,200); */
+  background: #f08700;
   font-weight: 500;
 }
 
 .perspective-line:nth-child(3) {
   left: 87px;
   /* background: #5ad1cd; */
-  background: rgb(215,215,215);
+  /* background: rgb(215,215,215); */
+  background: #d67500;
   font-weight: 500;
 }
 
 .perspective-line:nth-child(4) {
   left: 116px;
   /* background: #f07e6e; */
-  background: rgb(230,230,230);
+  /* background: rgb(230,230,230);*/
+  background: #f08700;
   font-weight: 500;
 }
 
