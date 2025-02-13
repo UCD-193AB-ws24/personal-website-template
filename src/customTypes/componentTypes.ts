@@ -22,5 +22,7 @@ export interface ComponentItem {
     newPos: { x: number; y: number },
     newSize: { width: number; height: number }
   ) => void;
+  isActive?: boolean
+  onMouseDown?: any
 }
 

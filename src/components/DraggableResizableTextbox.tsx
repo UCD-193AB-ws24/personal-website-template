@@ -12,6 +12,8 @@ interface DraggableResizableTextboxProps {
   initialSize?: { width: number; height: number };
   components?: ComponentItem[];
   updateComponent?: (id: string, newPos: { x: number; y: number }, newSize: { width: number; height: number }) => void;
+  isActive?: boolean;
+  onMouseDown?: () => void;
 }
 
 export default function DraggableResizableTextbox({
@@ -21,9 +23,17 @@ export default function DraggableResizableTextbox({
   initialSize = { width: 200, height: 50 },
   components = [],
   updateComponent = () => { },
+  isActive = true,
+  onMouseDown: onMouseDown = () => { },
 }: DraggableResizableTextboxProps) {
   const [position, setPosition] = useState({ x: initialX, y: initialY });
   const [size, setSize] = useState(initialSize);
+
+  const handleMouseDown = (e: MouseEvent) => {
+    e.stopPropagation();
+    onMouseDown();
+  };
+
 
   return (
     <Rnd
@@ -34,12 +44,20 @@ export default function DraggableResizableTextbox({
       minWidth={100}
       minHeight={50}
       bounds="parent"
-      className="border-2 border-blue-500 bg-gray-100 shadow-md p-2"
+      onMouseDown={handleMouseDown}
+      style={{ pointerEvents: 'auto' }}
     >
-      <textarea
-        className="overflow-hidden w-full h-full resize-none border-none outline-none bg-transparent p-2 text-lg"
-        placeholder="Type here..."
-      />
+      <div
+        className={`p-2 w-full h-full transition-all duration-150 ease-in-out border-2 ${isActive
+          ? 'border-blue-500 bg-gray-100 shadow-md outline-none'
+          : 'border-transparent bg-transparent outline-none hover:outline-2 hover:outline-gray-300'
+          }`}
+      >
+        <textarea
+          className={`overflow-hidden w-full h-full resize-none border-none outline-none bg-transparent p-2 text-lg`}
+          placeholder="Type here..."
+        />
+      </div>
     </Rnd>
   );
 }

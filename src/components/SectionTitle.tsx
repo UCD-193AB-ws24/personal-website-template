@@ -12,6 +12,8 @@ interface SectionTitleProps {
   initialSize?: { width: number; height: number };
   components?: ComponentItem[];
   updateComponent?: (id: string, newPos: { x: number; y: number }, newSize: { width: number; height: number }) => void;
+  isActive?: boolean;
+  onMouseDown?: () => void;
 }
 
 export default function SectionTitleTextbox({
@@ -21,10 +23,17 @@ export default function SectionTitleTextbox({
   initialSize = { width: 350, height: 25 },
   components = [],
   updateComponent = () => { },
+  isActive = true,
+  onMouseDown: onMouseDown = () => { },
 }: SectionTitleProps) {
   const [position, setPosition] = useState({ x: initialX, y: initialY });
   const [size, setSize] = useState(initialSize);
   const [text, setText] = useState("Type section title here...");
+
+  const handleMouseDown = (e: MouseEvent) => {
+    e.stopPropagation();
+    onMouseDown();
+  };
 
   return (
     <Rnd
@@ -36,16 +45,26 @@ export default function SectionTitleTextbox({
       minWidth={100}
       minHeight={50}
       bounds="parent"
-      className="border-2 border-blue-500 bg-gray-100 shadow-md p-2 flex items-center justify-center"
+      onMouseDown={(e: MouseEvent) => {
+        handleMouseDown(e);
+      }}
+      style={{ pointerEvents: 'auto' }}
     >
-      <h1
-        contentEditable
-        suppressContentEditableWarning
-        className="overflow-hidden w-full h-full text-black text-2xl font-bold outline-none cursor-text"
-        onBlur={(e) => setText(e.currentTarget.innerText)}
+      <div
+        className={`p-2 w-full h-full flex items-center justify-center transition-all duration-150 ease-in-out border-2 ${isActive
+            ? 'border-blue-500 bg-gray-100 shadow-md outline-none'
+            : 'border-transparent bg-transparent outline-none hover:outline-2 hover:outline-gray-300'
+          }`}
       >
-        {text}
-      </h1>
+        <h1
+          contentEditable
+          suppressContentEditableWarning
+          className="overflow-hidden w-full h-full text-black text-2xl font-bold outline-none cursor-text"
+          onBlur={(e) => setText(e.currentTarget.innerText)}
+        >
+          {text}
+        </h1>
+      </div>
     </Rnd>
   );
 }
