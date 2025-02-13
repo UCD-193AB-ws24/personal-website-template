@@ -22,7 +22,8 @@
       "@components/*": ["./src/components/*"],
       "@utils/*": ["./src/utils/*"],
       "@customTypes/*": ["./src/customTypes/*"],
-      "@firebase/*": ["./src/firebase/*"]
+      "@firebase/*": ["./src/lib/firebase/*"],
+      "@css/*": ["./src/css/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
