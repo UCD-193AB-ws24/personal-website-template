@@ -1,18 +1,33 @@
 import { useDroppable } from '@dnd-kit/core';
+import { forwardRef, Ref } from 'react';
 
-export default function EditorDropZone({ children, onClick }: { children: React.ReactNode, onClick: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void }) {
-  const { setNodeRef, isOver } = useDroppable({
-    id: 'editor-drop-zone'
-  });
+function EditorDropZone(
+  { children, onClick, style }: {
+    children: React.ReactNode;
+    onClick: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+    style?: React.CSSProperties;
+  },
+  ref: Ref<HTMLDivElement>
+) {
+  const { setNodeRef, isOver } = useDroppable({ id: 'editor-drop-zone' });
 
   return (
     <div
-      ref={setNodeRef}
+      ref={(node) => {
+        setNodeRef(node); // Set dnd-kit ref
+        if (typeof ref === 'function') {
+          ref(node);
+        } else if (ref && node) {
+          (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+        }
+      }}
       onMouseDown={onClick}
-      className={`overflow-hidden flex-1 p-4 relative ${isOver ? 'bg-white' : 'bg-white'}`}
+      className={`overflow-hidden w-full p-4 relative transition-all duration-300 ${isOver ? 'bg-gray-100' : 'bg-white'}`}
+      style={style}
     >
       {children}
     </div>
   );
-};
+}
 
+export default forwardRef(EditorDropZone);

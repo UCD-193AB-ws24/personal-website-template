@@ -22,7 +22,7 @@ export default function Sidebar() {
   const toggleSidebar = () => setCollapsed(!collapsed);
 
   return (
-    <div className={`flex ${collapsed ? 'w-12' : 'w-64'} bg-gray-100 h-screen relative transition-width duration-300`}>
+    <div className={`flex ${collapsed ? 'w-12' : 'w-64'} bg-gray-100 h-screen sticky top-0 transition-width duration-300`}>
       {!collapsed && (
         <div className="overflow-scroll w-64 bg-gray-100 p-4 border-r h-screen">
           <h2 className="text-lg font-bold mb-4">Components</h2>

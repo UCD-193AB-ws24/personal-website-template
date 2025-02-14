@@ -14,6 +14,7 @@ interface DraggableResizableTextboxProps {
   updateComponent?: (id: string, newPos: Position, newSize: Size, content?: any) => void;
   isActive?: boolean;
   onMouseDown?: () => void;
+  setIsDragging?: (dragging: boolean) => void;
 }
 
 export default function DraggableResizableTextbox({
@@ -25,6 +26,7 @@ export default function DraggableResizableTextbox({
   updateComponent = () => { },
   isActive = true,
   onMouseDown: onMouseDown = () => { },
+  setIsDragging = () => { }
 }: DraggableResizableTextboxProps) {
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
@@ -42,8 +44,16 @@ export default function DraggableResizableTextbox({
     <Rnd
       size={{ width: size.width, height: size.height }}
       position={{ x: position.x, y: position.y }}
-      onDragStop={handleDragStop(id, size, components, updateComponent, setPosition)}
-      onResizeStop={handleResizeStop(id, components, updateComponent, setSize, setPosition)}
+      onDragStart={() => setIsDragging(true)}
+      onDragStop={(e, d) => {
+        setIsDragging(false);
+        handleDragStop(id, size, components, updateComponent, setPosition)(e, d);
+      }}
+      onResizeStart={() => setIsDragging(true)}
+      onResizeStop={(e, d, ref, delta, newPosition) => {
+        setIsDragging(false);
+        handleResizeStop(id, components, updateComponent, setSize, setPosition)(e, d, ref, delta, newPosition);
+      }}
       minWidth={100}
       minHeight={50}
       bounds="parent"

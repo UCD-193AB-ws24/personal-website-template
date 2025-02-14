@@ -11,7 +11,6 @@ export const handleDragStop = (
   updateComponent: (id: string, newPos: Position, newSize: Size, content?: any) => void,
   setPosition: (pos: { x: number; y: number }) => void
 ) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (e: any, d: DraggableData) => {
     const newPos = findBestFreeSpot({ x: d.x, y: d.y }, size, components, id);
     console.log(newPos)
