@@ -1,3 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Iceland&display=swap');
+
+.iceland-font {
+  font-family: 'Iceland', sans-serif;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -35,7 +41,3 @@ body::before {
   background-blend-mode: normal, multiply, multiply;
   z-index: -1;
 }
-
-
-
-
