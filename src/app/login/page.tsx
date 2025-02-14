@@ -1,3 +1,4 @@
+import logo from "@public/logo.png"
 import "@css/authentication.css"
 import Link from "next/link";
 import Image from "next/image";
@@ -12,7 +13,7 @@ export default function LogIn() {
                 <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
                     <a href=".." className="flex items-center space-x-3 rtl:space-x-reverse">
 
-                        <Image src="logo.png" className="h-8" alt="Profesite Logo" />
+                        <Image src={logo} width={32} height={32} className="h-8" alt="Profesite Logo" />
 
                         <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Profesite</span>
                     </a>

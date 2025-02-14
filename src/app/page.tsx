@@ -3,6 +3,7 @@
 import "./homePage.css"
 import Link from 'next/link';
 import Image from 'next/image';
+import logo from "../../public/logo.png"
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@firebase/firebaseApp"
 import { signUserOut } from "@firebase/auth"
@@ -64,7 +65,9 @@ export default function Home() {
 							className="flex items-center space-x-3 rtl:space-x-reverse"
 						>
 							<Image
-								src="logo.png"
+								src={logo}
+                width={32}
+                height={32}
 								className="h-8"
 								alt="Profesite Logo"
 							/>

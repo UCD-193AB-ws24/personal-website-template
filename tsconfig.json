@@ -23,7 +23,8 @@
       "@utils/*": ["./src/utils/*"],
       "@customTypes/*": ["./src/customTypes/*"],
       "@firebase/*": ["./src/lib/firebase/*"],
-      "@css/*": ["./src/css/*"]
+      "@css/*": ["./src/css/*"],
+      "@public/*": ["./public/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
