@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DndContext, DragOverlay, DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import { restrictToWindowEdges } from '@dnd-kit/modifiers';
 import { XIcon } from "lucide-react";
@@ -19,6 +19,28 @@ export default function Editor() {
   const [components, setComponents] = useState<ComponentItem[]>([]);
   const [activeComponent, setActiveComponent] = useState<ComponentItem | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+
+  useEffect(() => {
+    fetchSavedComponents().then((res) => {
+      return res.json();
+    }).then((res) => {
+      const savedComponents: ComponentItem[] = [];
+      res.data.forEach((c: ComponentItem) => {
+        savedComponents.push(c);
+      })
+      setComponents(savedComponents);
+    }).catch((err) => {
+      console.log("error:", err);
+    })
+  }, []);
+
+  const fetchSavedComponents = () => {
+    return Promise.resolve(fetch("/api/db/drafts?draftNumber=1", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }));
+  }
 
   const handleBackgroundClick = (e: React.MouseEvent<HTMLDivElement>) => {
     // Only clear active if the background (drop zone) was clicked
@@ -107,10 +129,10 @@ export default function Editor() {
       <Component
         key={comp.id}
         id={comp.id}
-        initialX={comp.position.x}
-        initialY={comp.position.y}
+        initialPos={comp.position}
         initialSize={comp.size}
         components={components}
+        content={comp?.content}
         updateComponent={updateComponent}
         isActive={activeComponent?.id === comp.id}
         onMouseDown={() => handleComponentSelect(comp)}
@@ -118,6 +140,8 @@ export default function Editor() {
       />
     ) : null;
   };
+
+
 
   return (
     <DndContext

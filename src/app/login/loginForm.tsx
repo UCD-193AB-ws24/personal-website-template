@@ -1,6 +1,6 @@
 'use client'
 
-import "../css/authentication.css"
+import "@css/authentication.css"
 import Link from "next/link";
 import { signInWithGoogle, signInWithEmail } from "@firebase/auth"
 import { useState } from "react"
@@ -17,45 +17,23 @@ export default function LogInForm() {
 
   const handleSignIn = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
-    setError("");
-    setSuccess(false);
 
-    try {
-      await signInWithEmail(email, password);
-      setSuccess(true);
-      setEmail("");
-      setPassword("");
-      router.push("/");
-
-    } catch (err) {
-      setSuccess(false);
-      if (err instanceof Error) {
-        setError(err.message); 
-      } else {
-        setError("An unknown error occurred.");
-      }
+    const response = await signInWithEmail(email, password);
+    if (response.success === true) {
+      router.push("/")
+      return;
+    } else {
+      setError(response.error);
     }
   };
 
   const handleSignInWithGoogle = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
-    setError("");
-    setSuccess(false);
 
-    try {
-      await signInWithGoogle();
-      setSuccess(true);
-      setEmail("");
-      setPassword("");
-      router.push("/");
-
-    } catch (err) {
-      setSuccess(false);
-      if (err instanceof Error) {
-        setError(err.message); 
-      } else {
-        setError("An unknown error occurred.");
-      }
+    const isOk = await signInWithGoogle();
+    if (isOk) {
+      router.push("/")
+      return;
     }
   };
 

@@ -13,8 +13,7 @@ export interface ComponentItem {
   type: string;
   position: Position;
   size: Size;
-  initialX?: number;
-  initialY?: number;
+  initialPos?: Position;
   initialSize?: Size;
   components?: ComponentItem[];
   updateComponent?: (
@@ -25,5 +24,6 @@ export interface ComponentItem {
   isActive?: boolean
   onMouseDown?: any
   setIsDragging?: (dragging: boolean) => void;
+  content?: any
 }
 
