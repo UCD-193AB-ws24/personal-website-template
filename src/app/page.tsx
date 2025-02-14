@@ -2,15 +2,12 @@
 
 import "./homePage.css"
 import Link from 'next/link';
-import Image from 'next/image';
-import logo from "@public/logo.png"
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@firebase/firebaseApp"
 import { signUserOut } from "@firebase/auth"
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { APIResponse } from "@customTypes/apiResponse";
-
 import Navbar from "@components/Navbar"
 
 
