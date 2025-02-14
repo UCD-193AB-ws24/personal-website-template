@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { DndContext, DragOverlay, DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import { restrictToWindowEdges } from '@dnd-kit/modifiers';
+import { XIcon } from "lucide-react";
 
 import EditorDropZone from '@components/EditorDropZone';
 import Sidebar from '@components/sidebar/Sidebar';
@@ -16,17 +17,18 @@ import { findBestFreeSpot } from '@utils/collisionUtils';
 
 export default function Editor() {
   const [components, setComponents] = useState<ComponentItem[]>([]);
-  const [activeComponent, setActiveComponent] = useState<{ id: string | null, type: string | null }>({ id: null, type: null });
+  const [activeComponent, setActiveComponent] = useState<ComponentItem | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   const handleBackgroundClick = (e: React.MouseEvent<HTMLDivElement>) => {
     // Only clear active if the background (drop zone) was clicked
     if (e.target === e.currentTarget) {
-      setActiveComponent({ id: null, type: null });
+      setActiveComponent(null)
     }
   };
 
-  const handleComponentSelect = (id: string, type: string) => {
-    setActiveComponent({ id, type });
+  const handleComponentSelect = (component: ComponentItem) => {
+    setActiveComponent(component);
   };
 
 
@@ -40,26 +42,45 @@ export default function Editor() {
     setComponents(prev => [...prev, { id, type, position, size }]);
   };
 
+  const removeComponent = (id: string) => {
+    setComponents(prev => prev.filter(comp => comp.id !== id));
+    setActiveComponent(null);
+  }
+
   const updateComponent = (id: string, position: { x: number; y: number }, size: { width: number; height: number }) => {
-    setComponents(prev => prev.map(comp => comp.id === id ? { ...comp, position, size } : comp));
+    setComponents(prev => prev.map(comp =>
+      comp.id === id ? { ...comp, position, size } : comp
+    ));
+
+    if (activeComponent?.id === id) {
+      setActiveComponent(prev => (prev ? { ...prev, position, size } : null));
+    }
   };
+
 
   const handleDragStart = ({ active }: DragStartEvent) => {
-    setActiveComponent({ id: String(active.id), type: active.data?.current?.type || null });
+    setIsDragging(true);
+    const id = String(active.id);
+    const type = active.data?.current?.type || null;
+    setActiveComponent({ id, type, position: { x: -1, y: -1 }, size: { width: -1, height: -1 } });
   };
 
+
   const handleDragEnd = ({ active, over }: DragEndEvent) => {
-    if (over?.id === 'editor-drop-zone' && active.rect.current.translated && activeComponent.id && activeComponent.type) {
+    setIsDragging(false);
+    if (!activeComponent) return;
+    if (over?.id === 'editor-drop-zone' && active.rect.current.translated) {
       const editorBounds = over.rect;
       const draggedRect = active.rect.current.translated as DOMRect;
 
       const dropX = Math.max(0, Math.min(draggedRect.left - editorBounds.left, editorBounds.width - draggedRect.width));
       const dropY = Math.max(0, Math.min(draggedRect.top - editorBounds.top, editorBounds.height - draggedRect.height));
 
-      const newSize = { width: draggedRect.width, height: draggedRect.height }
+      const newSize = { width: draggedRect.width, height: draggedRect.height };
       const newPos = findBestFreeSpot({ x: dropX, y: dropY }, newSize, components, activeComponent.id);
 
       addComponent(activeComponent.type, newPos, activeComponent.id);
+      setActiveComponent({ ...activeComponent, position: newPos, size: newSize });
     }
   };
 
@@ -91,8 +112,9 @@ export default function Editor() {
         initialSize={comp.size}
         components={components}
         updateComponent={updateComponent}
-        isActive={activeComponent.id === comp.id}
-        onMouseDown={() => handleComponentSelect(comp.id, comp.type)}
+        isActive={activeComponent?.id === comp.id}
+        onMouseDown={() => handleComponentSelect(comp)}
+        setIsDragging={setIsDragging}
       />
     ) : null;
   };
@@ -114,10 +136,33 @@ export default function Editor() {
           ) : (
             components.map(renderComponent)
           )}
+
+          {activeComponent && !isDragging && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                removeComponent(activeComponent.id);
+              }}
+              style={{
+                position: "absolute",
+                top: activeComponent.position.y < 40
+                  ? `${activeComponent.position.y + activeComponent.size.height + 15}px`
+                  : `${activeComponent.position.y - 25}px`,
+                left: `${activeComponent.position.x + activeComponent.size.width - 20}px`,
+                zIndex: 10,
+                pointerEvents: "auto",
+                transition: "opacity 0.2s ease-in-out, transform 0.1s",
+              }}
+              className="w-6 h-6 bg-red-500 text-white rounded shadow-md hover:bg-red-600 hover:scale-110 flex items-center justify-center"
+            >
+              <XIcon size={32} />
+            </button>
+          )}
+
         </EditorDropZone>
       </div>
       <DragOverlay>
-        {renderOverlayContent(activeComponent.type)}
+        {renderOverlayContent(activeComponent?.type || null)}
       </DragOverlay>
     </DndContext>
   );

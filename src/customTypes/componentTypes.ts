@@ -24,5 +24,6 @@ export interface ComponentItem {
   ) => void;
   isActive?: boolean
   onMouseDown?: any
+  setIsDragging?: (dragging: boolean) => void;
 }
 

@@ -14,6 +14,7 @@ interface SectionTitleProps {
   updateComponent?: (id: string, newPos: { x: number; y: number }, newSize: { width: number; height: number }) => void;
   isActive?: boolean;
   onMouseDown?: () => void;
+  setIsDragging?: (dragging: boolean) => void;
 }
 
 export default function SectionTitleTextbox({
@@ -25,6 +26,7 @@ export default function SectionTitleTextbox({
   updateComponent = () => { },
   isActive = true,
   onMouseDown: onMouseDown = () => { },
+  setIsDragging = () => { }
 }: SectionTitleProps) {
   const [position, setPosition] = useState({ x: initialX, y: initialY });
   const [size, setSize] = useState(initialSize);
@@ -39,8 +41,16 @@ export default function SectionTitleTextbox({
     <Rnd
       size={{ width: size.width, height: size.height }}
       position={{ x: position.x, y: position.y }}
-      onDragStop={handleDragStop(id, size, components, updateComponent, setPosition)}
-      onResizeStop={handleResizeStop(id, components, updateComponent, setSize, setPosition)}
+      onDragStart={() => setIsDragging(true)}
+      onDragStop={(e, d) => {
+        setIsDragging(false);
+        handleDragStop(id, size, components, updateComponent, setPosition)(e, d);
+      }}
+      onResizeStart={() => setIsDragging(true)}
+      onResizeStop={(e, d, ref, delta, newPosition) => {
+        setIsDragging(false);
+        handleResizeStop(id, components, updateComponent, setSize, setPosition)(e, d, ref, delta, newPosition);
+      }}
       enableResizing={{ top: false, right: true, bottom: false, left: true, topRight: false, bottomRight: false, bottomLeft: false, topLeft: false }}
       minWidth={100}
       minHeight={50}
