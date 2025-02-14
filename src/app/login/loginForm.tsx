@@ -1,7 +1,7 @@
 'use client'
 
 import Image from "next/image";
-import googleLogo from "../../../public/googlelogo.png";
+import googleLogo from "@public/googlelogo.png";
 import "@css/authentication.css"
 import Link from "next/link";
 import { signInWithGoogle, signInWithEmail } from "@firebase/auth"

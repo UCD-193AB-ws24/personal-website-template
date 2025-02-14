@@ -3,7 +3,7 @@
 import "./homePage.css"
 import Link from 'next/link';
 import Image from 'next/image';
-import logo from "../../public/logo.png"
+import logo from "@public/logo.png"
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@firebase/firebaseApp"
 import { signUserOut } from "@firebase/auth"
