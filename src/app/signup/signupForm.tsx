@@ -21,8 +21,12 @@ export default function SignUpForm() {
     setSuccess(false);
 
     try {
-      await signUpWithEmail(email, username, password);
-      setSuccess(true);
+      const isOk = await signUpWithEmail(email, username, password);
+      setSuccess(isOk);
+      if (!isOk) {
+        throw new Error("Unsuccessful sign up attempt.");
+      }
+
       setEmail("");
       setPassword("");
       setUsername("");

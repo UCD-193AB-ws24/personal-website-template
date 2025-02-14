@@ -5,13 +5,12 @@ import { db, getCurrentUser } from '@firebase/firebaseAdmin';
 // GET /api/user/username
 // Returns the current signed in user's username
 export async function GET() {
-	const user = await getCurrentUser();
-	if (user === null) {
-		console.log('No current user');
-		return null;
-	}
-
 	try {
+		const user = await getCurrentUser();
+		if (user === null) {
+			throw new Error("User not found");
+		}
+
 		const userDoc = await db.collection('users').doc(user.uid).get();
 		if (userDoc.exists) {
 			return NextResponse.json<APIResponse<string>>({

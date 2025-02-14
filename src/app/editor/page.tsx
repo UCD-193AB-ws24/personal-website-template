@@ -8,22 +8,25 @@ import EditorDropZone from '@components/EditorDropZone';
 import Sidebar from '@components/sidebar/Sidebar';
 import DraggableResizableTextbox from '@components/DraggableResizableTextbox';
 import SectionTitleTextbox from '@components/SectionTitle';
+import LoadingSpinner from '@components/LoadingSpinner';
 
-import type { ComponentItem } from '@customTypes/componentTypes';
+import type { ComponentItem, Position, Size } from '@customTypes/componentTypes';
 
 import { findBestFreeSpot } from '@utils/collisionUtils';
+import { APIResponse } from '@customTypes/apiResponse';
 import { useSearchParams } from 'next/navigation';
 
 
 export default function Editor() {
   const [components, setComponents] = useState<ComponentItem[]>([]);
   const [activeComponent, setActiveComponent] = useState<{ id: string | null, type: string | null }>({ id: null, type: null });
+  const [isLoading, setIsLoading] = useState(true);
 
   const searchParams = useSearchParams();
   const draftNumber = searchParams.get("draftNumber");
 
   useEffect(() => {
-    if (draftNumber && draftNumber != "-1") {
+    if (draftNumber) {
       fetchSavedComponents(draftNumber as string).then((res) => {
         return res.json();
       }).then((res) => {
@@ -32,18 +35,51 @@ export default function Editor() {
           savedComponents.push(c);
         })
         setComponents(savedComponents);
-      }).catch((err) => {
-        console.log("error:", err);
+        setIsLoading(false);
+    }).catch((error: any) => {
+        console.log("error:", error.message);
+        setIsLoading(false);
       })
+    } else{
+      setIsLoading(false)
     }
   }, [draftNumber]);
 
   const fetchSavedComponents = (draftNumber: string | string[]) => {
+    setIsLoading(true);
+
     return Promise.resolve(fetch("/api/db/drafts?draftNumber=" + draftNumber, {
       headers: {
         "Content-Type": "application/json",
       },
     }));
+  }
+
+  const saveComponents = async () => {
+    setIsLoading(true);
+
+    try {
+      const res = await fetch("/api/db/drafts?draftNumber=1", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          components: components
+        }),
+      });
+      const resBody = await res.json() as APIResponse<string>;
+      
+      if (res.ok && resBody.success) {
+        setIsLoading(false);
+        return
+      }
+
+      throw new Error("Bad request");
+    } catch (error: any) {
+      console.log("error:", error.message)
+      setIsLoading(false);
+    }
   }
 
   const handleBackgroundClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -69,8 +105,12 @@ export default function Editor() {
   };
 
   // Updates a component's position and size, given by their id
-  const updateComponent = (id: string, position: { x: number; y: number }, size: { width: number; height: number }) => {
-    setComponents(prev => prev.map(comp => comp.id === id ? { ...comp, position, size } : comp));
+  const updateComponent = (id: string, position: Position, size: Size, content?: any) => {
+    if (content) {
+      setComponents(prev => prev.map(comp => comp.id === id ? { ...comp, position, size, content } : comp));
+    } else {
+      setComponents(prev => prev.map(comp => comp.id === id ? { ...comp, position, size } : comp));
+    }
   };
 
   const handleDragStart = ({ active }: DragStartEvent) => {
@@ -126,8 +166,6 @@ export default function Editor() {
     ) : null;
   };
 
-
-
   return (
     <DndContext
       modifiers={[restrictToWindowEdges]}
@@ -136,9 +174,12 @@ export default function Editor() {
     >
       <div className="flex h-screen text-black">
         <Sidebar />
+        <button className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-full" style={{position: "fixed", bottom: "20px", right: "20px", zIndex: "10"}} onClick={saveComponents}>Save</button>
+
+        <LoadingSpinner show={isLoading} />
 
         <EditorDropZone onClick={handleBackgroundClick}>
-          {components.length === 0 ? (
+          {!isLoading && components.length === 0 ? (
             <h1 className="text-2xl font-bold mb-4 text-gray-400 text-center mt-20">
               Drag components here to start building your site!
             </h1>

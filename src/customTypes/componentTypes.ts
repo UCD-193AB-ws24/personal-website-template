@@ -19,7 +19,8 @@ export interface ComponentItem {
   updateComponent?: (
     id: string,
     newPos: { x: number; y: number },
-    newSize: { width: number; height: number }
+    newSize: { width: number; height: number },
+    content?: any
   ) => void;
   isActive?: boolean
   onMouseDown?: any
