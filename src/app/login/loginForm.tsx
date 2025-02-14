@@ -4,7 +4,7 @@ import Image from "next/image";
 import googleLogo from "@public/googlelogo.png";
 import "@css/authentication.css"
 import Link from "next/link";
-import { signInWithGoogle, signInWithEmail } from "@firebase/auth"
+import { signInWithGoogle, signInWithEmail } from "@lib/firebase/auth"
 import { useState } from "react"
 import { useRouter } from "next/navigation";
 
@@ -48,20 +48,20 @@ export default function LogInForm() {
 
       <div className="center flex flex-col gap-4 mt-5 max-w-md mx-auto bg-gray-900 p-10 rounded-lg">
         <form className="grid gap-4" onSubmit={handleSignIn}>
-          <input 
-            type="email" 
-            placeholder="Email" 
-            value={email} 
-            onChange={(e) => setEmail(e.target.value)} 
-            required 
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
             className="p-2 border rounded w-full"
           />
-          <input 
-            type="password" 
-            placeholder="Password" 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)} 
-            required 
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
             className="p-2 border rounded w-full"
           />
           <button type="submit" className="relative w-full px-6 py-4 font-semibold text-white bg-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#d67500] hover:border-[#d67500] shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50">
@@ -78,8 +78,8 @@ export default function LogInForm() {
 
         {/* Google Sign-In Button */}
         <div className="flex flex-col items-center gap-2 mt-4">
-          <button 
-            onClick={handleSignInWithGoogle} 
+          <button
+            onClick={handleSignInWithGoogle}
            className="flex items-center w-full max-w-xs px-4 py-3 bg-white border border-gray-300 rounded-md shadow-md transition duration-300 hover:bg-gray-100 focus:outline-none"
           >
            <img src="googlelogo.png" alt="Google logo" className="w-6 h-6 mr-3" />
@@ -88,7 +88,7 @@ export default function LogInForm() {
         </div>
 
         {/* Horizontal Divider & Text */}
-          <div className="relative flex items-center my-6"> 
+          <div className="relative flex items-center my-6">
             <hr className="w-full border-gray-600" />
             <span className="absolute left-1/2 -translate-x-1/2 bg-gray-900 px-4 py-1 text-gray-400 text-sm">
               Don&apos;t have an account?
