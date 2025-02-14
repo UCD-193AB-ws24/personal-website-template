@@ -12,28 +12,34 @@ import SectionTitleTextbox from '@components/SectionTitle';
 import type { ComponentItem } from '@customTypes/componentTypes';
 
 import { findBestFreeSpot } from '@utils/collisionUtils';
+import { useSearchParams } from 'next/navigation';
 
 
 export default function Editor() {
   const [components, setComponents] = useState<ComponentItem[]>([]);
   const [activeComponent, setActiveComponent] = useState<{ id: string | null, type: string | null }>({ id: null, type: null });
 
-  useEffect(() => {
-    fetchSavedComponents().then((res) => {
-      return res.json();
-    }).then((res) => {
-      const savedComponents: ComponentItem[] = [];
-      res.data.forEach((c: ComponentItem) => {
-        savedComponents.push(c);
-      })
-      setComponents(savedComponents);
-    }).catch((err) => {
-      console.log("error:", err);
-    })
-  }, []);
+  const searchParams = useSearchParams();
+  const draftNumber = searchParams.get("draftNumber");
 
-  const fetchSavedComponents = () => {
-    return Promise.resolve(fetch("/api/db/drafts?draftNumber=1", {
+  useEffect(() => {
+    if (draftNumber && draftNumber != "-1") {
+      fetchSavedComponents(draftNumber as string).then((res) => {
+        return res.json();
+      }).then((res) => {
+        const savedComponents: ComponentItem[] = [];
+        res.data.forEach((c: ComponentItem) => {
+          savedComponents.push(c);
+        })
+        setComponents(savedComponents);
+      }).catch((err) => {
+        console.log("error:", err);
+      })
+    }
+  }, [draftNumber]);
+
+  const fetchSavedComponents = (draftNumber: string | string[]) => {
+    return Promise.resolve(fetch("/api/db/drafts?draftNumber=" + draftNumber, {
       headers: {
         "Content-Type": "application/json",
       },
