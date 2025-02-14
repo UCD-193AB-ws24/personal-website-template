@@ -22,13 +22,19 @@ export default function Editor() {
   const [components, setComponents] = useState<ComponentItem[]>([]);
   const [activeComponent, setActiveComponent] = useState<ComponentItem | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [editorHeight, setEditorHeight] = useState(window.innerHeight);
+  const [editorHeight, setEditorHeight] = useState(0);
   const editorRef = useRef<HTMLDivElement>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const searchParams = useSearchParams();
   const draftNumber = searchParams.get("draftNumber");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setEditorHeight(window.innerHeight);
+    }
+  }, []);
 
   useEffect(() => {
     if (draftNumber) {
@@ -41,11 +47,11 @@ export default function Editor() {
         })
         setComponents(savedComponents);
         setIsLoading(false);
-    }).catch((error: any) => {
+      }).catch((error: any) => {
         console.log("error:", error.message);
         setIsLoading(false);
       })
-    } else{
+    } else {
       setIsLoading(false)
     }
   }, [draftNumber]);
@@ -83,7 +89,7 @@ export default function Editor() {
         }),
       });
       const resBody = await res.json() as APIResponse<string>;
-      
+
       if (res.ok && resBody.success) {
         setIsLoading(false);
         return
@@ -128,12 +134,12 @@ export default function Editor() {
       setComponents(prev => prev.map(comp => comp.id === id ? { ...comp, position, size, content } : comp));
     } else {
       setComponents(prev => prev.map(comp =>
-      comp.id === id ? { ...comp, position, size } : comp
-    ));
+        comp.id === id ? { ...comp, position, size } : comp
+      ));
 
-    if (activeComponent?.id === id) {
-      setActiveComponent(prev => (prev ? { ...prev, position, size } : null));
-    }
+      if (activeComponent?.id === id) {
+        setActiveComponent(prev => (prev ? { ...prev, position, size } : null));
+      }
     }
   };
 
@@ -222,7 +228,7 @@ export default function Editor() {
     >
       <div className="flex text-black">
         <Sidebar />
-        <button className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-full" style={{position: "fixed", bottom: "20px", right: "20px", zIndex: "10"}} onClick={saveComponents}>Save</button>
+        <button className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-full" style={{ position: "fixed", bottom: "20px", right: "20px", zIndex: "10" }} onClick={saveComponents}>Save</button>
 
         <LoadingSpinner show={isLoading} />
 
