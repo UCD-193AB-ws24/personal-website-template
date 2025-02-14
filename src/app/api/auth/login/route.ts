@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
-import { createSessionCookie } from '@firebase/firebaseAdmin';
+import { createSessionCookie } from '@lib/firebase/firebaseAdmin';
 import { APIResponse } from '@customTypes/apiResponse';
 
 // POST /api/auth/login:
