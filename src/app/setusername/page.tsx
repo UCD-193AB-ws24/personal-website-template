@@ -1,11 +1,9 @@
 'use client'
 
 import "@css/authentication.css"
-import Link from "next/link";
 import { setUsername} from "@firebase/auth"
 import { useState } from "react"
 import { useRouter } from "next/navigation";
-
 import Navbar from "@components/Navbar"
 
 

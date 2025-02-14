@@ -38,6 +38,13 @@ export const signUpWithEmail = async (email: string, username: string, password:
       body: JSON.stringify({ idToken })
     });
 
+    const resBody = (await response.json()) as APIResponse<string>;
+
+    if (response.ok && resBody.success) {
+      return true;
+    }
+    return false;
+
   } catch (error: any) {
     console.log("Error signing up:", error.message);
     throw error;

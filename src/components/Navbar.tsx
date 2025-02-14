@@ -1,4 +1,6 @@
 import Link from "next/link";
+import logo from "@public/logo.png"
+import Image from "next/image";
 
 interface NavLink {
   label: string;
@@ -17,7 +19,13 @@ const Navbar: React.FC<NavbarProps> = ({ user, onSignOut, logoHref = "/", navLin
     <nav className="border-[#00f2ff] bg-gray-900 overflow-hidden top-0 left-0 w-full z-50">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
         <a href={logoHref} className="flex items-center space-x-3 rtl:space-x-reverse">
-          <img src="logo.png" className="h-8" alt="Profesite Logo" />
+          <Image
+								src={logo}
+                width={32}
+                height={32}
+								className="h-8"
+								alt="Profesite Logo"
+					/>
           <span className="self-center text-4xl font-light tracking-wide whitespace-nowrap text-white iceland-font">
             PROFESITE
           </span>

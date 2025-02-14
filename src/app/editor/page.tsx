@@ -9,10 +9,12 @@ import EditorDropZone from '@components/EditorDropZone';
 import Sidebar from '@components/sidebar/Sidebar';
 import DraggableResizableTextbox from '@components/DraggableResizableTextbox';
 import SectionTitleTextbox from '@components/SectionTitle';
+import LoadingSpinner from '@components/LoadingSpinner';
 
-import type { ComponentItem } from '@customTypes/componentTypes';
+import type { ComponentItem, Position, Size } from '@customTypes/componentTypes';
 
 import { findBestFreeSpot } from '@utils/collisionUtils';
+import { APIResponse } from '@customTypes/apiResponse';
 
 
 export default function Editor() {
@@ -22,6 +24,7 @@ export default function Editor() {
   const [editorHeight, setEditorHeight] = useState(window.innerHeight);
   const editorRef = useRef<HTMLDivElement>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetchSavedComponents().then((res) => {
@@ -32,8 +35,10 @@ export default function Editor() {
         savedComponents.push(c);
       })
       setComponents(savedComponents);
-    }).catch((err) => {
-      console.log("error:", err);
+      setIsLoading(false);
+    }).catch((error: any) => {
+      console.log("error:", error.message);
+      setIsLoading(false);
     })
   }, []);
 
@@ -47,11 +52,40 @@ export default function Editor() {
   }, []);
 
   const fetchSavedComponents = () => {
+    setIsLoading(true);
+
     return Promise.resolve(fetch("/api/db/drafts?draftNumber=1", {
       headers: {
         "Content-Type": "application/json",
       },
     }));
+  }
+
+  const saveComponents = async () => {
+    setIsLoading(true);
+
+    try {
+      const res = await fetch("/api/db/drafts?draftNumber=1", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          components: components
+        }),
+      });
+      const resBody = await res.json() as APIResponse<string>;
+      
+      if (res.ok && resBody.success) {
+        setIsLoading(false);
+        return
+      }
+
+      throw new Error("Bad request");
+    } catch (error: any) {
+      console.log("error:", error.message)
+      setIsLoading(false);
+    }
   }
 
   const handleBackgroundClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -81,13 +115,17 @@ export default function Editor() {
     setActiveComponent(null);
   }
 
-  const updateComponent = (id: string, position: { x: number; y: number }, size: { width: number; height: number }) => {
-    setComponents(prev => prev.map(comp =>
+  const updateComponent = (id: string, position: Position, size: Size, content?: any) => {
+    if (content) {
+      setComponents(prev => prev.map(comp => comp.id === id ? { ...comp, position, size, content } : comp));
+    } else {
+      setComponents(prev => prev.map(comp =>
       comp.id === id ? { ...comp, position, size } : comp
     ));
 
     if (activeComponent?.id === id) {
       setActiveComponent(prev => (prev ? { ...prev, position, size } : null));
+    }
     }
   };
 
@@ -167,8 +205,6 @@ export default function Editor() {
     ) : null;
   };
 
-
-
   return (
     <DndContext
       modifiers={[restrictToWindowEdges]}
@@ -178,13 +214,16 @@ export default function Editor() {
     >
       <div className="flex text-black">
         <Sidebar />
+        <button className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-full" style={{position: "fixed", bottom: "20px", right: "20px", zIndex: "10"}} onClick={saveComponents}>Save</button>
+
+        <LoadingSpinner show={isLoading} />
 
         <EditorDropZone
           ref={editorRef}
           onClick={handleBackgroundClick}
           style={{ minHeight: `${editorHeight}px`, height: 'auto' }}
         >
-          {components.length === 0 ? (
+          {!isLoading && components.length === 0 ? (
             <h1 className="text-2xl font-bold mb-4 text-gray-400 text-center mt-20">
               Drag components here to start building your site!
             </h1>

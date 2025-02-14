@@ -8,7 +8,6 @@ import { signUserOut } from "@firebase/auth"
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { APIResponse } from "@customTypes/apiResponse";
-
 import Navbar from "@components/Navbar"
 
 
