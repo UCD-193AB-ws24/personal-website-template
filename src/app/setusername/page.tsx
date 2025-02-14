@@ -1,11 +1,9 @@
 'use client'
 
 import "@css/authentication.css"
-import Link from "next/link";
-import { setUsername} from "@firebase/auth"
+import { setUsername} from "@lib/firebase/auth"
 import { useState } from "react"
 import { useRouter } from "next/navigation";
-
 import Navbar from "@components/Navbar"
 
 
@@ -14,24 +12,24 @@ export default function SetUsername() {
       const [username, setLocalUsername] = useState("");
       const [error, setError] = useState("");
       const [success, setSuccess] = useState(false);
-    
+
       const router = useRouter();
-    
+
       const handleSetUsername = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
         setError("");
         setSuccess(false);
-    
+
         try {
           await setUsername(username);
           setSuccess(true);
           setLocalUsername("");
           router.push("/");
-    
+
         } catch (err) {
           setSuccess(false);
           if (err instanceof Error) {
-            setError(err.message); 
+            setError(err.message);
           } else {
             setError("An unknown error occurred.");
           }
@@ -53,11 +51,11 @@ export default function SetUsername() {
 
         <div className="center flex flex-col gap-4 mt-5 max-w-md mx-auto bg-gray-100 p-10 rounded-lg">
           <form className="grid gap-4" onSubmit={handleSetUsername}>
-              <input 
-                  type="username" 
-                  placeholder="Username" 
-                  value={username} 
-                  onChange={(e) => setLocalUsername(e.target.value)} 
+              <input
+                  type="username"
+                  placeholder="Username"
+                  value={username}
+                  onChange={(e) => setLocalUsername(e.target.value)}
                   required
                   className="p-2 border rounded w-full"
               />

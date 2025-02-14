@@ -13,14 +13,18 @@ export interface ComponentItem {
   type: string;
   position: Position;
   size: Size;
-  initialX?: number;
-  initialY?: number;
+  initialPos?: Position;
   initialSize?: Size;
   components?: ComponentItem[];
   updateComponent?: (
     id: string,
     newPos: { x: number; y: number },
-    newSize: { width: number; height: number }
+    newSize: { width: number; height: number },
+    content?: any
   ) => void;
+  isActive?: boolean
+  onMouseDown?: any
+  setIsDragging?: (dragging: boolean) => void;
+  content?: any
 }
 

@@ -3,12 +3,11 @@
 import "./homePage.css"
 import Link from 'next/link';
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@firebase/firebaseApp"
-import { signUserOut } from "@firebase/auth"
+import { auth } from "@lib/firebase/firebaseApp"
+import { signUserOut } from "@lib/firebase/auth"
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { APIResponse } from "@customTypes/apiResponse";
-
 import Navbar from "@components/Navbar"
 
 
@@ -54,14 +53,17 @@ export default function Home() {
       console.log(error.message);
     }
   }
-  
+
 	return (
 		<div>
 			<header>
         {user ? <Navbar
                   user={true}
                   onSignOut={handleSignOut}
-                /> : 
+                  navLinks={[
+                    { label: "Drafts", href: "/saveddrafts"}
+                  ]}
+                /> :
                 <Navbar
                   user={false}
                   navLinks={[
@@ -93,7 +95,7 @@ export default function Home() {
           <div className="md:grid md:grid-cols-subgrid md:col-span-2 md:justify-end">
             <p className="md:col-start-2 mb-5 text-base text-gray-700 sm:text-xl tracking-wide mt-10 sm:mt-16 md:mt-24">
               Build a personal website that&apos;s as unique as you.
-              Showcase your skills, experience, and personality with no coding required. 
+              Showcase your skills, experience, and personality with no coding required.
               Make a lasting impression on recruiters, clients, and connections.
             </p>
             <div className="justify-self-center md:col-start-2 md:justify-self-start space-y-4 sm:flex sm:space-y-0 sm:space-x-4 rtl:space-x-reverse">

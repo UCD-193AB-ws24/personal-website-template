@@ -1,7 +1,5 @@
 import "@css/authentication.css"
-import Link from "next/link";
 import SignUpForm from "./signupForm"
-
 import Navbar from "@components/Navbar"
 
 
