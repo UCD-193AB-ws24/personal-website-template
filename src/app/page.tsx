@@ -128,7 +128,7 @@ export default function Home() {
 				</div>
 
         <div className="mt-16 p-6 text-center bg-gray-900 border border-[#00f2ff] sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0">
-					<h3 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">
+					<h3 className="mb-2 text-3xl font-bold text-white">
             How It Works
 					</h3>
           <div className="flex justify-center">
@@ -144,7 +144,7 @@ export default function Home() {
 				</div>
 
         <div className="mt-16 p-6 text-center bg-gray-900 border border-[#00f2ff] sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0">
-					<h3 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">
+					<h3 className="mb-2 text-3xl font-bold text-white">
             Who&apos;s It For?
 					</h3>
           <div className="flex justify-center">
