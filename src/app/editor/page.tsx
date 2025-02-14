@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react';
-import { DndContext, DragOverlay, DragStartEvent, DragEndEvent } from '@dnd-kit/core';
+import { useState, useEffect, useRef } from 'react';
+import { DndContext, DragOverlay, DragStartEvent, DragEndEvent, DragMoveEvent } from '@dnd-kit/core';
 import { restrictToWindowEdges } from '@dnd-kit/modifiers';
-import { XIcon } from "lucide-react";
+import { ArrowUpIcon, XIcon } from "lucide-react";
 
 import EditorDropZone from '@components/EditorDropZone';
 import Sidebar from '@components/sidebar/Sidebar';
@@ -19,6 +19,9 @@ export default function Editor() {
   const [components, setComponents] = useState<ComponentItem[]>([]);
   const [activeComponent, setActiveComponent] = useState<ComponentItem | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [editorHeight, setEditorHeight] = useState(window.innerHeight);
+  const editorRef = useRef<HTMLDivElement>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
     fetchSavedComponents().then((res) => {
@@ -32,6 +35,15 @@ export default function Editor() {
     }).catch((err) => {
       console.log("error:", err);
     })
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 300) setShowScrollTop(true);
+      else setShowScrollTop(false);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const fetchSavedComponents = () => {
@@ -103,6 +115,20 @@ export default function Editor() {
 
       addComponent(activeComponent.type, newPos, activeComponent.id);
       setActiveComponent({ ...activeComponent, position: newPos, size: newSize });
+
+      const lowestY = Math.max(...components.map(comp => comp.position.y + comp.size.height), newPos.y + newSize.height);
+      setEditorHeight(Math.max(100 + lowestY, window.innerHeight));
+    }
+  };
+
+  const handleDragMove = ({ active }: DragMoveEvent) => {
+    if (!editorRef.current) return;
+
+    const editorRect = editorRef.current.getBoundingClientRect();
+    const cursorY = active.rect.current.translated?.top ?? 0;
+
+    if (cursorY > editorRect.bottom - 100) {
+      setEditorHeight(prevHeight => prevHeight + 50);
     }
   };
 
@@ -148,11 +174,16 @@ export default function Editor() {
       modifiers={[restrictToWindowEdges]}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
+      onDragMove={handleDragMove}
     >
-      <div className="flex h-screen text-black">
+      <div className="flex text-black">
         <Sidebar />
 
-        <EditorDropZone onClick={handleBackgroundClick}>
+        <EditorDropZone
+          ref={editorRef}
+          onClick={handleBackgroundClick}
+          style={{ minHeight: `${editorHeight}px`, height: 'auto' }}
+        >
           {components.length === 0 ? (
             <h1 className="text-2xl font-bold mb-4 text-gray-400 text-center mt-20">
               Drag components here to start building your site!
@@ -185,6 +216,14 @@ export default function Editor() {
 
         </EditorDropZone>
       </div>
+      {showScrollTop && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="fixed bottom-5 right-5 p-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition"
+        >
+          <ArrowUpIcon size={24} />
+        </button>
+      )}
       <DragOverlay>
         {renderOverlayContent(activeComponent?.type || null)}
       </DragOverlay>
