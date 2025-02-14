@@ -10,7 +10,8 @@ interface SectionTitleProps {
   initialPos?: Position
   initialSize?: Size
   components?: ComponentItem[];
-  updateComponent?: (id: string, newPos: { x: number; y: number }, newSize: { width: number; height: number }) => void;
+  content?: any
+  updateComponent?: (id: string, newPos: Position, newSize: Size, content?: any) => void;
   isActive?: boolean;
   onMouseDown?: () => void;
 }
@@ -20,18 +21,24 @@ export default function SectionTitleTextbox({
   initialPos = { x: -1, y: -1 },
   initialSize = { width: 350, height: 25 },
   components = [],
+  content = "Type section title here...",
   updateComponent = () => { },
   isActive = true,
   onMouseDown: onMouseDown = () => { },
 }: SectionTitleProps) {
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
-  const [text, setText] = useState("Type section title here...");
+  const [text, setText] = useState(content);
 
   const handleMouseDown = (e: MouseEvent) => {
     e.stopPropagation();
     onMouseDown();
   };
+
+  const handleBlur = (e: React.FocusEvent<HTMLHeadingElement, Element>) => {
+    setText(e.currentTarget.innerText);
+    updateComponent(id, position, size, e.currentTarget.innerText);
+  }
 
   return (
     <Rnd
@@ -58,7 +65,7 @@ export default function SectionTitleTextbox({
           contentEditable
           suppressContentEditableWarning
           className="overflow-hidden w-full h-full text-black text-2xl font-bold outline-none cursor-text"
-          onBlur={(e) => setText(e.currentTarget.innerText)}
+          onBlur={handleBlur}
         >
           {text}
         </h1>

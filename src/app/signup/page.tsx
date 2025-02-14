@@ -1,5 +1,6 @@
 import "@css/authentication.css"
 import Link from "next/link";
+import Image from "next/image";
 import SignUpForm from "./signupForm"
 
 
@@ -11,7 +12,7 @@ export default function SignUp() {
                 <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
                     <a href=".." className="flex items-center space-x-3 rtl:space-x-reverse">
 
-                    <img src="logo.png" className="h-8" alt="Profesite Logo" />
+                    <Image src="logo.png" className="h-8" alt="Profesite Logo" />
 
                     <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Profesite</span>
                     </a>

@@ -1,5 +1,6 @@
 'use client'
 
+import Image from "next/image"
 import "@css/authentication.css"
 import Link from "next/link";
 import { signInWithGoogle, signInWithEmail } from "@firebase/auth"
@@ -71,7 +72,7 @@ export default function LogInForm() {
         {error && <p style={{ color: "red" }}>{error}</p>}
 
         <div className="center">
-          <img onClick={handleSignInWithGoogle} src="googlelogo.png" alt="Sign in with Google" className="shadow-md hover:brightness-50 focus:outline-none transition duration-200 ease-in-out"/>
+          <Image onClick={handleSignInWithGoogle} src="googlelogo.png" alt="Sign in with Google" className="shadow-md hover:brightness-50 focus:outline-none transition duration-200 ease-in-out"/>
         </div>
 
         <Link href="/signup" className="center">
