@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { signInWithGoogle, signUpWithEmail } from "@firebase/auth"
 import { useRouter } from "next/navigation";
-import "../css/authentication.css"
+import "@css/authentication.css"
 
 
 export default function SignUpForm() {
@@ -37,31 +37,18 @@ export default function SignUpForm() {
     }
   };
 
-  const handleSignUpWithGoogle = async (e: { preventDefault: () => void; }) => {
+  const handleSignInWithGoogle = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
-    setError("");
-    setSuccess(false);
 
-    try {
-      await signInWithGoogle();
-      setSuccess(true);
-      setEmail("");
-      setPassword("");
-      setUsername("");
-      router.push("/setusername");
-    } catch (err) {
-      setSuccess(false);
-      if (err instanceof Error) {
-        setError(err.message)
-      } else {
-        setError("An unknown error occurred.");
-      }
+    const isOk = await signInWithGoogle();
+    if (isOk) {
+      router.push("/setusername")
+      return;
     }
   };
 
   return (
     <div>
-
       <div className="center mt-10">
         <div className="mb-2 text-3xl font-bold">Sign Up</div>
       </div>
@@ -74,7 +61,6 @@ export default function SignUpForm() {
                 value={email} 
                 onChange={(e) => setEmail(e.target.value)} 
                 required 
-                className="p-2 border rounded w-full"
             />
             <input 
                 type="username" 
@@ -82,7 +68,6 @@ export default function SignUpForm() {
                 value={username} 
                 onChange={(e) => setUsername(e.target.value)} 
                 required 
-                className="p-2 border rounded w-full"
             />
             <input 
                 type="password" 

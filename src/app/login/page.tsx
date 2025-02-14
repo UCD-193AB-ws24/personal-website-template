@@ -1,4 +1,4 @@
-import "../css/authentication.css"
+import "@css/authentication.css"
 import Link from "next/link";
 import LogInForm from "./loginForm"
 

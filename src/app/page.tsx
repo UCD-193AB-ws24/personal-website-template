@@ -1,30 +1,29 @@
-'use client'
+'use client';
 
 import "./homePage.css"
 import Link from 'next/link';
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@firebase/firebaseApp"
-import { getUsername, signUserOut } from "@firebase/auth"
+import { signUserOut } from "@firebase/auth"
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { APIResponse } from "@customTypes/apiResponse";
 
 import Navbar from "@components/Navbar"
 
 
 export default function Home() {
-  
   const [user] = useAuthState(auth);
   const [username, setUsername] = useState("");
   const router = useRouter();
 
   useEffect(() => {
     if (user) {
-      handleGetUsername();
+      getUsername();
     }
   }, [user]);
 
   const handleSignOut = async () => {
-
     try {
       await signUserOut();
       setUsername("")
@@ -34,14 +33,25 @@ export default function Home() {
     }
   }
 
-  const handleGetUsername = async () => {
-
+  const getUsername = async () => {
     try {
-      const username =  await getUsername();
-      setUsername(username || "username not found");
-    } catch (error) {
-      console.error("Could not retrieve username");
-      setUsername("username not found");
+      const response = await fetch("/api/user/username", {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const resBody = await response.json() as APIResponse<string>;
+
+      if (response.ok && resBody.success) {
+        setUsername(resBody.data);
+      } else {
+        throw new Error("Unknown username");
+      }
+    } catch (error: any) {
+      setUsername("Unknown");
+      router.push("/setusername")
+      console.log(error.message);
     }
   }
   
