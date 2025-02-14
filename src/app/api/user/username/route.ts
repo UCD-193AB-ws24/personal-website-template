@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { APIResponse } from '@customTypes/apiResponse';
-import { db, getCurrentUser } from '@firebase/firebaseAdmin';
+import { db, getCurrentUser } from '@lib/firebase/firebaseAdmin';
 
 // GET /api/user/username
 // Returns the current signed in user's username

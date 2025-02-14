@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
-import { revokeAllSessions } from '@firebase/firebaseAdmin';
+import { revokeAllSessions } from '@lib/firebase/firebaseAdmin';
 import { APIResponse } from '@customTypes/apiResponse';
 
 // GET /api/auth/signout

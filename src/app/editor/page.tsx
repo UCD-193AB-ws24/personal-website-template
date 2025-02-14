@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { DndContext, DragOverlay, DragStartEvent, DragEndEvent, DragMoveEvent } from '@dnd-kit/core';
 import { restrictToWindowEdges } from '@dnd-kit/modifiers';
 import { ArrowUpIcon, XIcon } from "lucide-react";
@@ -17,38 +17,48 @@ import { findBestFreeSpot } from '@utils/collisionUtils';
 import { APIResponse } from '@customTypes/apiResponse';
 import { useSearchParams } from 'next/navigation';
 
-
-export default function Editor() {
-  const [components, setComponents] = useState<ComponentItem[]>([]);
-  const [activeComponent, setActiveComponent] = useState<ComponentItem | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [editorHeight, setEditorHeight] = useState(window.innerHeight);
-  const editorRef = useRef<HTMLDivElement>(null);
-  const [showScrollTop, setShowScrollTop] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
+function DraftLoader({ setComponents, setIsLoading }: { setComponents: (c: ComponentItem[]) => void, setIsLoading: (loading: boolean) => void }) {
   const searchParams = useSearchParams();
   const draftNumber = searchParams.get("draftNumber");
 
   useEffect(() => {
     if (draftNumber) {
-      fetchSavedComponents(draftNumber as string).then((res) => {
-        return res.json();
-      }).then((res) => {
-        const savedComponents: ComponentItem[] = [];
-        res.data.forEach((c: ComponentItem) => {
-          savedComponents.push(c);
-        })
-        setComponents(savedComponents);
-        setIsLoading(false);
-    }).catch((error: any) => {
-        console.log("error:", error.message);
-        setIsLoading(false);
+      fetch(`/api/db/drafts?draftNumber=${draftNumber}`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
       })
-    } else{
-      setIsLoading(false)
+        .then((res) => res.json())
+        .then((res) => {
+          setComponents(Array.isArray(res.data) ? res.data : []);
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching draft:", error);
+          setIsLoading(false);
+        });
+    } else {
+      setIsLoading(false);
     }
   }, [draftNumber]);
+
+  return null;
+}
+
+export default function Editor() {
+  const [components, setComponents] = useState<ComponentItem[]>([]);
+  const [activeComponent, setActiveComponent] = useState<ComponentItem | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [editorHeight, setEditorHeight] = useState(0);
+  const editorRef = useRef<HTMLDivElement>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setEditorHeight(window.innerHeight);
+    }
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -58,16 +68,6 @@ export default function Editor() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const fetchSavedComponents = (draftNumber: string | string[]) => {
-    setIsLoading(true);
-
-    return Promise.resolve(fetch("/api/db/drafts?draftNumber=" + draftNumber, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }));
-  }
 
   const saveComponents = async () => {
     setIsLoading(true);
@@ -83,7 +83,7 @@ export default function Editor() {
         }),
       });
       const resBody = await res.json() as APIResponse<string>;
-      
+
       if (res.ok && resBody.success) {
         setIsLoading(false);
         return
@@ -128,12 +128,12 @@ export default function Editor() {
       setComponents(prev => prev.map(comp => comp.id === id ? { ...comp, position, size, content } : comp));
     } else {
       setComponents(prev => prev.map(comp =>
-      comp.id === id ? { ...comp, position, size } : comp
-    ));
+        comp.id === id ? { ...comp, position, size } : comp
+      ));
 
-    if (activeComponent?.id === id) {
-      setActiveComponent(prev => (prev ? { ...prev, position, size } : null));
-    }
+      if (activeComponent?.id === id) {
+        setActiveComponent(prev => (prev ? { ...prev, position, size } : null));
+      }
     }
   };
 
@@ -222,9 +222,13 @@ export default function Editor() {
     >
       <div className="flex text-black">
         <Sidebar />
-        <button className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-full" style={{position: "fixed", bottom: "20px", right: "20px", zIndex: "10"}} onClick={saveComponents}>Save</button>
+        <button className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-full" style={{ position: "fixed", bottom: "20px", right: "20px", zIndex: "10" }} onClick={saveComponents}>Save</button>
 
         <LoadingSpinner show={isLoading} />
+
+        <Suspense fallback={<LoadingSpinner show={true} />}>
+          <DraftLoader setComponents={setComponents} setIsLoading={setIsLoading} />
+        </Suspense>
 
         <EditorDropZone
           ref={editorRef}
