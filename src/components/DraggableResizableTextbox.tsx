@@ -11,7 +11,7 @@ interface DraggableResizableTextboxProps {
   initialSize?: Size
   components?: ComponentItem[];
   content?: any;
-  updateComponent?: (id: string, newPos: { x: number; y: number }, newSize: { width: number; height: number }) => void;
+  updateComponent?: (id: string, newPos: Position, newSize: Size, content?: any) => void;
   isActive?: boolean;
   onMouseDown?: () => void;
   setIsDragging?: (dragging: boolean) => void;
@@ -36,6 +36,9 @@ export default function DraggableResizableTextbox({
     onMouseDown();
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    updateComponent(id, position, size, e.target.value);
+  }
 
   return (
     <Rnd
@@ -67,6 +70,7 @@ export default function DraggableResizableTextbox({
           className={`overflow-hidden w-full h-full resize-none border-none outline-none bg-transparent p-2 text-lg`}
           placeholder="Type here..."
           defaultValue={content}
+          onChange={handleChange}
         />
       </div>
     </Rnd>

@@ -1,5 +1,7 @@
+import logo from "@public/logo.png"
 import "@css/authentication.css"
 import Link from "next/link";
+import Image from "next/image";
 import LogInForm from "./loginForm"
 
 import Navbar from "@components/Navbar"

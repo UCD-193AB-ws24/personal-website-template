@@ -1,7 +1,8 @@
 'use client'
 
+import Image from "next/image"
+import logo from "@public/logo.png"
 import "@css/authentication.css"
-import Link from "next/link";
 import { setUsername} from "@firebase/auth"
 import { useState } from "react"
 import { useRouter } from "next/navigation";
