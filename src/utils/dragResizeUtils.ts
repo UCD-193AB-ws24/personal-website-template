@@ -13,6 +13,7 @@ export const handleDragStop = (
 ) => {
   return (e: any, d: DraggableData) => {
     const newPos = findBestFreeSpot({ x: d.x, y: d.y }, size, components, id);
+    console.log(newPos)
     setPosition(newPos);
     updateComponent(id, newPos, size);
   };

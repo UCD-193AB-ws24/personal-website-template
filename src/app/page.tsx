@@ -60,6 +60,9 @@ export default function Home() {
         {user ? <Navbar
                   user={true}
                   onSignOut={handleSignOut}
+                  navLinks={[
+                    { label: "Drafts", href: "/saveddrafts"}
+                  ]}
                 /> : 
                 <Navbar
                   user={false}

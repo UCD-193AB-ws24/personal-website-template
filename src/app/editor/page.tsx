@@ -15,6 +15,7 @@ import type { ComponentItem, Position, Size } from '@customTypes/componentTypes'
 
 import { findBestFreeSpot } from '@utils/collisionUtils';
 import { APIResponse } from '@customTypes/apiResponse';
+import { useSearchParams } from 'next/navigation';
 
 
 export default function Editor() {
@@ -26,21 +27,28 @@ export default function Editor() {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  const searchParams = useSearchParams();
+  const draftNumber = searchParams.get("draftNumber");
+
   useEffect(() => {
-    fetchSavedComponents().then((res) => {
-      return res.json();
-    }).then((res) => {
-      const savedComponents: ComponentItem[] = [];
-      res.data.forEach((c: ComponentItem) => {
-        savedComponents.push(c);
-      })
-      setComponents(savedComponents);
-      setIsLoading(false);
+    if (draftNumber) {
+      fetchSavedComponents(draftNumber as string).then((res) => {
+        return res.json();
+      }).then((res) => {
+        const savedComponents: ComponentItem[] = [];
+        res.data.forEach((c: ComponentItem) => {
+          savedComponents.push(c);
+        })
+        setComponents(savedComponents);
+        setIsLoading(false);
     }).catch((error: any) => {
-      console.log("error:", error.message);
-      setIsLoading(false);
-    })
-  }, []);
+        console.log("error:", error.message);
+        setIsLoading(false);
+      })
+    } else{
+      setIsLoading(false)
+    }
+  }, [draftNumber]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -51,10 +59,10 @@ export default function Editor() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const fetchSavedComponents = () => {
+  const fetchSavedComponents = (draftNumber: string | string[]) => {
     setIsLoading(true);
 
-    return Promise.resolve(fetch("/api/db/drafts?draftNumber=1", {
+    return Promise.resolve(fetch("/api/db/drafts?draftNumber=" + draftNumber, {
       headers: {
         "Content-Type": "application/json",
       },
