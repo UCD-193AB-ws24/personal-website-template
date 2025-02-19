@@ -54,6 +54,35 @@ export default function Home() {
     }
   }
 
+  const handleNewDraft = async () => {
+    if (!user) {
+      router.push("/login");
+    }
+
+		const timestamp = Date.now();
+		try {
+			const res = await fetch('/api/user/update-drafts', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					timestamp: timestamp,
+				}),
+			});
+
+			const resBody = (await res.json()) as APIResponse<string>;
+
+			if (res.ok && resBody.success) {
+				router.push('/editor?draftNumber=' + timestamp);
+			} else if (!resBody.success) {
+				throw new Error(resBody.error);
+			}
+		} catch (error: any) {
+			console.log('Error creating new draft:', error.message);
+		}
+	};
+
 	return (
 		<div>
 			<header>
@@ -99,8 +128,8 @@ export default function Home() {
               Make a lasting impression on recruiters, clients, and connections.
             </p>
             <div className="justify-self-center md:col-start-2 md:justify-self-start space-y-4 sm:flex sm:space-y-0 sm:space-x-4 rtl:space-x-reverse">
-              <Link
-                href="/editor"
+              <button
+                onClick={handleNewDraft}
                 className="relative px-6 py-4 font-semibold text-white bg-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#d67500] hover:border-[#d67500] shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50"
               >
                 <div className="text-left rtl:text-right">
@@ -108,7 +137,7 @@ export default function Home() {
                     Start Building
                   </div>
                 </div>
-              </Link>
+              </button>
             </div>
           </div>
 				</div>
@@ -168,8 +197,8 @@ export default function Home() {
             Start Your Website Today
 					</h3>
           <p className="mb-4 text-white">No coding. No hassle. Just results.</p>
-          <Link
-            href="/editor"
+          <button
+            onClick={handleNewDraft}
             className="relative inline-flex px-6 py-4 text-lg font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#f08700] hover:text-black shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50 items-center justify-center text-center"
           >
             <div className="text-left rtl:text-right">
@@ -177,7 +206,7 @@ export default function Home() {
                 Create My Site Now
               </div>
             </div>
-          </Link>
+          </button>
 				</div>
 			</main>
 			<footer></footer>
