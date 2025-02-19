@@ -91,13 +91,13 @@ export async function POST(req: NextRequest) {
 
     if (snapshot.docs.length === 0) {
       // Create a new document if the user doesn't have any previous saves
-      draftsRef.add({
+      await draftsRef.add({
         draftId:`${user.uid}-${draftNumber}`,
         components: reqJson.components
       })
     } else {
       // Update existing document
-      draftsRef.doc(snapshot.docs[0].id).update(
+      await draftsRef.doc(snapshot.docs[0].id).update(
         {components: reqJson.components}
       )
     }

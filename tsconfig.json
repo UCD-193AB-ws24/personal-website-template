@@ -24,7 +24,8 @@
       "@customTypes/*": ["./src/customTypes/*"],
       "@lib/firebase/*": ["./src/lib/firebase/*"],
       "@css/*": ["./src/css/*"],
-      "@public/*": ["./public/*"]
+      "@public/*": ["./public/*"],
+      "@lib/hooks/*": ["./src/lib/hooks/*"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

@@ -1,5 +1,5 @@
 import { useState, cloneElement } from "react";
-import useComponentVisible from "@components/useComponentVisible"
+import useComponentVisibleInteractive from "@lib/hooks/useComponentVisibleInteractive"
 
 // Required props for a valid child
 export interface InteractiveChildProps {
@@ -41,7 +41,7 @@ export default function Interactive({ child, widthPx = 50, heightPx = 50 }: Inte
     }
   }
 
-  const ref = useComponentVisible<HTMLDivElement>(handleClickOutside);
+  const ref = useComponentVisibleInteractive<HTMLDivElement>(handleClickOutside);
 
   const handleDragStart = (e: React.DragEvent) => {
     setIsSelected(true);
