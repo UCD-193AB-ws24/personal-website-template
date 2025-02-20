@@ -17,7 +17,7 @@ import { findBestFreeSpot } from '@utils/collisionUtils';
 import { APIResponse } from '@customTypes/apiResponse';
 import { useSearchParams } from 'next/navigation';
 
-function DraftLoader({ setComponents, setIsLoading, setDraftNumber }: { setComponents: (c: ComponentItem[]) => void, setIsLoading: (loading: boolean) => void, setDraftNumber: (draftNumber: number) => void }) {
+function DraftLoader({ setComponents, setIsLoading, setDraftNumber, setHasLoadedDraftOnce }: { setComponents: (c: ComponentItem[]) => void, setIsLoading: (loading: boolean) => void, setDraftNumber: (draftNumber: number) => void , setHasLoadedDraftOnce: (hasLoadedDraftOnce: boolean) => void}) {
   const searchParams = useSearchParams();
   const draftNumber = searchParams.get("draftNumber");
 
@@ -34,13 +34,16 @@ function DraftLoader({ setComponents, setIsLoading, setDraftNumber }: { setCompo
         .then((res) => {
           setComponents(Array.isArray(res.data) ? res.data : []);
           setIsLoading(false);
+          setHasLoadedDraftOnce(true);
         })
         .catch((error) => {
           console.error("Error fetching draft:", error);
           setIsLoading(false);
+          setHasLoadedDraftOnce(true);
         });
     } else {
       setIsLoading(false);
+      setHasLoadedDraftOnce(true);
     }
   }, [draftNumber]);
 
@@ -55,6 +58,7 @@ export default function Editor() {
   const editorRef = useRef<HTMLDivElement>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasLoadedDraftOnce, setHasLoadedDraftOnce] = useState(false);
   const [draftNumber, setDraftNumber] = useState(-1);
   const [isPreview, setIsPreview] = useState(false);
 
@@ -253,7 +257,7 @@ export default function Editor() {
             <LoadingSpinner show={isLoading} />
 
             <Suspense fallback={<LoadingSpinner show={true} />}>
-              <DraftLoader setDraftNumber={setDraftNumber} setComponents={setComponents} setIsLoading={setIsLoading} />
+              {!hasLoadedDraftOnce && (<DraftLoader setDraftNumber={setDraftNumber} setComponents={setComponents} setIsLoading={setIsLoading} setHasLoadedDraftOnce={setHasLoadedDraftOnce} />)}
             </Suspense>
 
             <div className="flex flex-col flex-grow">
