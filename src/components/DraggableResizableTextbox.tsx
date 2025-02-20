@@ -44,20 +44,16 @@ export default function DraggableResizableTextbox({
 
   return isPreview ? (
     <div
-      className="w-full h-full"
+      style={{
+        position: "absolute",
+        left: position.x,
+        top: position.y,
+        width: size.width,
+        height: size.height,
+      }}
+      className="whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg"
     >
-      <div
-        style={{
-          position: "absolute",
-          left: position.x,
-          top: position.y,
-          width: size.width,
-          height: size.height,
-        }}
-        className="whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg"
-      >
-        {content}
-      </div>
+      {content}
     </div>
   ) : (
     <Rnd

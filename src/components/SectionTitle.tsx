@@ -45,22 +45,18 @@ export default function SectionTitleTextbox({
   }
 
   return isPreview ? (
-    <div
-      className="w-full h-full"
+    <h1
+      style={{
+        position: "absolute",
+        left: position.x,
+        top: position.y,
+        width: size.width,
+        height: size.height,
+      }}
+      className="whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-2xl font-bold"
     >
-      <h1
-        style={{
-          position: "absolute",
-          left: position.x,
-          top: position.y,
-          width: size.width,
-          height: size.height,
-        }}
-        className="whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-2xl font-bold"
-      >
-        {content}
-      </h1>
-    </div>
+      {content}
+    </h1>
   ) : (
     <Rnd
       size={{ width: size.width, height: size.height }}
