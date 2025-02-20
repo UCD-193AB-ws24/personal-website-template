@@ -56,10 +56,11 @@ export default function Editor() {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [draftNumber, setDraftNumber] = useState(-1);
+  const [isPreview, setIsPreview] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setEditorHeight(window.innerHeight);
+      setEditorHeight(window.innerHeight - 64); // top bar is 64px
     }
   }, []);
 
@@ -233,42 +234,57 @@ export default function Editor() {
           <DraftLoader setDraftNumber={setDraftNumber} setComponents={setComponents} setIsLoading={setIsLoading} />
         </Suspense>
 
-        <EditorDropZone
-          ref={editorRef}
-          onClick={handleBackgroundClick}
-          style={{ minHeight: `${editorHeight}px`, height: 'auto' }}
-        >
-          {!isLoading && components.length === 0 ? (
-            <h1 className="text-2xl font-bold mb-4 text-gray-400 text-center mt-20">
-              Drag components here to start building your site!
-            </h1>
-          ) : (
-            components.map(renderComponent)
-          )}
-
-          {activeComponent && !isDragging && (
+        <div className="flex flex-col flex-grow">
+          <div className="fixed top-0 right-0 z-50 bg-gray-100 flex justify-end px-6 py-3 w-[calc(100%-256px)] h-[64px]">
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                removeComponent(activeComponent.id);
-              }}
-              style={{
-                position: "absolute",
-                top: activeComponent.position.y < 40
-                  ? `${activeComponent.position.y + activeComponent.size.height + 15}px`
-                  : `${activeComponent.position.y - 25}px`,
-                left: `${activeComponent.position.x + activeComponent.size.width - 20}px`,
-                zIndex: 10,
-                pointerEvents: "auto",
-                transition: "opacity 0.2s ease-in-out, transform 0.1s",
-              }}
-              className="w-6 h-6 bg-red-500 text-white rounded shadow-md hover:bg-red-600 hover:scale-110 flex items-center justify-center"
+              className={`text-large font-semibold px-4 py-2 rounded-md mr-4 border border-indigo-500 transition-all duration-300 hover:bg-indigo-500 hover:text-white shadow-md hover:shadow-lg`}
+              onClick={() => setIsPreview(!isPreview)}
             >
-              <XIcon size={32} />
+              Preview
             </button>
-          )}
 
-        </EditorDropZone>
+            <button
+              className={`text-white text-large font-semibold px-4 py-2 rounded-md bg-indigo-500 border border-indigo-500 transition-all duration-300 hover:bg-indigo-700 shadow-md hover:shadow-lg`}
+            >
+              Publish
+            </button>
+          </div>
+          <EditorDropZone
+            ref={editorRef}
+            onClick={handleBackgroundClick}
+            style={{ minHeight: `${editorHeight}px`, height: 'auto', marginTop: '64px' }}
+          >
+            {!isLoading && components.length === 0 ? (
+              <h1 className="text-2xl font-bold mb-4 text-gray-400 text-center mt-20">
+                Drag components here to start building your site!
+              </h1>
+            ) : (
+              components.map(renderComponent)
+            )}
+
+            {activeComponent && !isDragging && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  removeComponent(activeComponent.id);
+                }}
+                style={{
+                  position: "absolute",
+                  top: activeComponent.position.y < 40
+                    ? `${activeComponent.position.y + activeComponent.size.height + 15}px`
+                    : `${activeComponent.position.y - 25}px`,
+                  left: `${activeComponent.position.x + activeComponent.size.width - 20}px`,
+                  zIndex: 10,
+                  pointerEvents: "auto",
+                  transition: "opacity 0.2s ease-in-out, transform 0.1s",
+                }}
+                className="w-6 h-6 bg-red-500 text-white rounded shadow-md hover:bg-red-600 hover:scale-110 flex items-center justify-center"
+              >
+                <XIcon size={32} />
+              </button>
+            )}
+          </EditorDropZone>
+        </div>
       </div>
       {showScrollTop && (
         <button
