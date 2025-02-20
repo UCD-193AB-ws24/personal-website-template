@@ -263,14 +263,14 @@ export default function Editor() {
             <div className="flex flex-col flex-grow">
               <div className="fixed top-0 right-0 z-50 bg-gray-100 flex justify-end px-6 py-3 w-[calc(100%-256px)] h-[64px]">
                 <button
-                  className={`text-large font-semibold px-4 py-2 rounded-md mr-4 border border-indigo-500 transition-all duration-300 hover:bg-indigo-500 hover:text-white shadow-md hover:shadow-lg`}
+                  className={`text-large font-semibold px-4 py-2 rounded-md mr-4 border border-blue-500 transition-all duration-300 hover:bg-blue-500 hover:text-white shadow-md hover:shadow-lg`}
                   onClick={() => setIsPreview(!isPreview)}
                 >
                   Preview
                 </button>
 
                 <button
-                  className={`text-white text-large font-semibold px-4 py-2 rounded-md bg-indigo-500 transition-all duration-300 hover:bg-indigo-700 shadow-md hover:shadow-lg`}
+                  className={`text-white text-large font-semibold px-4 py-2 rounded-md bg-blue-500 transition-all duration-300 hover:bg-blue-700 shadow-md hover:shadow-lg`}
                 >
                   Publish
                 </button>
@@ -315,7 +315,7 @@ export default function Editor() {
           {showScrollTop && (
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="fixed bottom-20 right-5 p-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition"
+              className="fixed bottom-20 right-5 p-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-700 transition"
             >
               <ArrowUpIcon size={24} />
             </button>
