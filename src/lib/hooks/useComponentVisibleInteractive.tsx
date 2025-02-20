@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useCallback } from 'react';
 
-export default function useComponentVisible<T extends HTMLElement>(customBehavior: () => void) {
+export default function useComponentVisibleInteractive<T extends HTMLElement>(customBehavior: () => void) {
     const ref = useRef<T>(null);
     const handleClickOutside = useCallback((e: MouseEvent) => {
     const target = e.target as HTMLElement;

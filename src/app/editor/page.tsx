@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { DndContext, DragOverlay, DragStartEvent, DragEndEvent, DragMoveEvent } from '@dnd-kit/core';
 import { restrictToWindowEdges } from '@dnd-kit/modifiers';
-import { ArrowUpIcon, XIcon } from "lucide-react";
+import { ArrowUpIcon, Router, XIcon } from "lucide-react";
 
 import EditorDropZone from '@components/EditorDropZone';
 import Sidebar from '@components/sidebar/Sidebar';
@@ -17,11 +17,13 @@ import { findBestFreeSpot } from '@utils/collisionUtils';
 import { APIResponse } from '@customTypes/apiResponse';
 import { useSearchParams } from 'next/navigation';
 
-function DraftLoader({ setComponents, setIsLoading }: { setComponents: (c: ComponentItem[]) => void, setIsLoading: (loading: boolean) => void }) {
+function DraftLoader({ setComponents, setIsLoading, setDraftNumber }: { setComponents: (c: ComponentItem[]) => void, setIsLoading: (loading: boolean) => void, setDraftNumber: (draftNumber: number) => void }) {
   const searchParams = useSearchParams();
   const draftNumber = searchParams.get("draftNumber");
 
   useEffect(() => {
+    setDraftNumber(parseInt(draftNumber!));
+
     if (draftNumber) {
       fetch(`/api/db/drafts?draftNumber=${draftNumber}`, {
         headers: {
@@ -53,6 +55,7 @@ export default function Editor() {
   const editorRef = useRef<HTMLDivElement>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [draftNumber, setDraftNumber] = useState(-1);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -73,7 +76,7 @@ export default function Editor() {
     setIsLoading(true);
 
     try {
-      const res = await fetch("/api/db/drafts?draftNumber=1", {
+      const res = await fetch(`/api/db/drafts?draftNumber=${draftNumber}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -227,7 +230,7 @@ export default function Editor() {
         <LoadingSpinner show={isLoading} />
 
         <Suspense fallback={<LoadingSpinner show={true} />}>
-          <DraftLoader setComponents={setComponents} setIsLoading={setIsLoading} />
+          <DraftLoader setDraftNumber={setDraftNumber} setComponents={setComponents} setIsLoading={setIsLoading} />
         </Suspense>
 
         <EditorDropZone
