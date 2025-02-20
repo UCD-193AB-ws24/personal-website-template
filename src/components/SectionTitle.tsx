@@ -15,18 +15,20 @@ interface SectionTitleProps {
   isActive?: boolean;
   onMouseDown?: () => void;
   setIsDragging?: (dragging: boolean) => void;
+  isPreview?: boolean;
 }
 
 export default function SectionTitleTextbox({
   id = "",
   initialPos = { x: -1, y: -1 },
-  initialSize = { width: 350, height: 25 },
+  initialSize = { width: 350, height: 50 },
   components = [],
   content = "Type section title here...",
   updateComponent = () => { },
   isActive = true,
   onMouseDown: onMouseDown = () => { },
-  setIsDragging = () => { }
+  setIsDragging = () => { },
+  isPreview = false
 }: SectionTitleProps) {
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
@@ -42,7 +44,20 @@ export default function SectionTitleTextbox({
     updateComponent(id, position, size, e.currentTarget.innerText);
   }
 
-  return (
+  return isPreview ? (
+    <h1
+      style={{
+        position: "absolute",
+        left: position.x,
+        top: position.y,
+        width: size.width,
+        height: size.height,
+      }}
+      className="whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-2xl font-bold"
+    >
+      {content}
+    </h1>
+  ) : (
     <Rnd
       size={{ width: size.width, height: size.height }}
       position={{ x: position.x, y: position.y }}
@@ -66,9 +81,9 @@ export default function SectionTitleTextbox({
       style={{ pointerEvents: 'auto' }}
     >
       <div
-        className={`p-2 w-full h-full flex items-center justify-center transition-all duration-150 ease-in-out border-2 ${isActive
-            ? 'border-blue-500 bg-gray-100 shadow-md outline-none'
-            : 'border-transparent bg-transparent outline-none hover:outline-2 hover:outline-gray-300'
+        className={`w-full h-full flex items-center justify-center transition-all duration-150 ease-in-out border-2 ${isActive
+          ? 'border-blue-500 bg-gray-100 shadow-md outline-none'
+          : 'border-transparent bg-transparent outline-none hover:outline-2 hover:outline-gray-300'
           }`}
       >
         <h1

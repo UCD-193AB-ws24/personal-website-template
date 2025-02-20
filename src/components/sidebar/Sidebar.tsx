@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { ChevronLeft, ChevronRight, BaselineIcon, BriefcaseIcon, CircleArrowRightIcon, ContactIcon, FileUserIcon, ImagesIcon, QuoteIcon, SchoolIcon, SquareMenuIcon, TextIcon } from 'lucide-react';
+import { BaselineIcon, BriefcaseIcon, CircleArrowRightIcon, ContactIcon, FileUserIcon, ImagesIcon, QuoteIcon, SchoolIcon, SquareMenuIcon, TextIcon } from 'lucide-react';
 
 import SidebarItem from './SidebarItem';
 
@@ -17,14 +16,9 @@ const sidebarItems = [
 ];
 
 export default function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false);
-
-  const toggleSidebar = () => setCollapsed(!collapsed);
-
   return (
-    <div className={`flex ${collapsed ? 'w-12' : 'w-64'} bg-gray-100 h-screen sticky top-0 transition-width duration-300`}>
-      {!collapsed && (
-        <div className="overflow-scroll w-64 bg-gray-100 p-4 border-r h-screen">
+    <div className={`flex w-64 bg-gray-100 h-screen sticky top-0 transition-width duration-300`}>
+        <div className="overflow-y-auto w-64 bg-gray-100 p-4 border-r h-screen">
           <h2 className="text-lg font-bold mb-4">Components</h2>
           <div className="space-y-4">
             {sidebarItems.map(item => (
@@ -38,13 +32,6 @@ export default function Sidebar() {
             ))}
           </div>
         </div>
-      )}
-      <button
-        className="absolute top-1/2 transform -translate-y-1/2 right-0 bg-white border rounded-l-lg py-3 shadow"
-        onClick={toggleSidebar}
-      >
-        {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-      </button>
     </div>
   );
 }
