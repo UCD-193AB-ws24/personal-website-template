@@ -21,7 +21,7 @@ interface SectionTitleProps {
 export default function SectionTitleTextbox({
   id = "",
   initialPos = { x: -1, y: -1 },
-  initialSize = { width: 350, height: 25 },
+  initialSize = { width: 350, height: 50 },
   components = [],
   content = "Type section title here...",
   updateComponent = () => { },

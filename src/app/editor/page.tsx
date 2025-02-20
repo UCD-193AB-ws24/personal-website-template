@@ -118,7 +118,7 @@ export default function Editor() {
 
   const componentSizes: Record<string, { width: number; height: number }> = {
     textBlock: { width: 200, height: 150 },
-    sectionTitle: { width: 350, height: 25 },
+    sectionTitle: { width: 350, height: 50 },
   };
 
   const addComponent = (type: string, position: { x: number; y: number }, id: string) => {
