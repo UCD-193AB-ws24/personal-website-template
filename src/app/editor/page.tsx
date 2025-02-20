@@ -104,6 +104,33 @@ export default function Editor() {
     }
   }
 
+  const handlePublish = async () => {
+    setIsLoading(true);
+
+    try {
+      const res = await fetch(`/api/user/publish-draft`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          draftNumber: draftNumber
+        }),
+      }); 
+
+      const resBody = await res.json();
+
+      if (!resBody.success) {
+        throw new Error(resBody.error);
+      }
+
+      setIsLoading(false);
+    } catch (error: any) {
+      console.log("Error:", error.message);
+      setIsLoading(false);
+    }
+  }
+
   const handleBackgroundClick = (e: React.MouseEvent<HTMLDivElement>) => {
     // Only clear active if the background (drop zone) was clicked
     if (e.target === e.currentTarget) {
@@ -271,6 +298,7 @@ export default function Editor() {
 
                 <button
                   className={`text-white text-large font-semibold px-4 py-2 rounded-md bg-blue-500 transition-all duration-300 hover:bg-blue-700 shadow-md hover:shadow-lg`}
+                  onClick={handlePublish}
                 >
                   Publish
                 </button>
