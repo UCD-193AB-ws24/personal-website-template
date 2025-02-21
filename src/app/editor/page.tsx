@@ -116,7 +116,7 @@ export default function Editor() {
         body: JSON.stringify({
           draftNumber: draftNumber
         }),
-      }); 
+      });
 
       const resBody = await res.json();
 
@@ -252,7 +252,9 @@ export default function Editor() {
   return (
     <>
       {isPreview ?
-        <div>
+        <div
+          className="bg-white"
+        >
           <button
             className={`text-white text-large font-semibold px-3 py-2 rounded-md mr-1 bg-red-500 transition-all duration-300 hover:bg-red-700 shadow-md hover:shadow-lg fixed top-[10px] right-[0px] z-10`}
             onClick={() => setIsPreview(!isPreview)}
@@ -261,7 +263,7 @@ export default function Editor() {
           </button>
           <div
             /* Sidebar is w-64 = 16rem*/
-            className="relative min-h-screen w-[calc(100%-16rem)] mx-auto bg-white border-l-2 border-r-2 border-black"
+            className="relative min-h-screen w-[calc(100%-16rem)] mx-auto"
             style={{ minHeight: `${editorHeight + 64}px` }} // top bar is 64px
           >
             {components.map(renderComponent)}
