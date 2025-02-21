@@ -19,7 +19,7 @@ export default function Sidebar() {
   return (
     <div className={`flex w-64 bg-gray-100 h-screen sticky top-0 transition-width duration-300`}>
         <div className="overflow-y-auto w-64 bg-gray-100 p-4 border-r h-screen">
-          <h2 className="text-lg font-bold mb-4">Components</h2>
+          <h1 className="text-lg font-bold mb-4">Components</h1>
           <div className="space-y-4">
             {sidebarItems.map(item => (
               <SidebarItem
