@@ -20,8 +20,8 @@ const sidebarItems = [
 export default function Sidebar() {
   return (
     <div className={`flex w-64 bg-gray-100 h-screen sticky top-0 transition-width duration-300`}>
-      <div className="overflow-y-auto w-64 bg-gray-100 p-4 border-r h-screen">
-        <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse mb-4">
+      <div className="overflow-y-auto w-64 bg-gray-100 px-4 pt-3 pb-4 border-r h-screen">
+        <Link href="/" className="flex items-center gap-x-3 mb-4">
           <Image src="/logo.png" width={32} height={32} alt="Profesite Logo" />
           <span className="self-center text-4xl font-light tracking-wide whitespace-nowrap iceland-font">
             PROFESITE

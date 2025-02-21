@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, Suspense } from 'react';
+import Link from 'next/link';
 import { DndContext, DragOverlay, DragStartEvent, DragEndEvent, DragMoveEvent } from '@dnd-kit/core';
 import { restrictToWindowEdges } from '@dnd-kit/modifiers';
 import { ArrowUpIcon, Router, XIcon } from "lucide-react";
@@ -17,7 +18,7 @@ import { findBestFreeSpot } from '@utils/collisionUtils';
 import { APIResponse } from '@customTypes/apiResponse';
 import { useSearchParams } from 'next/navigation';
 
-function DraftLoader({ setComponents, setIsLoading, setDraftNumber, setHasLoadedDraftOnce }: { setComponents: (c: ComponentItem[]) => void, setIsLoading: (loading: boolean) => void, setDraftNumber: (draftNumber: number) => void , setHasLoadedDraftOnce: (hasLoadedDraftOnce: boolean) => void}) {
+function DraftLoader({ setComponents, setIsLoading, setDraftNumber, setHasLoadedDraftOnce }: { setComponents: (c: ComponentItem[]) => void, setIsLoading: (loading: boolean) => void, setDraftNumber: (draftNumber: number) => void, setHasLoadedDraftOnce: (hasLoadedDraftOnce: boolean) => void }) {
   const searchParams = useSearchParams();
   const draftNumber = searchParams.get("draftNumber");
 
@@ -116,7 +117,7 @@ export default function Editor() {
         body: JSON.stringify({
           draftNumber: draftNumber
         }),
-      }); 
+      });
 
       const resBody = await res.json();
 
@@ -288,20 +289,25 @@ export default function Editor() {
             </Suspense>
 
             <div className="flex flex-col flex-grow">
-              <div className="fixed top-0 right-0 z-50 bg-gray-100 flex justify-end px-6 py-3 w-[calc(100%-256px)] h-[64px]">
-                <button
-                  className={`text-large font-semibold px-4 py-2 rounded-md mr-4 border border-blue-500 transition-all duration-300 hover:bg-blue-500 hover:text-white shadow-md hover:shadow-lg`}
-                  onClick={() => setIsPreview(!isPreview)}
-                >
-                  Preview
-                </button>
+              <div className="fixed top-0 right-0 z-50 bg-gray-100 flex justify-between items-center px-6 py-3 w-[calc(100%-256px)] h-[64px]">
+                <Link href="/saveddrafts" className="text-large font-semibold px-4 py-2 rounded-md border border-gray-500 transition-all duration-300 hover:bg-gray-500 hover:text-white shadow-md hover:shadow-lg">
+                  Drafts
+                </Link>
+                <div className="flex">
+                  <button
+                    className={`text-large font-semibold px-4 py-2 rounded-md mr-4 border border-blue-500 transition-all duration-300 hover:bg-blue-500 hover:text-white shadow-md hover:shadow-lg`}
+                    onClick={() => setIsPreview(!isPreview)}
+                  >
+                    Preview
+                  </button>
 
-                <button
-                  className={`text-white text-large font-semibold px-4 py-2 rounded-md bg-blue-500 transition-all duration-300 hover:bg-blue-700 shadow-md hover:shadow-lg`}
-                  onClick={handlePublish}
-                >
-                  Publish
-                </button>
+                  <button
+                    className={`text-white text-large font-semibold px-4 py-2 rounded-md bg-blue-500 transition-all duration-300 hover:bg-blue-700 shadow-md hover:shadow-lg`}
+                    onClick={handlePublish}
+                  >
+                    Publish
+                  </button>
+                </div>
               </div>
               <EditorDropZone
                 ref={editorRef}
