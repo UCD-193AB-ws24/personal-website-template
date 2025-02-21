@@ -8,16 +8,17 @@ interface NavLink {
 
 interface NavbarProps {
   user?: boolean;
+  username?: string;
   onSignOut?: () => void;
   logoHref?: string;
   navLinks?: NavLink[];
 }
 
-export default function Navbar({ user, onSignOut, logoHref = "/", navLinks = [] }: NavbarProps) {
+export default function Navbar({ user, username, onSignOut, logoHref = "/", navLinks = [] }: NavbarProps) {
   return (
     <nav className="border-[#00f2ff] bg-gray-900 overflow-hidden top-0 left-0 w-full z-50">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-4 py-3">
-      {/* Logo */}
+        {/* Logo */}
         <a href={logoHref} className="flex items-center space-x-3 rtl:space-x-reverse">
           <Image src="/logo.png" width={32} height={32} alt="Profesite Logo" />
           <span className="self-center text-4xl font-light tracking-wide whitespace-nowrap text-white iceland-font">
@@ -25,8 +26,15 @@ export default function Navbar({ user, onSignOut, logoHref = "/", navLinks = [] 
           </span>
         </a>
 
-      {/* Nav Links */}
-        <div className="md:flex md:w-auto space-x-8">
+
+        {/* Nav Links */}
+        <div className="flex w-auto space-x-8 items-center">
+          {user && (
+            <div className="text-white font-medium text-lg">
+              {username ? username : "Loading..."}
+            </div>
+          )}
+
           {navLinks.map((link) => (
             <Link
               key={link.href}

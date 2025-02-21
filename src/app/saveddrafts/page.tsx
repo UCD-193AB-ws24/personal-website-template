@@ -26,6 +26,7 @@ export default function SavedDrafts() {
 
 	useEffect(() => {
 		if (user) {
+                        getUsername();
 			getDraftMappings();
 		}
 		// else {
@@ -197,6 +198,7 @@ export default function SavedDrafts() {
 				{user ? (
 					<Navbar
 						user={true}
+                                                username={username}
 						onSignOut={handleSignOut}
 						navLinks={[{ label: 'Home', href: '/' }]}
 					/>
