@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useState } from 'react';
 import { Rnd } from 'react-rnd';
 
@@ -15,6 +17,7 @@ interface DraggableResizableTextboxProps {
   isActive?: boolean;
   onMouseDown?: () => void;
   setIsDragging?: (dragging: boolean) => void;
+  isPreview?: boolean;
 }
 
 export default function DraggableResizableTextbox({
@@ -26,7 +29,8 @@ export default function DraggableResizableTextbox({
   updateComponent = () => { },
   isActive = true,
   onMouseDown: onMouseDown = () => { },
-  setIsDragging = () => { }
+  setIsDragging = () => { },
+  isPreview = false
 }: DraggableResizableTextboxProps) {
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
@@ -40,7 +44,20 @@ export default function DraggableResizableTextbox({
     updateComponent(id, position, size, e.target.value);
   }
 
-  return (
+  return isPreview ? (
+    <div
+      style={{
+        position: "absolute",
+        left: position.x,
+        top: position.y,
+        width: size.width,
+        height: size.height,
+      }}
+      className="whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg"
+    >
+      {content}
+    </div>
+  ) : (
     <Rnd
       size={{ width: size.width, height: size.height }}
       position={{ x: position.x, y: position.y }}
@@ -61,13 +78,13 @@ export default function DraggableResizableTextbox({
       style={{ pointerEvents: 'auto' }}
     >
       <div
-        className={`p-2 w-full h-full transition-all duration-150 ease-in-out border-2 ${isActive
+        className={`w-full h-full transition-all duration-150 ease-in-out border-2 ${isActive
           ? 'border-blue-500 bg-gray-100 shadow-md outline-none'
           : 'border-transparent bg-transparent outline-none hover:outline-2 hover:outline-gray-300'
           }`}
       >
         <textarea
-          className={`overflow-hidden w-full h-full resize-none border-none outline-none bg-transparent p-2 text-lg`}
+          className={`overflow-hidden w-full h-full resize-none border-none outline-none bg-transparent text-lg`}
           placeholder="Type here..."
           defaultValue={content}
           onChange={handleChange}

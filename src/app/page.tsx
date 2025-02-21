@@ -88,6 +88,7 @@ export default function Home() {
 			<header>
         {user ? <Navbar
                   user={true}
+                  username={username}
                   onSignOut={handleSignOut}
                   navLinks={[
                     { label: "Drafts", href: "/saveddrafts"}

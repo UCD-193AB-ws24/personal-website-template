@@ -26,5 +26,6 @@ export interface ComponentItem {
   onMouseDown?: any
   setIsDragging?: (dragging: boolean) => void;
   content?: any
+  isPreview?: boolean
 }
 
