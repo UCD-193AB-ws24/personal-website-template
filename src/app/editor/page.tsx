@@ -11,6 +11,7 @@ import EditorDropZone from '@components/EditorDropZone';
 import Sidebar from '@components/sidebar/Sidebar';
 import DraggableResizableTextbox from '@components/DraggableResizableTextbox';
 import SectionTitleTextbox from '@components/SectionTitle';
+import NavigationBar from '@components/NavigationBar';
 import LoadingSpinner from '@components/LoadingSpinner';
 import PublishToast from '@components/PublishToast';
 
@@ -174,6 +175,7 @@ export default function Editor() {
   const componentSizes: Record<string, { width: number; height: number }> = {
     textBlock: { width: 200, height: 150 },
     sectionTitle: { width: 350, height: 50 },
+    navBar: {width: 1000, height: 64}
   };
 
   const addComponent = (type: string, position: { x: number; y: number }, id: string) => {
@@ -213,6 +215,12 @@ export default function Editor() {
     setIsDragging(false);
     if (!activeComponent) return;
     if (over?.id === 'editor-drop-zone' && active.rect.current.translated) {
+      if (activeComponent.type == 'navBar') {
+        const draggedRect = active.rect.current.translated as DOMRect;
+        addComponent(activeComponent.type, {x: 0, y: 0}, activeComponent.id);
+        setActiveComponent({ ...activeComponent, position: {x: 0, y:0}, size: { width: draggedRect.width, height: draggedRect.height } });
+        return;
+      }
       const editorBounds = over.rect;
       const draggedRect = active.rect.current.translated as DOMRect;
 
@@ -247,6 +255,8 @@ export default function Editor() {
         return <DraggableResizableTextbox />;
       case 'sectionTitle':
         return <SectionTitleTextbox />
+      case 'navBar':
+        return <NavigationBar />
       default:
         return null;
     }
@@ -255,10 +265,12 @@ export default function Editor() {
   const componentMap: Record<string, React.ComponentType<Partial<ComponentItem>>> = {
     textBlock: DraggableResizableTextbox,
     sectionTitle: SectionTitleTextbox,
+    navBar: NavigationBar,
   };
 
   const renderComponent = (comp: ComponentItem) => {
     const Component = componentMap[comp.type];
+    console.log(components);
 
     return Component ? (
       <Component
@@ -368,7 +380,7 @@ export default function Editor() {
                       pointerEvents: "auto",
                       transition: "opacity 0.2s ease-in-out, transform 0.1s",
                     }}
-                    className="w-6 h-6 bg-red-500 text-white rounded shadow-md hover:bg-red-600 hover:scale-110 flex items-center justify-center"
+                    className="w-6 h-6 bg-red-500 text-white rounded shadow-md hover:bg-red-600 hover:scale-110 flex items-center justify-center z-50"
                   >
                     <XIcon size={32} />
                   </button>
