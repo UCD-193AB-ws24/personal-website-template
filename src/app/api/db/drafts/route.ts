@@ -6,7 +6,7 @@ import { ComponentItem } from '@customTypes/componentTypes';
 // GET /api/db/drafts?draftNumber=number
 // Returns saved components
 export async function GET(req: NextRequest) {
-	try {
+  try {
     // Get the draftNumber
     const searchParams = req.nextUrl.searchParams;
     const draftNumber = searchParams.get('draftNumber');
@@ -21,44 +21,30 @@ export async function GET(req: NextRequest) {
       throw new Error("No user found");
     }
 
-		const draftsRef = db.collection('drafts');
-		const query = draftsRef.where(
-			'draftId',
-			'==',
-			`${user.uid}-${draftNumber}`
-		);
-		const snapshot = await query.get();
+    const draftsRef = db.collection('drafts');
+    const query = draftsRef.where(
+      'draftId',
+      '==',
+      `${user.uid}-${draftNumber}`
+    );
+    const snapshot = await query.get();
 
     if (snapshot.docs.length === 0) {
       throw new Error("No draft found");
     }
 
-		const components = snapshot.docs[0].data();
-
-		const data: ComponentItem[] = [];
-		components.components.forEach((c: ComponentItem) => {
-			data.push({
-				id: c.id,
-				type: c.type,
-				position: c.position!,
-				size: c.size!,
-				components: c?.components,
-				content: c?.content,
-			});
-		});
-
-		return NextResponse.json<APIResponse<ComponentItem[]>>({
-			success: true,
-			data: data,
-		});
-	} catch (error: any) {
-		console.log('Error fetching user data:', error.message);
-
-		return NextResponse.json<APIResponse<string>>(
-			{ success: false, error: error.message },
-			{ status: 400 }
-		);
-	}
+    const draftData = snapshot.docs[0].data();
+    return NextResponse.json<APIResponse<typeof draftData.pages>>({
+      success: true,
+      data: draftData.pages || {},
+    });
+  } catch (error: any) {
+    console.log('Error fetching user data:', error.message);
+    return NextResponse.json<APIResponse<string>>(
+      { success: false, error: error.message },
+      { status: 400 }
+    );
+  }
 }
 
 // POST /api/db/drafts?draftNumber=number
@@ -82,23 +68,27 @@ export async function POST(req: NextRequest) {
     // Get the user who sent the request and their uid to query for
     // saved draft document
     const draftsRef = db.collection('drafts');
-		const query = draftsRef.where(
-			'draftId',
-			'==',
-			`${user.uid}-${draftNumber}`
-		);
-		const snapshot = await query.get();
+    const query = draftsRef.where(
+      'draftId',
+      '==',
+      `${user.uid}-${draftNumber}`
+    );
+    const snapshot = await query.get();
+    const pagesArray = Object.values(reqJson.pages || {});
 
     if (snapshot.docs.length === 0) {
       // Create a new document if the user doesn't have any previous saves
       await draftsRef.add({
-        draftId:`${user.uid}-${draftNumber}`,
-        components: reqJson.components
+        draftId: `${user.uid}-${draftNumber}`,
+        pages: pagesArray,
       })
     } else {
       // Update existing document
       await draftsRef.doc(snapshot.docs[0].id).update(
-        {components: reqJson.components}
+        {
+          draftId: `${user.uid}-${draftNumber}`,
+          pages: pagesArray,
+        }
       )
     }
 
