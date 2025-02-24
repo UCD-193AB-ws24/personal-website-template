@@ -126,8 +126,15 @@ export default function Editor() {
         prevPages[activePageIndex].components = [...components];
       }
 
-      const newPage = { pageName: "New Page", components: [] };
-      const updatedPages = [...prevPages, newPage];
+      // Enumerate New Page (e.g., New Page 2, New Page 3, ...)
+      const existingNames = new Set(prevPages.map(page => page.pageName));
+      let counter = 2;
+      let newPageName = "New Page";
+      while (existingNames.has(newPageName)) {
+        newPageName = `New Page ${counter++}`;
+      }
+
+      const updatedPages = [...prevPages, { pageName: newPageName, components: [] }]
 
       setActivePageIndex(updatedPages.length - 1);
       setComponents([]);

@@ -45,8 +45,13 @@ export default function NavigationBar({
 
   const handleEditSubmit = (index: number) => {
     if (!editedName.trim()) {
-      setEditedName(pages[index].pageName); // Revert if empty
+      setEditedName(pages[index].pageName); // Revert to existing name if new name is empty string
     } else {
+      const isDuplicate = pages.some((page, i) => i !== index && page.pageName === editedName.trim());
+      if (isDuplicate) {
+        alert("Page name must be unique!");
+        return;
+      }
       updatePageName(index, editedName.trim());
     }
     setEditingIndex(null);
