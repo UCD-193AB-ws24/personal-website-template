@@ -1,4 +1,3 @@
-import "@css/authentication.css"
 import SignUpForm from "./signupForm"
 import Navbar from "@components/Navbar"
 

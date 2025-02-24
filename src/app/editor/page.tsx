@@ -5,18 +5,21 @@ import Link from 'next/link';
 import { DndContext, DragOverlay, DragStartEvent, DragEndEvent, DragMoveEvent } from '@dnd-kit/core';
 import { restrictToWindowEdges } from '@dnd-kit/modifiers';
 import { ArrowUpIcon, Router, XIcon } from "lucide-react";
+import { ToastContainer, toast, Bounce, Slide, Zoom, Flip } from 'react-toastify';
 
 import EditorDropZone from '@components/EditorDropZone';
 import Sidebar from '@components/sidebar/Sidebar';
 import DraggableResizableTextbox from '@components/DraggableResizableTextbox';
 import SectionTitleTextbox from '@components/SectionTitle';
 import LoadingSpinner from '@components/LoadingSpinner';
+import PublishToast from '@components/PublishToast';
 
 import type { ComponentItem, Position, Size } from '@customTypes/componentTypes';
 
 import { findBestFreeSpot } from '@utils/collisionUtils';
 import { APIResponse } from '@customTypes/apiResponse';
 import { useSearchParams } from 'next/navigation';
+import { fetchUsername } from '@lib/requests/fetchUsername';
 
 function DraftLoader({ setComponents, setIsLoading, setDraftNumber, setHasLoadedDraftOnce }: { setComponents: (c: ComponentItem[]) => void, setIsLoading: (loading: boolean) => void, setDraftNumber: (draftNumber: number) => void, setHasLoadedDraftOnce: (hasLoadedDraftOnce: boolean) => void }) {
   const searchParams = useSearchParams();
@@ -126,10 +129,34 @@ export default function Editor() {
       }
 
       setIsLoading(false);
+      await toastPublish()
     } catch (error: any) {
       console.log("Error:", error.message);
       setIsLoading(false);
     }
+  }
+
+  const toastPublish = async () => {
+    const username = await fetchUsername();
+
+    toast(PublishToast, {
+      position: "top-right",
+      autoClose: false,
+      hideProgressBar: true,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: false,
+      progress: undefined,
+      theme: "light",
+      transition: Flip,
+      onClose: (reason) => {
+        switch (reason) {
+          case "view":
+            window.open(`${process.env.NEXT_PUBLIC_URL}/pages/${username}`, '_blank')?.focus()
+          default:
+        }
+      },
+    });
   }
 
   const handleBackgroundClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -285,6 +312,7 @@ export default function Editor() {
             <button className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-full" style={{ position: "fixed", bottom: "20px", right: "20px", zIndex: "10" }} onClick={saveComponents}>Save</button>
 
             <LoadingSpinner show={isLoading} />
+            <ToastContainer />
 
             <Suspense fallback={<LoadingSpinner show={true} />}>
               {!hasLoadedDraftOnce && (<DraftLoader setDraftNumber={setDraftNumber} setComponents={setComponents} setIsLoading={setIsLoading} setHasLoadedDraftOnce={setHasLoadedDraftOnce} />)}

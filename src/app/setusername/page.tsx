@@ -1,6 +1,5 @@
 'use client'
 
-import "@css/authentication.css"
 import { setUsername} from "@lib/firebase/auth"
 import { useState } from "react"
 import { useRouter } from "next/navigation";
@@ -45,8 +44,8 @@ export default function SetUsername() {
           />
         </header>
 
-        <div className="center">
-          <div className="mt-5 text-lg font-semibold">Set Username</div>
+        <div className="flex justify-center">
+          <h1 className="mt-5 text-lg font-semibold text-center">Set Username</h1>
         </div>
 
         <div className="center flex flex-col gap-4 mt-5 max-w-md mx-auto bg-gray-100 p-10 rounded-lg">
@@ -57,7 +56,7 @@ export default function SetUsername() {
                   value={username}
                   onChange={(e) => setLocalUsername(e.target.value)}
                   required
-                  className="p-2 border rounded w-full"
+                  className="p-2 mb-[15px] border rounded-[4px] text-black"
               />
               <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded-md cursor-pointer hover:bg-green-600 hover:brightness-70 transition duration-200 ease-in-out">
                 Confirm
