@@ -14,6 +14,7 @@ import SectionTitleTextbox from '@components/SectionTitle';
 import NavigationBar from '@components/NavigationBar';
 import LoadingSpinner from '@components/LoadingSpinner';
 import PublishToast from '@components/PublishToast';
+import ImageComponent from '@components/ImageComponent'
 
 import type { ComponentItem, Position, Size } from '@customTypes/componentTypes';
 
@@ -266,7 +267,8 @@ export default function Editor() {
   const componentSizes: Record<string, { width: number; height: number }> = {
     textBlock: { width: 200, height: 150 },
     sectionTitle: { width: 350, height: 50 },
-    navBar: { width: 5000, height: 48 }
+    navBar: { width: 5000, height: 48 },
+    image: { width: 200, height: 150}
   };
 
   const addComponent = (type: string, position: { x: number; y: number }, id: string) => {
@@ -363,6 +365,7 @@ export default function Editor() {
     textBlock: DraggableResizableTextbox,
     sectionTitle: SectionTitleTextbox,
     navBar: NavigationBar,
+    image: ImageComponent
   };
 
   const renderComponent = (comp: ComponentItem) => {
