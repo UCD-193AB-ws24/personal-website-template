@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { signInWithGoogle, signUpWithEmail } from "@lib/firebase/auth"
 import { useRouter } from "next/navigation";
-import "@css/authentication.css"
 
 
 export default function SignUpForm() {
@@ -53,13 +52,14 @@ export default function SignUpForm() {
 
   return (
     <div>
-      <div className="center mt-10">
-        <div className="mb-2 text-3xl font-bold">Sign Up</div>
+      <div className="flex justify-center mt-10">
+        <h1 className="mb-2 text-3xl font-bold text-center">Sign Up</h1>
       </div>
 
       <div className="center flex flex-col gap-4 mt-5 max-w-md mx-auto bg-gray-900 p-10 rounded-lg">
         <form className="grid gap-4" onSubmit={handleSignUp}>
             <input
+                className="p-2 mb-[15px] border rounded-[4px] text-black"
                 type="email"
                 placeholder="Email"
                 value={email}
@@ -67,6 +67,7 @@ export default function SignUpForm() {
                 required
             />
             <input
+                className="p-2 mb-[15px] border rounded-[4px] text-black"
                 type="username"
                 placeholder="Username"
                 value={username}
@@ -74,6 +75,7 @@ export default function SignUpForm() {
                 required
             />
             <input
+                className="p-2 mb-[15px] border rounded-[4px] text-black"
                 type="password"
                 placeholder="Password"
                 value={password}
