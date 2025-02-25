@@ -21,7 +21,7 @@ export default async function PublishedPage({ params }: PublishedPageProps) {
   };
 
   try {
-    const response = await fetch(`${process.env.URL}/api/db/drafts/published-draft?username=${username}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/db/drafts/published-draft?username=${username}`, {
       headers: { 'Content-Type': 'application/json' },
     });
 

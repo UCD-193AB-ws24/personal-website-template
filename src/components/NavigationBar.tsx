@@ -5,6 +5,9 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { XIcon, PlusIcon, PencilIcon } from "lucide-react";
+import { toast, Flip } from 'react-toastify';
+
+import ErrorToast from '@components/ErrorToast';
 
 interface NavigationBarProps {
   username?: string;
@@ -54,7 +57,17 @@ export default function NavigationBar({
     } else {
       const isDuplicate = pages.some((page, i) => i !== index && page.pageName === editedName.trim());
       if (isDuplicate) {
-        alert("Page name must be unique!");
+        toast((props) => <ErrorToast {...props} message="Page name must be unique!" />, {
+          position: "top-right",
+          autoClose: false,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: false,
+          progress: undefined,
+          theme: "light",
+          transition: Flip,
+        });
         return;
       }
       updatePageName(index, editedName.trim());
