@@ -274,8 +274,7 @@ export default function Editor() {
 
     if (type === "navBar") {
       const hasNavBar = components.some((comp) => comp.type === "navBar");
-      console.log(hasNavBar);
-      if (hasNavBar) return;
+      if (hasNavBar) return; // do not add an additional nav bar
     }
 
     setComponents(prev => [...prev, { id, type, position, size }]);

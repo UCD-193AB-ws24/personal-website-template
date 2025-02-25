@@ -3,9 +3,11 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { XIcon, PlusIcon, PencilIcon } from "lucide-react";
 
 interface NavigationBarProps {
+  username?: string;
   pages?: { pageName: string }[];
   activePageIndex?: number;
   switchPage?: (index: number) => void;
@@ -13,10 +15,12 @@ interface NavigationBarProps {
   deletePage?: (index: number) => void;
   updatePageName?: (index: number, newName: string) => void;
   isPreview?: boolean;
+  isPublish?: boolean;
   onMouseDown?: () => void;
 }
 
 export default function NavigationBar({
+  username = "",
   pages = [],
   activePageIndex,
   switchPage: switchPage = () => { },
@@ -24,6 +28,7 @@ export default function NavigationBar({
   deletePage: deletePage = () => { },
   updatePageName: updatePageName = () => { },
   isPreview,
+  isPublish = false,
   onMouseDown,
 }: NavigationBarProps) {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -56,6 +61,26 @@ export default function NavigationBar({
     }
     setEditingIndex(null);
   };
+
+  if (isPublish) {
+    return (
+      <div className="absolute top-0 left-0 w-full h-12 bg-gray-800 text-white flex items-center px-4 shadow-lg">
+        {pages.map((page, index) => {
+          const urlFriendlyPageName = encodeURIComponent(page.pageName.replace(/\s+/g, "-"));
+          return (
+            <Link key={index} href={`/pages/${username}/${urlFriendlyPageName}`}>
+              <button
+                className={`px-4 py-2 mx-1 rounded-md transition-all duration-200 ${activePageIndex === index ? "bg-blue-500" : "bg-gray-700 hover:bg-gray-600"
+                  }`}
+              >
+                {page.pageName}
+              </button>
+            </Link>
+          );
+        })}
+      </div>
+    );
+  }
 
   return (
     <div
