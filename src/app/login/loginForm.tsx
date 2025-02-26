@@ -21,7 +21,7 @@ export default function LogInForm() {
 
     const response = await signInWithEmail(email, password);
     if (response.success === true) {
-      router.push("/")
+      router.push("/profile")
       return;
     } else {
       setError(response.error);
@@ -33,7 +33,7 @@ export default function LogInForm() {
 
     const isOk = await signInWithGoogle();
     if (isOk) {
-      router.push("/")
+      router.push("/profile")
       return;
     }
   };

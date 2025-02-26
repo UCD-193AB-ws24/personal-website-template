@@ -188,9 +188,12 @@ export default function SavedDrafts() {
 				{user ? (
 					<Navbar
 						user={true}
-                                                username={username}
+						username={username}
 						onSignOut={handleSignOut}
-						navLinks={[{ label: 'Home', href: '/' }]}
+						navLinks={[
+							{ label: 'Home', href: '/' },
+							{ label: 'Profile', href: '/profile'}
+						]}
 					/>
 				) : (
 					<Navbar
