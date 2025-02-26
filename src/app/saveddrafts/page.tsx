@@ -3,11 +3,13 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '@lib/firebase/firebaseApp';
 import { signUserOut } from '@lib/firebase/auth';
 import { useRouter } from 'next/navigation';
-import { Ref, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { APIResponse } from '@customTypes/apiResponse';
 import Navbar from '@components/Navbar';
 import LoadingSpinner from '@components/LoadingSpinner';
 import DraftItem from '@components/DraftItem';
+import { fetchUsername } from '@lib/requests/fetchUsername'
+
 
 export default function SavedDrafts() {
 	const [user] = useAuthState(auth);
@@ -26,7 +28,7 @@ export default function SavedDrafts() {
 
 	useEffect(() => {
 		if (user) {
-                        getUsername();
+            getUsername();
 			getDraftMappings();
 		}
 		// else {
@@ -45,24 +47,12 @@ export default function SavedDrafts() {
 	};
 
 	const getUsername = async () => {
-		try {
-			const response = await fetch('/api/user/username', {
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			});
-
-			const resBody = (await response.json()) as APIResponse<string>;
-
-			if (response.ok && resBody.success) {
-				setUsername(resBody.data);
-			} else {
-				throw new Error('Unknown username');
-			}
-		} catch (error: any) {
+		const name = await fetchUsername();
+		if (name === null) {
 			setUsername('Unknown');
 			router.push('/setusername');
-			console.log(error.message);
+		} else {
+			setUsername(name);
 		}
 	};
 

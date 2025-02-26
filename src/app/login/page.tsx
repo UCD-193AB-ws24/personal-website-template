@@ -1,4 +1,3 @@
-import "@css/authentication.css"
 import LogInForm from "./loginForm"
 import Navbar from "@components/Navbar"
 

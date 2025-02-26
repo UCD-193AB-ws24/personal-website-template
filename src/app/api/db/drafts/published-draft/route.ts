@@ -42,23 +42,23 @@ export async function GET(req: NextRequest) {
 			throw new Error('No draft found');
 		}
 
-		const components = draftSnapshot.docs[0].data();
+                const draftData = draftSnapshot.docs[0].data();
 
-		const data: ComponentItem[] = [];
-		components.components.forEach((c: ComponentItem) => {
-			data.push({
-				id: c.id,
-				type: c.type,
-				position: c.position!,
-				size: c.size!,
-				components: c?.components,
-				content: c?.content,
-			});
-		});
+                const pages = draftData.pages.map((page: any) => ({
+                  pageName: page.pageName,
+                  components: page.components.map((c: ComponentItem) => ({
+                    id: c.id,
+                    type: c.type,
+                    position: c.position!,
+                    size: c.size!,
+	            components: c?.components,
+                    content: c?.content
+                  })),
+                }));
 
-		return NextResponse.json<APIResponse<ComponentItem[]>>({
+                return NextResponse.json<APIResponse<{ pages: typeof pages }>>({
 			success: true,
-			data: data,
+			data: { pages },
 		});
 	} catch (error: any) {
 		console.log('Error fetching data:', error.message);
