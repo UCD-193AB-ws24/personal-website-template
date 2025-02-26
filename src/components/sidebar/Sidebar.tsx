@@ -9,7 +9,7 @@ const sidebarItems = [
   { id: 2, type: 'sectionTitle', name: 'Section Title', description: 'Add a bold title to separate different sections.', icon: <BaselineIcon /> },
   { id: 3, type: 'navButton', name: 'Navigation Button', description: 'Add a button to link to other pages or sections.', icon: <CircleArrowRightIcon /> },
   { id: 4, type: 'navBar', name: 'Navigation Bar', description: 'Add a customizable menu for easy site navigation.', icon: <SquareMenuIcon /> },
-  { id: 5, type: 'image', name: 'Image Gallery', description: 'Display multiple photos in a grid or slideshow format.', icon: <ImagesIcon /> },
+  { id: 5, type: 'image', name: 'Image', description: 'Upload and display an image.', icon: <ImagesIcon /> },
   { id: 6, type: 'aboutMeCard', name: 'About Me Card', description: 'Create a quick bio with your photo and contact info.', icon: <ContactIcon /> },
   { id: 7, type: 'academicEntry', name: 'Academic Entry', description: 'Highlight information about an academic institution, degree, and duration', icon: <SchoolIcon /> },
   { id: 8, type: 'workEntry', name: 'Work Entry', description: 'Describe a job role, company, and time period.', icon: <BriefcaseIcon /> },

@@ -46,9 +46,20 @@ export default function ImageComponent({
       const reader = new FileReader();
       reader.onloadend = () => {
         const imageUrl = reader.result as string;
-        setImageSrc(imageUrl);
-        updateComponent(id, position, size, imageUrl);
+        const img = new Image();
+        img.src = imageUrl;
+
+        img.onload = () => {
+          const aspectRatio = img.width / img.height;
+          const newWidth = 300 // Default width
+          const newHeight = newWidth / aspectRatio; // Maintain aspect ratio
+
+          setImageSrc(imageUrl);
+          setSize({ width: newWidth, height: newHeight});
+          updateComponent(id, position, { width: newWidth, height: newHeight }, imageUrl);
+        };
       };
+
       reader.readAsDataURL(file);
     }
   };
@@ -87,7 +98,20 @@ export default function ImageComponent({
       onResizeStart={() => setIsDragging(true)}
       onResizeStop={(e, d, ref, delta, newPosition) => {
         setIsDragging(false);
-        handleResizeStop(id, components, updateComponent, setSize, setPosition)(e, d, ref, delta, newPosition);
+
+        const newWidth = ref.offsetWidth;
+        // const newHeight = ref.offsetHeight;
+        const aspectRatio = size.width / size.height;
+
+        // Maintain aspect ratio
+        const adjustedHeight = newWidth / aspectRatio;
+        setSize({ width: newWidth, height: adjustedHeight });
+        setPosition(newPosition);
+        updateComponent(id, newPosition, { width: newWidth, height: adjustedHeight }, imageSrc);
+        // handleResizeStop(id, components, updateComponent, setSize,
+        // setPosition)(e, d, ref, delta, newPosition);
+        // FIX: commenting this causes bug where components can't be placed at
+        // the very top of the page
       }}
       minWidth={100}
       minHeight={100}
