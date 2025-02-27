@@ -98,21 +98,9 @@ export default function ImageComponent({
       onResizeStart={() => setIsDragging(true)}
       onResizeStop={(e, d, ref, delta, newPosition) => {
         setIsDragging(false);
-
-        const newWidth = ref.offsetWidth;
-        // const newHeight = ref.offsetHeight;
-        const aspectRatio = size.width / size.height;
-
-        // Maintain aspect ratio
-        const adjustedHeight = newWidth / aspectRatio;
-        setSize({ width: newWidth, height: adjustedHeight });
-        setPosition(newPosition);
-        updateComponent(id, newPosition, { width: newWidth, height: adjustedHeight }, imageSrc);
-        // handleResizeStop(id, components, updateComponent, setSize,
-        // setPosition)(e, d, ref, delta, newPosition);
-        // FIX: commenting this causes bug where components can't be placed at
-        // the very top of the page
+        handleResizeStop(id, components, updateComponent, setSize, setPosition)(e, d, ref, delta, newPosition);
       }}
+      lockAspectRatio={true}
       minWidth={100}
       minHeight={100}
       bounds="parent"
