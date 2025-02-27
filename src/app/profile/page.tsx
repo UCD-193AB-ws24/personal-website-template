@@ -7,7 +7,9 @@ import { signUserOut } from "@lib/firebase/auth"
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { APIResponse } from "@customTypes/apiResponse";
-import { fetchUsername } from '@lib/requests/fetchUsername'
+import { fetchUsername } from '@lib/requests/fetchUsername';
+import LoadingSpinner from '@components/LoadingSpinner';
+
 import Navbar from "@components/Navbar"
 
 
@@ -15,12 +17,15 @@ export default function Profile() {
   const [user] = useAuthState(auth);
   const [username, setUsername] = useState("");
   const [publishedDraftNumber, setPublishedDraftNumber] = useState("");
+  const [draftMappings, setDraftMappings] = useState<Array<{ id: number; name: string }>>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     if (user) {
       getUsername();
       getPublishedDraftNumber();
+      getDraftMappings();
     }
   }, [user]);
 
@@ -43,6 +48,28 @@ export default function Profile() {
       setUsername(name);
     }
   }
+
+  const getDraftMappings = () => {
+		setIsLoading(true);
+		fetch('/api/user/get-drafts', {
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		})
+			.then((res) => res.json())
+			.then((res) => {
+				if (res.success) {
+					setDraftMappings(res.data);
+					setIsLoading(false);
+				} else {
+					throw new Error(res.error);
+				}
+			})
+			.catch((error) => {
+				console.log(error.message);
+				setIsLoading(false);
+			});
+	};
 
   const handleNewDraft = async () => {
     if (!user) {
@@ -139,43 +166,72 @@ export default function Profile() {
             </h1>
           </div>
 
-          <div className="flex justify-center mt-5">
-            <h2>
-              Your Website Is: {publishedDraftNumber === ""
-              ? <div className="text-red-500 flex justify-center">Offline!</div>
-              : <div className="text-green-500 flex justify-center">Online!</div>}
-            </h2>
-          </div>
+          <div className="flex justify-evenly">
 
-          <div className="flex justify-center mt-5">
+            <div className="mt-16 p-6 text-center bg-gray-900 border border-[#00f2ff] sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0 flex flex-col justify-center mt-5">
 
-            { publishedDraftNumber === "" ?
-              <button disabled className="relative inline-flex px-6 py-4 text-lg font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all shadow-[0_0_10px_rgba(240,135,0,0.4)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 items-center justify-center text-center">
-                My Website
-              </button>
-            :
-              <button onClick={handleOpenWebsite} className="relative inline-flex px-6 py-4 text-lg font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#f08700] hover:text-black shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50 items-center justify-center text-center">
-                My Website
-              </button>
-            }
-          </div>
-
-          <div className="mt-16 p-6 text-center bg-gray-900 border border-[#00f2ff] sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0">
-            <h3 className="mb-4 text-3xl font-bold text-white">
-              Start Your Website Today
-            </h3>
-            <p className="mb-4 text-white">No coding. No hassle. Just results.</p>
-            <button
-              onClick={handleNewDraft}
-              className="relative inline-flex px-6 py-4 text-lg font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#f08700] hover:text-black shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50 items-center justify-center text-center"
-            >
-              <div className="text-left rtl:text-right">
-                <div className="-mt-1 font-sans text-lg font-semibold">
-                  Create My Site Now
-                </div>
+              <div className="flex justify-center mt-5 mb-4 text-5xl font-bold text-white">
+                <h2>
+                  Your Website Is: {publishedDraftNumber === ""
+                  ? <div className="text-red-500 flex justify-center">Offline!</div>
+                  : <div className="text-green-500 flex justify-center">Online!</div>}
+                </h2>
               </div>
-            </button>
+
+              { publishedDraftNumber === "" ?
+                <button disabled className="relative inline-flex px-6 py-4 text-lg font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all shadow-[0_0_10px_rgba(240,135,0,0.4)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 items-center justify-center text-center">
+                  My Website
+                </button>
+              :
+                <button onClick={handleOpenWebsite} className="relative inline-flex px-6 py-4 text-lg font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#f08700] hover:text-black shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50 items-center justify-center text-center">
+                  My Website
+                </button>
+              }
+            </div>
+
+            <div className="mt-16 p-6 text-center bg-gray-900 border border-[#00f2ff] sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0 flex flex-col gap-2">
+
+              <LoadingSpinner show={isLoading} />
+
+              <div className="mb-4 text-5xl font-bold text-white">
+                {draftMappings.length}
+              </div>
+
+              <h3 className="mb-4 text-3xl text-center font-bold text-white bg-gray-900">
+                Saved Drafts
+              </h3>
+
+              <button
+                onClick={() => router.push("/saveddrafts")}
+                className="relative inline-flex mt-4 px-6 py-4 text-lg font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#f08700] hover:text-black shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50 items-center justify-center text-center"
+              >
+                <div className="text-left rtl:text-right">
+                  <div className="-mt-1 font-sans text-lg font-semibold">
+                    View Drafts
+                  </div>
+                </div>
+              </button>
+
+            </div>
+
+            <div className="mt-16 p-6 text-center bg-gray-900 border border-[#00f2ff] sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0">
+              <h3 className="mb-4 text-3xl font-bold text-white">
+                Make a new website!
+              </h3>
+              <button
+                onClick={handleNewDraft}
+                className="relative inline-flex px-6 py-4 text-lg font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#f08700] hover:text-black shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50 items-center justify-center text-center"
+              >
+                <div className="text-left rtl:text-right">
+                  <div className="-mt-1 font-sans text-lg font-semibold">
+                    Create My Site Now
+                  </div>
+                </div>
+              </button>
+            </div>
+
           </div>
+
 
         </main>
 
