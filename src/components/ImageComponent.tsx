@@ -118,7 +118,7 @@ export default function ImageComponent({
           <label
             className="w-full h-full flex items-center justify-center cursor-pointer bg-gray-200"
           >
-            Click to Upload
+            Click to Upload an Image
             <input
               type="file"
               accept="image/*"
