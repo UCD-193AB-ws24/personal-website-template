@@ -8,8 +8,7 @@ import { APIResponse } from '@customTypes/apiResponse';
 import Navbar from '@components/Navbar';
 import LoadingSpinner from '@components/LoadingSpinner';
 import DraftItem from '@components/DraftItem';
-import { fetchUsername } from '@lib/requests/fetchUsername'
-
+import { fetchUsername } from '@lib/requests/fetchUsername';
 
 export default function SavedDrafts() {
 	const [user] = useAuthState(auth);
@@ -25,11 +24,13 @@ export default function SavedDrafts() {
 	const [newDraftName, setNewDraftName] = useState('');
 	const router = useRouter();
 	const [isLoading, setIsLoading] = useState(false);
+	const [publishedDraftNumber, setPublishedDraftNumber] = useState(0);
 
 	useEffect(() => {
 		if (user) {
-            getUsername();
+			getUsername();
 			getDraftMappings();
+			getPublishedDraftNumber();
 		}
 		// else {
 		//   router.push("/")
@@ -67,6 +68,51 @@ export default function SavedDrafts() {
 			.then((res) => {
 				if (res.success) {
 					setDraftMappings(res.data);
+					setIsLoading(false);
+				} else {
+					throw new Error(res.error);
+				}
+			})
+			.catch((error) => {
+				console.log(error.message);
+				setIsLoading(false);
+			});
+	};
+
+	const getPublishedDraftNumber = () => {
+		setIsLoading(true);
+		fetch('/api/user/publish-draft', {
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		})
+			.then((res) => res.json())
+			.then((res) => {
+				if (res.success) {
+					setPublishedDraftNumber(res.data);
+					setIsLoading(false);
+				} else {
+					throw new Error(res.error);
+				}
+			})
+			.catch((error) => {
+				console.log(error.message);
+				setIsLoading(false);
+			});
+	};
+
+	const unpublish = () => {
+		setIsLoading(true);
+		fetch('/api/user/unpublish-draft', {
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			method: 'POST',
+		})
+			.then((res) => res.json())
+			.then((res) => {
+				if (res.success) {
+					setPublishedDraftNumber(0);
 					setIsLoading(false);
 				} else {
 					throw new Error(res.error);
@@ -229,10 +275,12 @@ export default function SavedDrafts() {
 									key={i}
 									id={d.id}
 									name={d.name}
+									isPublished={d.id === publishedDraftNumber}
 									loadEditor={loadEditor}
 									handleDeleteDraft={handleDeleteDraft}
 									setIsModalHidden={setIsModalHidden}
 									setSelectedDraft={setSelectedDraft}
+									unpublish={unpublish}
 								/>
 							);
 						})

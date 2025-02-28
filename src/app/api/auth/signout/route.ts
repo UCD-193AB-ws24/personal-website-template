@@ -17,7 +17,9 @@ export async function GET() {
 		);
 	}
 
-	reqCookies.delete('__session');
+	reqCookies.getAll().map((cookieKey) => {
+		reqCookies.delete(cookieKey)
+	})
 
 	await revokeAllSessions(sessionCookie);
 

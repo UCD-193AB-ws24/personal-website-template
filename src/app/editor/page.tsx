@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { DndContext, DragOverlay, DragStartEvent, DragEndEvent, DragMoveEvent } from '@dnd-kit/core';
 import { restrictToWindowEdges } from '@dnd-kit/modifiers';
 import { ArrowUpIcon, Router, XIcon } from "lucide-react";
-import { ToastContainer, toast, Bounce, Slide, Zoom, Flip } from 'react-toastify';
+import { Flip, toast, ToastContainer } from 'react-toastify';
 
 import EditorDropZone from '@components/EditorDropZone';
 import Sidebar from '@components/sidebar/Sidebar';
@@ -13,14 +13,18 @@ import DraggableResizableTextbox from '@components/DraggableResizableTextbox';
 import SectionTitleTextbox from '@components/SectionTitle';
 import NavigationBar from '@components/NavigationBar';
 import LoadingSpinner from '@components/LoadingSpinner';
-import PublishToast from '@components/PublishToast';
+import { toastPublish} from '@components/PublishToast';
+import ImageComponent from '@components/ImageComponent';
+import FileComponent from '@components/FileComponent';
 
-import type { ComponentItem, Position, Size } from '@customTypes/componentTypes';
+import type { ComponentItem, Page, Position, Size } from '@customTypes/componentTypes';
 
 import { findBestFreeSpot } from '@utils/collisionUtils';
 import { APIResponse } from '@customTypes/apiResponse';
 import { useSearchParams } from 'next/navigation';
-import { fetchUsername } from '@lib/requests/fetchUsername';
+import { toastSaveSuccess } from '@components/SaveToast';
+import { saveDraft } from '@lib/requests/saveDrafts';
+import SavedDrafts from '../saveddrafts/page';
 
 function DraftLoader({ setPages, setActivePageId, setComponents, setIsLoading, setDraftNumber, setHasLoadedDraftOnce }: { setPages: any, setActivePageId: any, setComponents: (c: ComponentItem[]) => void, setIsLoading: (loading: boolean) => void, setDraftNumber: (draftNumber: number) => void, setHasLoadedDraftOnce: (hasLoadedDraftOnce: boolean) => void }) {
   const searchParams = useSearchParams();
@@ -79,7 +83,7 @@ export default function Editor() {
   const [hasLoadedDraftOnce, setHasLoadedDraftOnce] = useState(false);
   const [draftNumber, setDraftNumber] = useState(-1);
   const [isPreview, setIsPreview] = useState(false);
-  const [pages, setPages] = useState<{ pageName: string; components: ComponentItem[] }[]>([]);
+  const [pages, setPages] = useState<Page[]>([]);
   const [activePageIndex, setActivePageIndex] = useState<number | null>(null);
 
 
@@ -216,7 +220,7 @@ export default function Editor() {
     });
   };
 
-  const saveDraft = async () => {
+  const handleSaveDraft = async () => {
     if (activePageIndex == null) return;
     setIsLoading(true);
 
@@ -228,17 +232,11 @@ export default function Editor() {
 
       setPages(updatedPages);
 
-      const res = await fetch(`/api/db/drafts?draftNumber=${draftNumber}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ pages: updatedPages })
-      });
-      const resBody = await res.json() as APIResponse<string>;
+      const result = await saveDraft(draftNumber, pages);
 
-      if (res.ok && resBody.success) {
+      if (result === "") {
         setIsLoading(false);
+        toastSaveSuccess();
         return
       }
 
@@ -249,10 +247,23 @@ export default function Editor() {
     }
   }
 
+  // Saves the current changes and publishes the draft
   const handlePublish = async () => {
     setIsLoading(true);
 
     try {
+      // Save changes to the current page
+      const updatedPages = pages.map((page, index) =>
+        index === activePageIndex ? { ...page, components: [...components] } : page
+      );
+
+      setPages(updatedPages);
+
+      const saveDraftResult = await saveDraft(draftNumber, updatedPages);
+      if (saveDraftResult !== "") {
+        throw new Error(saveDraftResult);
+      }
+
       const res = await fetch(`/api/user/publish-draft`, {
         method: "POST",
         headers: {
@@ -265,39 +276,17 @@ export default function Editor() {
 
       const resBody = await res.json();
 
-      if (!resBody.success) {
-        throw new Error(resBody.error);
+      if (res.ok && resBody.success) {
+        toastPublish();
+        setIsLoading(false);
+        return;
       }
 
-      setIsLoading(false);
-      await toastPublish()
+      throw new Error(resBody.error);
     } catch (error: any) {
       console.log("Error:", error.message);
       setIsLoading(false);
     }
-  }
-
-  const toastPublish = async () => {
-    const username = await fetchUsername();
-
-    toast(PublishToast, {
-      position: "top-right",
-      autoClose: false,
-      hideProgressBar: true,
-      closeOnClick: false,
-      pauseOnHover: true,
-      draggable: false,
-      progress: undefined,
-      theme: "light",
-      transition: Flip,
-      onClose: (reason) => {
-        switch (reason) {
-          case "view":
-            window.open(`${process.env.NEXT_PUBLIC_URL}/pages/${username}`, '_blank')?.focus()
-          default:
-        }
-      },
-    });
   }
 
   const handleBackgroundClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -315,7 +304,8 @@ export default function Editor() {
   const componentSizes: Record<string, { width: number; height: number }> = {
     textBlock: { width: 200, height: 150 },
     sectionTitle: { width: 350, height: 50 },
-    navBar: { width: 5000, height: 48 }
+    image: { width: 200, height: 150},
+    file: {width:425, height:550}
   };
 
   const addComponent = (type: string, position: { x: number; y: number }, id: string) => {
@@ -421,6 +411,10 @@ export default function Editor() {
         return <SectionTitleTextbox />
       case 'navBar':
         return <NavigationBar />
+      case 'image':
+        return <ImageComponent />
+      case 'file':
+        return <FileComponent />
       default:
         return null;
     }
@@ -430,6 +424,8 @@ export default function Editor() {
     textBlock: DraggableResizableTextbox,
     sectionTitle: SectionTitleTextbox,
     navBar: NavigationBar,
+    image: ImageComponent,
+    file: FileComponent
   };
 
   const renderComponent = (comp: ComponentItem) => {
@@ -511,7 +507,7 @@ export default function Editor() {
           >
             <Sidebar />
 
-            <button className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-full" style={{ position: "fixed", bottom: "20px", right: "20px", zIndex: "10" }} onClick={saveDraft}>Save</button>
+            <button className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-full" style={{ position: "fixed", bottom: "20px", right: "20px", zIndex: "10" }} onClick={handleSaveDraft}>Save</button>
 
             <LoadingSpinner show={isLoading} />
             <ToastContainer />
