@@ -123,7 +123,7 @@ export default function Profile() {
 
         console.log("draftnum: ", resBody.data);
 
-        if (resBody.data !== undefined) {
+        if (resBody.data !== undefined && resBody.data !== "0") {
           setPublishedDraftNumber(resBody.data);
           getViews(resBody.data);
         }
