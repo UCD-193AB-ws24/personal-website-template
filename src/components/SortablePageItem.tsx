@@ -38,7 +38,6 @@ export default function SortablePageItem({
     transition,
     width: "auto",
     minWidth: "80px",
-    zIndex: 50,
   };
 
   return (

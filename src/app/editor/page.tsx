@@ -330,9 +330,27 @@ export default function Editor() {
   };
 
   const removeComponent = (id: string) => {
-    setComponents(prev => prev.filter(comp => comp.id !== id));
+    setComponents(prev => {
+      const componentToRemove = prev.find(comp => comp.id === id);
+      const updatedComponents = prev.filter(comp => comp.id !== id);
+
+      // If the removed component is a navBar, set the first page's name back to Home
+      if (componentToRemove?.type === "navBar") {
+        setPages(prevPages => {
+          const updatedPages = [...prevPages];
+          if (updatedPages.length > 0) {
+            updatedPages[0] = { ...updatedPages[0], pageName: "Home" };
+          }
+          return updatedPages;
+        });
+      }
+
+      return updatedComponents;
+    });
+
     setActiveComponent(null);
-  }
+  };
+
 
   const updateComponent = (id: string, position: Position, size: Size, content?: any) => {
     if (content) {
