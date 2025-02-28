@@ -12,7 +12,7 @@ export async function GET() {
 	if (cookieStore.has("username")) {
 		return NextResponse.json<APIResponse<string>>({
 			success: true,
-			data: cookieStore.get("username")?.value!
+			data: cookieStore.get("username")!.value
 		});
 	}
 
