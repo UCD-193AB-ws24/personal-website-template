@@ -21,7 +21,7 @@ interface ImageComponentProps {
 
 export default function ImageComponent({
   id = "",
-  initialPos = { x: 50, y: 50 },
+  initialPos = { x: -1, y: -1 },
   initialSize = { width: 200, height: 150 },
   components = [],
   content = "",

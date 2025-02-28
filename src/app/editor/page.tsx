@@ -357,6 +357,10 @@ export default function Editor() {
         return <SectionTitleTextbox />
       case 'navBar':
         return <NavigationBar />
+      case 'image':
+        return <ImageComponent />
+      case 'file':
+        return <FileComponent />
       default:
         return null;
     }

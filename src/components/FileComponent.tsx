@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Rnd } from "react-rnd";
+import { GripIcon } from "lucide-react";
 
 import type { ComponentItem, Position, Size } from "@customTypes/componentTypes";
 import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
@@ -19,24 +20,25 @@ interface FileComponentProps {
 
 export default function FileComponent({
   id = "",
-  initialPos = { x: 50, y: 50 },
-  initialSize = { width: 400, height: 500 },
+  initialPos = { x: -1, y: -100 },
+  initialSize = { width: 200, height: 300 },
   components = [],
   content = "",
-  updateComponent = () => {},
+  updateComponent = () => { },
   isActive = false,
-  onMouseDown = () => {},
-  setIsDragging = () => {},
+  onMouseDown = () => { },
+  setIsDragging = () => { },
   isPreview = false,
 }: FileComponentProps) {
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
   const [pdfSrc, setPdfSrc] = useState(content || "");
-  const [isDragging, setDragging] = useState(false);
+  const [isOverlayActive, setIsOverlayActive] = useState(true);
 
   const handleMouseDown = (e: MouseEvent | React.MouseEvent) => {
     e.stopPropagation();
     onMouseDown();
+    setIsOverlayActive(false); // Hide overlay when clicked
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,49 +75,45 @@ export default function FileComponent({
     <Rnd
       size={{ width: size.width, height: size.height }}
       position={{ x: position.x, y: position.y }}
-      onDragStart={(e) => {
-        setIsDragging(true);
-        setDragging(true);
-      }}
+      onDragStart={() => setIsDragging(true)}
       onDragStop={(e, d) => {
         setIsDragging(false);
-        setDragging(false);
         handleDragStop(id, size, components, updateComponent, setPosition)(e, d);
       }}
-      onResizeStart={(e) => {
-        setIsDragging(true);
-        setDragging(true);
-      }}
+      onResizeStart={() => setIsDragging(true)}
       onResizeStop={(e, d, ref, delta, newPosition) => {
         setIsDragging(false);
-        setDragging(false);
         handleResizeStop(id, components, updateComponent, setSize, setPosition)(e, d, ref, delta, newPosition);
       }}
       bounds="parent"
       onMouseDown={handleMouseDown}
       style={{ pointerEvents: "auto" }}
+      dragHandleClassName={`${id}-drag-handle`}
     >
       <div
-        className={`w-full h-full border-2 transition-all duration-150 ease-in-out ${isActive ? "border-blue-500 bg-gray-100 shadow-md" : "border-transparent hover:border-gray-300"}`}
+        className={`w-full h-full border-2 transition-all duration-150 ease-in-out ${
+          isActive ? "border-blue-500 bg-gray-100 shadow-md" : "border-transparent hover:border-gray-300"
+        }`}
       >
-
-        {isDragging && pdfSrc && (
-          <div
-            className="absolute inset-0 z-10"
-            style={{ background: "transparent" }}
-          />
-        )}
-
         {pdfSrc ? (
           <div className="relative w-full h-full">
-          <iframe id={`pdf-iframe-${id}`} src={pdfSrc} className="w-full h-full border-none" style={{ pointerEvents: "auto" }} />
-          <div
+            {/* Transparent Overlay to Capture Clicks */}
+            {isOverlayActive && (
+              <div
+                className="absolute inset-0 bg-transparent z-10 cursor-pointer"
+                onMouseDown={handleMouseDown}
+              />
+            )}
 
-            className="absolute inset-0"
-            onMouseDown={handleMouseDown}
-            style={{ background: "transparent" }}
-          />
-        </div>
+            {/* PDF Viewer */}
+            <iframe
+              id={`pdf-iframe-${id}`}
+              src={pdfSrc}
+              className="w-full h-full border-none"
+              style={{ pointerEvents: "auto" }}
+              onMouseLeave={() => setIsOverlayActive(true)} // Re-enable overlay when leaving iframe
+            />
+          </div>
         ) : (
           <label className="w-full h-full flex items-center justify-center cursor-pointer bg-gray-200">
             Click to Upload a PDF
@@ -123,6 +121,14 @@ export default function FileComponent({
           </label>
         )}
       </div>
+
+      {isActive && (
+        <div
+          className={`${id}-drag-handle absolute top-10 right-[-30px] w-6 h-6 bg-gray-300 rounded-md cursor-move flex items-center justify-center z-10`}
+        >
+          <GripIcon />
+        </div>
+      )}
     </Rnd>
   );
 }
