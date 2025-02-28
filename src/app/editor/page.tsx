@@ -146,6 +146,56 @@ export default function Editor() {
   const deletePage = (pageIndex: number) => {
     if (activePageIndex == null) return;
 
+    // Save components first
+    setPages(prevPages => {
+      const updatedPages = [...prevPages];
+      updatedPages[activePageIndex].components = components;
+      return updatedPages;
+    });
+    const pageToDelete = pages[pageIndex];
+
+    if (pageToDelete.components.length > 1) {
+      toast(
+        <div className="flex flex-col">
+          <h3 className="font-semibold text-lg text-yellow-500">Warning</h3>
+          <p className="text-sm">
+            Are you sure you want to delete this page?
+          </p>
+          <div className="flex justify-between mt-4">
+            <button
+              className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition"
+              onClick={() => toast.dismiss()}
+            >
+              Cancel
+            </button>
+            <button
+              className="flex-1 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition ml-3"
+              onClick={() => {
+                toast.dismiss();
+                confirmDelete(pageIndex);
+              }}
+            >
+              Yes, Delete
+            </button>
+          </div>
+        </div >,
+        {
+          position: "top-center",
+          autoClose: false,
+          closeOnClick: false,
+          draggable: false,
+          closeButton: false,
+          transition: Flip,
+        }
+      );
+      return;
+    }
+    confirmDelete(pageIndex);
+  };
+
+  const confirmDelete = (pageIndex: number) => {
+    if (activePageIndex == null) return;
+
     setPages(prevPages => {
       const updatedPages = [...prevPages];
       updatedPages.splice(pageIndex, 1); // Remove the selected page
@@ -160,7 +210,6 @@ export default function Editor() {
       }
 
       setActivePageIndex(newActiveIndex);
-
       setComponents(updatedPages[newActiveIndex]?.components || []);
 
       return updatedPages;
