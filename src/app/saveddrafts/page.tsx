@@ -221,19 +221,27 @@ export default function SavedDrafts() {
 					id="draftsContainer"
 					className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 justify-evenly gap-4 mt-12"
 				>
-					{draftMappings.map((d, i) => {
-						return (
-							<DraftItem
-								key={i}
-								id={d.id}
-								name={d.name}
-								loadEditor={loadEditor}
-								handleDeleteDraft={handleDeleteDraft}
-								setIsModalHidden={setIsModalHidden}
-								setSelectedDraft={setSelectedDraft}
-							/>
-						);
-					})}
+					{ draftMappings ?
+
+						draftMappings.map((d, i) => {
+							return (
+								<DraftItem
+									key={i}
+									id={d.id}
+									name={d.name}
+									loadEditor={loadEditor}
+									handleDeleteDraft={handleDeleteDraft}
+									setIsModalHidden={setIsModalHidden}
+									setSelectedDraft={setSelectedDraft}
+								/>
+							);
+						})
+
+						:
+						
+						""
+					}
+
 				</div>
 				<div
 					style={{ display: isModalHidden ? 'none' : 'flex' }}

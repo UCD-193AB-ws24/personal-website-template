@@ -20,7 +20,6 @@ export default function Home() {
   useEffect(() => {
     if (user) {
       getUsername();
-      getPublishedDraftNumber();
     }
   }, [user]);
 
@@ -72,41 +71,6 @@ export default function Home() {
 			console.log('Error creating new draft:', error.message);
 		}
 	};
-
-  const handleOpenWebsite = async () => {
-    try {
-      window.open("https://www.profesite.online/pages/" + username, "_blank");
-    } catch (error: any) {
-      console.log('Error opening website:', error.message);
-    }
-  };
-
-  const getPublishedDraftNumber = async () => {
-    try {
-      const response = await fetch("/api/user/get-published-draftnumber", {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      const resBody = await response.json() as APIResponse<string>;
-
-      if (response.ok && resBody.success) {
-
-        console.log("draftnum: ", resBody.data);
-
-        if (resBody.data !== undefined) {
-          setPublishedDraftNumber(resBody.data);
-        }
-
-      } else {
-        throw new Error("Unknown draftNumber");
-      }
-    } catch (error: any) {
-      setPublishedDraftNumber("");
-      console.log(error.message);
-    }
-  }
 
 	return (
 		<div>
