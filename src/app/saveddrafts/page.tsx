@@ -236,7 +236,10 @@ export default function SavedDrafts() {
 						user={true}
 						username={username}
 						onSignOut={handleSignOut}
-						navLinks={[{ label: 'Home', href: '/' }]}
+						navLinks={[
+							{ label: 'Home', href: '/' },
+							{ label: 'Profile', href: '/profile'}
+						]}
 					/>
 				) : (
 					<Navbar
@@ -264,21 +267,29 @@ export default function SavedDrafts() {
 					id="draftsContainer"
 					className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 justify-evenly gap-4 mt-12"
 				>
-					{draftMappings.map((d, i) => {
-						return (
-							<DraftItem
-								key={i}
-								id={d.id}
-								name={d.name}
-								isPublished={d.id === publishedDraftNumber}
-								loadEditor={loadEditor}
-								handleDeleteDraft={handleDeleteDraft}
-								setIsModalHidden={setIsModalHidden}
-								setSelectedDraft={setSelectedDraft}
-								unpublish={unpublish}
-							/>
-						);
-					})}
+					{ draftMappings ?
+
+						draftMappings.map((d, i) => {
+							return (
+								<DraftItem
+									key={i}
+									id={d.id}
+									name={d.name}
+									isPublished={d.id === publishedDraftNumber}
+									loadEditor={loadEditor}
+									handleDeleteDraft={handleDeleteDraft}
+									setIsModalHidden={setIsModalHidden}
+									setSelectedDraft={setSelectedDraft}
+									unpublish={unpublish}
+								/>
+							);
+						})
+
+						:
+						
+						""
+					}
+
 				</div>
 				<div
 					style={{ display: isModalHidden ? 'none' : 'flex' }}
