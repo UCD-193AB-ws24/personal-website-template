@@ -146,6 +146,56 @@ export default function Editor() {
   const deletePage = (pageIndex: number) => {
     if (activePageIndex == null) return;
 
+    // Save components first
+    setPages(prevPages => {
+      const updatedPages = [...prevPages];
+      updatedPages[activePageIndex].components = components;
+      return updatedPages;
+    });
+    const pageToDelete = pages[pageIndex];
+
+    if (pageToDelete.components.length > 1) {
+      toast(
+        <div className="flex flex-col">
+          <h3 className="font-semibold text-lg text-yellow-500">Warning</h3>
+          <p className="text-sm">
+            Are you sure you want to delete this page?
+          </p>
+          <div className="flex justify-between mt-4">
+            <button
+              className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition"
+              onClick={() => toast.dismiss()}
+            >
+              Cancel
+            </button>
+            <button
+              className="flex-1 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition ml-3"
+              onClick={() => {
+                toast.dismiss();
+                confirmDelete(pageIndex);
+              }}
+            >
+              Yes, Delete
+            </button>
+          </div>
+        </div >,
+        {
+          position: "top-center",
+          autoClose: false,
+          closeOnClick: false,
+          draggable: false,
+          closeButton: false,
+          transition: Flip,
+        }
+      );
+      return;
+    }
+    confirmDelete(pageIndex);
+  };
+
+  const confirmDelete = (pageIndex: number) => {
+    if (activePageIndex == null) return;
+
     setPages(prevPages => {
       const updatedPages = [...prevPages];
       updatedPages.splice(pageIndex, 1); // Remove the selected page
@@ -160,7 +210,6 @@ export default function Editor() {
       }
 
       setActivePageIndex(newActiveIndex);
-
       setComponents(updatedPages[newActiveIndex]?.components || []);
 
       return updatedPages;
@@ -281,9 +330,27 @@ export default function Editor() {
   };
 
   const removeComponent = (id: string) => {
-    setComponents(prev => prev.filter(comp => comp.id !== id));
+    setComponents(prev => {
+      const componentToRemove = prev.find(comp => comp.id === id);
+      const updatedComponents = prev.filter(comp => comp.id !== id);
+
+      // If the removed component is a navBar, set the first page's name back to Home
+      if (componentToRemove?.type === "navBar") {
+        setPages(prevPages => {
+          const updatedPages = [...prevPages];
+          if (updatedPages.length > 0) {
+            updatedPages[0] = { ...updatedPages[0], pageName: "Home" };
+          }
+          return updatedPages;
+        });
+      }
+
+      return updatedComponents;
+    });
+
     setActiveComponent(null);
-  }
+  };
+
 
   const updateComponent = (id: string, position: Position, size: Size, content?: any) => {
     if (content) {
@@ -370,8 +437,12 @@ export default function Editor() {
       return (
         <NavigationBar
           key={comp.id}
+          components={components}
+          setComponents={setComponents}
           pages={pages}
+          setPages={setPages}
           activePageIndex={activePageIndex || 0}
+          setActivePageIndex={setActivePageIndex}
           switchPage={switchPage}
           addPage={addPage}
           deletePage={deletePage}
