@@ -1,4 +1,28 @@
-import { ToastContentProps } from 'react-toastify';
+import { toast, ToastContentProps, Flip } from 'react-toastify';
+import { fetchUsername } from '@lib/requests/fetchUsername';
+
+export async function toastPublish() {
+    const username = await fetchUsername();
+
+    toast(PublishToast, {
+      position: "top-right",
+      autoClose: false,
+      hideProgressBar: true,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: false,
+      progress: undefined,
+      theme: "light",
+      transition: Flip,
+      onClose: (reason) => {
+        switch (reason) {
+          case "view":
+            window.open(`/pages/${username}`, '_blank')?.focus()
+          default:
+        }
+      },
+    });
+  }
 
 export default function PublishToast({ closeToast }: ToastContentProps) {
 	return (
