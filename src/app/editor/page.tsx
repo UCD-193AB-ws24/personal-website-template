@@ -5,20 +5,28 @@ import Link from 'next/link';
 import { DndContext, DragOverlay, DragStartEvent, DragEndEvent, DragMoveEvent } from '@dnd-kit/core';
 import { restrictToWindowEdges } from '@dnd-kit/modifiers';
 import { ArrowUpIcon, Router, XIcon } from "lucide-react";
+import { Flip, toast, ToastContainer } from 'react-toastify';
 
 import EditorDropZone from '@components/EditorDropZone';
 import Sidebar from '@components/sidebar/Sidebar';
 import DraggableResizableTextbox from '@components/DraggableResizableTextbox';
 import SectionTitleTextbox from '@components/SectionTitle';
+import NavigationBar from '@components/NavigationBar';
 import LoadingSpinner from '@components/LoadingSpinner';
+import { toastPublish} from '@components/PublishToast';
+import ImageComponent from '@components/ImageComponent';
+import FileComponent from '@components/FileComponent';
 
-import type { ComponentItem, Position, Size } from '@customTypes/componentTypes';
+import type { ComponentItem, Page, Position, Size } from '@customTypes/componentTypes';
 
 import { findBestFreeSpot } from '@utils/collisionUtils';
 import { APIResponse } from '@customTypes/apiResponse';
 import { useSearchParams } from 'next/navigation';
+import { toastSaveSuccess } from '@components/SaveToast';
+import { saveDraft } from '@lib/requests/saveDrafts';
+import SavedDrafts from '../saveddrafts/page';
 
-function DraftLoader({ setComponents, setIsLoading, setDraftNumber, setHasLoadedDraftOnce }: { setComponents: (c: ComponentItem[]) => void, setIsLoading: (loading: boolean) => void, setDraftNumber: (draftNumber: number) => void, setHasLoadedDraftOnce: (hasLoadedDraftOnce: boolean) => void }) {
+function DraftLoader({ setPages, setActivePageId, setComponents, setIsLoading, setDraftNumber, setHasLoadedDraftOnce }: { setPages: any, setActivePageId: any, setComponents: (c: ComponentItem[]) => void, setIsLoading: (loading: boolean) => void, setDraftNumber: (draftNumber: number) => void, setHasLoadedDraftOnce: (hasLoadedDraftOnce: boolean) => void }) {
   const searchParams = useSearchParams();
   const draftNumber = searchParams.get("draftNumber");
 
@@ -33,7 +41,20 @@ function DraftLoader({ setComponents, setIsLoading, setDraftNumber, setHasLoaded
       })
         .then((res) => res.json())
         .then((res) => {
-          setComponents(Array.isArray(res.data) ? res.data : []);
+          const draftPages = res.data;
+          setPages(draftPages);
+
+          if (draftPages.length > 0) {
+            setActivePageId(0);
+            setComponents(draftPages[0].components || []);
+          } else {
+            // No pages exist, create a default one
+            const defaultPage = { pageName: "Home", components: [] };
+            setPages([defaultPage]);
+            setActivePageId(0);
+            setComponents([]);
+          }
+
           setIsLoading(false);
           setHasLoadedDraftOnce(true);
         })
@@ -62,6 +83,9 @@ export default function Editor() {
   const [hasLoadedDraftOnce, setHasLoadedDraftOnce] = useState(false);
   const [draftNumber, setDraftNumber] = useState(-1);
   const [isPreview, setIsPreview] = useState(false);
+  const [pages, setPages] = useState<Page[]>([]);
+  const [activePageIndex, setActivePageIndex] = useState<number | null>(null);
+
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -78,23 +102,141 @@ export default function Editor() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const saveComponents = async () => {
+  const switchPage = (pageIndex: number) => {
+    if (activePageIndex == null) return;
+
+    setPages(prevPages => {
+      const updatedPages = [...prevPages];
+      updatedPages[activePageIndex].components = components;
+      return updatedPages;
+    });
+
+    setActivePageIndex(pageIndex);
+    setComponents(pages[pageIndex]?.components || []);
+    setActiveComponent(null)
+  };
+
+  const updatePageName = (index: number, newName: string) => {
+    setPages(prevPages => {
+      const updatedPages = [...prevPages];
+      updatedPages[index].pageName = newName;
+      return updatedPages;
+    });
+  };
+
+  const addPage = () => {
+    setPages(prevPages => {
+      if (activePageIndex !== null) {
+        prevPages[activePageIndex].components = [...components];
+      }
+
+      // Enumerate New Page (e.g., New Page 2, New Page 3, ...)
+      const existingNames = new Set(prevPages.map(page => page.pageName));
+      let counter = 2;
+      let newPageName = "New Page";
+      while (existingNames.has(newPageName)) {
+        newPageName = `New Page ${counter++}`;
+      }
+
+      const updatedPages = [...prevPages, { pageName: newPageName, components: [] }]
+
+      setActivePageIndex(updatedPages.length - 1);
+      setComponents([]);
+
+      return updatedPages;
+    });
+  };
+
+  const deletePage = (pageIndex: number) => {
+    if (activePageIndex == null) return;
+
+    // Save components first
+    setPages(prevPages => {
+      const updatedPages = [...prevPages];
+      updatedPages[activePageIndex].components = components;
+      return updatedPages;
+    });
+    const pageToDelete = pages[pageIndex];
+
+    if (pageToDelete.components.length > 1) {
+      toast(
+        <div className="flex flex-col">
+          <h3 className="font-semibold text-lg text-yellow-500">Warning</h3>
+          <p className="text-sm">
+            Are you sure you want to delete this page?
+          </p>
+          <div className="flex justify-between mt-4">
+            <button
+              className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition"
+              onClick={() => toast.dismiss()}
+            >
+              Cancel
+            </button>
+            <button
+              className="flex-1 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition ml-3"
+              onClick={() => {
+                toast.dismiss();
+                confirmDelete(pageIndex);
+              }}
+            >
+              Yes, Delete
+            </button>
+          </div>
+        </div >,
+        {
+          position: "top-center",
+          autoClose: false,
+          closeOnClick: false,
+          draggable: false,
+          closeButton: false,
+          transition: Flip,
+        }
+      );
+      return;
+    }
+    confirmDelete(pageIndex);
+  };
+
+  const confirmDelete = (pageIndex: number) => {
+    if (activePageIndex == null) return;
+
+    setPages(prevPages => {
+      const updatedPages = [...prevPages];
+      updatedPages.splice(pageIndex, 1); // Remove the selected page
+
+      let newActiveIndex = activePageIndex;
+
+      // If the deleted page was the active page, shift active page index
+      if (activePageIndex >= updatedPages.length) {
+        newActiveIndex = updatedPages.length - 1;
+      } else if (activePageIndex === pageIndex) {
+        newActiveIndex = Math.max(0, pageIndex - 1);
+      }
+
+      setActivePageIndex(newActiveIndex);
+      setComponents(updatedPages[newActiveIndex]?.components || []);
+
+      return updatedPages;
+    });
+  };
+
+  const handleSaveDraft = async () => {
+    if (activePageIndex == null) return;
     setIsLoading(true);
 
     try {
-      const res = await fetch(`/api/db/drafts?draftNumber=${draftNumber}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          components: components
-        }),
-      });
-      const resBody = await res.json() as APIResponse<string>;
+      // Save changes to the current page
+      const updatedPages = pages.map((page, index) =>
+        index === activePageIndex ? { ...page, components: [...components] } : page
+      );
 
-      if (res.ok && resBody.success) {
+      setPages(updatedPages);
+
+      const result = await saveDraft(draftNumber, pages);
+
+      if (result === "") {
         setIsLoading(false);
+        toastSaveSuccess();
         return
       }
 
@@ -105,10 +247,23 @@ export default function Editor() {
     }
   }
 
+  // Saves the current changes and publishes the draft
   const handlePublish = async () => {
     setIsLoading(true);
 
     try {
+      // Save changes to the current page
+      const updatedPages = pages.map((page, index) =>
+        index === activePageIndex ? { ...page, components: [...components] } : page
+      );
+
+      setPages(updatedPages);
+
+      const saveDraftResult = await saveDraft(draftNumber, updatedPages);
+      if (saveDraftResult !== "") {
+        throw new Error(saveDraftResult);
+      }
+
       const res = await fetch(`/api/user/publish-draft`, {
         method: "POST",
         headers: {
@@ -121,11 +276,13 @@ export default function Editor() {
 
       const resBody = await res.json();
 
-      if (!resBody.success) {
-        throw new Error(resBody.error);
+      if (res.ok && resBody.success) {
+        toastPublish();
+        setIsLoading(false);
+        return;
       }
 
-      setIsLoading(false);
+      throw new Error(resBody.error);
     } catch (error: any) {
       console.log("Error:", error.message);
       setIsLoading(false);
@@ -147,17 +304,43 @@ export default function Editor() {
   const componentSizes: Record<string, { width: number; height: number }> = {
     textBlock: { width: 200, height: 150 },
     sectionTitle: { width: 350, height: 50 },
+    image: { width: 200, height: 150},
+    file: {width:425, height:550}
   };
 
   const addComponent = (type: string, position: { x: number; y: number }, id: string) => {
     const size = componentSizes[type] || { width: 200, height: 150 };
+
+    if (type === "navBar") {
+      const hasNavBar = components.some((comp) => comp.type === "navBar");
+      if (hasNavBar) return; // do not add an additional nav bar
+    }
+
     setComponents(prev => [...prev, { id, type, position, size }]);
   };
 
   const removeComponent = (id: string) => {
-    setComponents(prev => prev.filter(comp => comp.id !== id));
+    setComponents(prev => {
+      const componentToRemove = prev.find(comp => comp.id === id);
+      const updatedComponents = prev.filter(comp => comp.id !== id);
+
+      // If the removed component is a navBar, set the first page's name back to Home
+      if (componentToRemove?.type === "navBar") {
+        setPages(prevPages => {
+          const updatedPages = [...prevPages];
+          if (updatedPages.length > 0) {
+            updatedPages[0] = { ...updatedPages[0], pageName: "Home" };
+          }
+          return updatedPages;
+        });
+      }
+
+      return updatedComponents;
+    });
+
     setActiveComponent(null);
-  }
+  };
+
 
   const updateComponent = (id: string, position: Position, size: Size, content?: any) => {
     if (content) {
@@ -186,6 +369,12 @@ export default function Editor() {
     setIsDragging(false);
     if (!activeComponent) return;
     if (over?.id === 'editor-drop-zone' && active.rect.current.translated) {
+      if (activeComponent.type == 'navBar') {
+        const draggedRect = active.rect.current.translated as DOMRect;
+        addComponent(activeComponent.type, { x: 0, y: 0 }, activeComponent.id);
+        setActiveComponent({ ...activeComponent, position: { x: 0, y: 0 }, size: { width: draggedRect.width, height: draggedRect.height } });
+        return;
+      }
       const editorBounds = over.rect;
       const draggedRect = active.rect.current.translated as DOMRect;
 
@@ -220,6 +409,12 @@ export default function Editor() {
         return <DraggableResizableTextbox />;
       case 'sectionTitle':
         return <SectionTitleTextbox />
+      case 'navBar':
+        return <NavigationBar />
+      case 'image':
+        return <ImageComponent />
+      case 'file':
+        return <FileComponent />
       default:
         return null;
     }
@@ -228,9 +423,32 @@ export default function Editor() {
   const componentMap: Record<string, React.ComponentType<Partial<ComponentItem>>> = {
     textBlock: DraggableResizableTextbox,
     sectionTitle: SectionTitleTextbox,
+    navBar: NavigationBar,
+    image: ImageComponent,
+    file: FileComponent
   };
 
   const renderComponent = (comp: ComponentItem) => {
+    if (comp.type === "navBar") {
+      return (
+        <NavigationBar
+          key={comp.id}
+          components={components}
+          setComponents={setComponents}
+          pages={pages}
+          setPages={setPages}
+          activePageIndex={activePageIndex || 0}
+          setActivePageIndex={setActivePageIndex}
+          switchPage={switchPage}
+          addPage={addPage}
+          deletePage={deletePage}
+          updatePageName={updatePageName}
+          isPreview={isPreview}
+          onMouseDown={() => handleComponentSelect(comp)}
+        />
+      );
+    }
+
     const Component = componentMap[comp.type];
 
     return Component ? (
@@ -249,6 +467,13 @@ export default function Editor() {
       />
     ) : null;
   };
+
+  {/* Make Navigation Bar always present when more than one page exists */ }
+  useEffect(() => {
+    if (pages.length > 1 && !components.some((comp) => comp.type === "navBar")) {
+      addComponent("navBar", { x: 0, y: 0 }, `navBar-${Date.now()}`);
+    }
+  }, [pages, components]);
 
   return (
     <>
@@ -278,16 +503,17 @@ export default function Editor() {
           onDragMove={handleDragMove}
         >
           <div
-            className={`flex ${isPreview ? "justify-center items-center h-screen bg-gray-200" : ""} text-black relative`}
+            className={`flex ${isPreview ? "justify-center items-center h-screen bg-gray-200" : ""} text-black relative bg-white`}
           >
             <Sidebar />
 
-            <button className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-full" style={{ position: "fixed", bottom: "20px", right: "20px", zIndex: "10" }} onClick={saveComponents}>Save</button>
+            <button className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-full" style={{ position: "fixed", bottom: "20px", right: "20px", zIndex: "10" }} onClick={handleSaveDraft}>Save</button>
 
             <LoadingSpinner show={isLoading} />
+            <ToastContainer />
 
             <Suspense fallback={<LoadingSpinner show={true} />}>
-              {!hasLoadedDraftOnce && (<DraftLoader setDraftNumber={setDraftNumber} setComponents={setComponents} setIsLoading={setIsLoading} setHasLoadedDraftOnce={setHasLoadedDraftOnce} />)}
+              {!hasLoadedDraftOnce && (<DraftLoader setPages={setPages} setActivePageId={setActivePageIndex} setDraftNumber={setDraftNumber} setComponents={setComponents} setIsLoading={setIsLoading} setHasLoadedDraftOnce={setHasLoadedDraftOnce} />)}
             </Suspense>
 
             <div className="flex flex-col flex-grow">
@@ -316,7 +542,7 @@ export default function Editor() {
                 onClick={handleBackgroundClick}
                 style={{ minHeight: `${editorHeight}px`, height: 'auto', marginTop: '64px' }}
               >
-                {!isLoading && components.length === 0 ? (
+                {!isLoading && components.length === 0 && pages.length < 2 ? (
                   <h1 className="text-2xl font-bold mb-4 text-gray-400 text-center mt-20">
                     Drag components here to start building your site!
                   </h1>
@@ -325,25 +551,30 @@ export default function Editor() {
                 )}
 
                 {activeComponent && !isDragging && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeComponent(activeComponent.id);
-                    }}
-                    style={{
-                      position: "absolute",
-                      top: activeComponent.position.y < 40
-                        ? `${activeComponent.position.y + activeComponent.size.height + 15}px`
-                        : `${activeComponent.position.y - 25}px`,
-                      left: `${activeComponent.position.x + activeComponent.size.width - 20}px`,
-                      zIndex: 10,
-                      pointerEvents: "auto",
-                      transition: "opacity 0.2s ease-in-out, transform 0.1s",
-                    }}
-                    className="w-6 h-6 bg-red-500 text-white rounded shadow-md hover:bg-red-600 hover:scale-110 flex items-center justify-center"
-                  >
-                    <XIcon size={32} />
-                  </button>
+                  (activeComponent.type !== "navBar" || pages.length === 1) && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeComponent(activeComponent.id);
+                      }}
+                      style={{
+                        position: "absolute",
+                        top: activeComponent.position.y < 40
+                          ? `${activeComponent.position.y + activeComponent.size.height + 15}px`
+                          : `${activeComponent.position.y - 25}px`,
+                        left:
+                          activeComponent.type === "navBar"
+                            ? "50px"
+                            : `${activeComponent.position.x + activeComponent.size.width - 20}px`,
+                        zIndex: 10,
+                        pointerEvents: "auto",
+                        transition: "opacity 0.2s ease-in-out, transform 0.1s",
+                      }}
+                      className="w-6 h-6 bg-red-500 text-white rounded shadow-md hover:bg-red-600 hover:scale-110 flex items-center justify-center z-50"
+                    >
+                      <XIcon size={32} />
+                    </button>
+                  )
                 )}
               </EditorDropZone>
             </div>

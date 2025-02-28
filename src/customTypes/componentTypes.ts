@@ -29,3 +29,7 @@ export interface ComponentItem {
   isPreview?: boolean
 }
 
+export interface Page {
+  pageName: string;
+  components: ComponentItem[]
+}

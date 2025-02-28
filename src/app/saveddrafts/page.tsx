@@ -3,11 +3,12 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '@lib/firebase/firebaseApp';
 import { signUserOut } from '@lib/firebase/auth';
 import { useRouter } from 'next/navigation';
-import { Ref, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { APIResponse } from '@customTypes/apiResponse';
 import Navbar from '@components/Navbar';
 import LoadingSpinner from '@components/LoadingSpinner';
 import DraftItem from '@components/DraftItem';
+import { fetchUsername } from '@lib/requests/fetchUsername';
 
 export default function SavedDrafts() {
 	const [user] = useAuthState(auth);
@@ -23,11 +24,13 @@ export default function SavedDrafts() {
 	const [newDraftName, setNewDraftName] = useState('');
 	const router = useRouter();
 	const [isLoading, setIsLoading] = useState(false);
+	const [publishedDraftNumber, setPublishedDraftNumber] = useState(0);
 
 	useEffect(() => {
 		if (user) {
-                        getUsername();
+			getUsername();
 			getDraftMappings();
+			getPublishedDraftNumber();
 		}
 		// else {
 		//   router.push("/")
@@ -45,24 +48,12 @@ export default function SavedDrafts() {
 	};
 
 	const getUsername = async () => {
-		try {
-			const response = await fetch('/api/user/username', {
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			});
-
-			const resBody = (await response.json()) as APIResponse<string>;
-
-			if (response.ok && resBody.success) {
-				setUsername(resBody.data);
-			} else {
-				throw new Error('Unknown username');
-			}
-		} catch (error: any) {
+		const name = await fetchUsername();
+		if (name === null) {
 			setUsername('Unknown');
 			router.push('/setusername');
-			console.log(error.message);
+		} else {
+			setUsername(name);
 		}
 	};
 
@@ -77,6 +68,51 @@ export default function SavedDrafts() {
 			.then((res) => {
 				if (res.success) {
 					setDraftMappings(res.data);
+					setIsLoading(false);
+				} else {
+					throw new Error(res.error);
+				}
+			})
+			.catch((error) => {
+				console.log(error.message);
+				setIsLoading(false);
+			});
+	};
+
+	const getPublishedDraftNumber = () => {
+		setIsLoading(true);
+		fetch('/api/user/publish-draft', {
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		})
+			.then((res) => res.json())
+			.then((res) => {
+				if (res.success) {
+					setPublishedDraftNumber(res.data);
+					setIsLoading(false);
+				} else {
+					throw new Error(res.error);
+				}
+			})
+			.catch((error) => {
+				console.log(error.message);
+				setIsLoading(false);
+			});
+	};
+
+	const unpublish = () => {
+		setIsLoading(true);
+		fetch('/api/user/unpublish-draft', {
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			method: 'POST',
+		})
+			.then((res) => res.json())
+			.then((res) => {
+				if (res.success) {
+					setPublishedDraftNumber(0);
 					setIsLoading(false);
 				} else {
 					throw new Error(res.error);
@@ -198,7 +234,7 @@ export default function SavedDrafts() {
 				{user ? (
 					<Navbar
 						user={true}
-                                                username={username}
+						username={username}
 						onSignOut={handleSignOut}
 						navLinks={[{ label: 'Home', href: '/' }]}
 					/>
@@ -234,10 +270,12 @@ export default function SavedDrafts() {
 								key={i}
 								id={d.id}
 								name={d.name}
+								isPublished={d.id === publishedDraftNumber}
 								loadEditor={loadEditor}
 								handleDeleteDraft={handleDeleteDraft}
 								setIsModalHidden={setIsModalHidden}
 								setSelectedDraft={setSelectedDraft}
+								unpublish={unpublish}
 							/>
 						);
 					})}
