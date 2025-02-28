@@ -16,7 +16,7 @@ import Navbar from "@components/Navbar"
 export default function Profile() {
   const [user] = useAuthState(auth);
   const [username, setUsername] = useState("");
-  const [publishedDraftNumber, setPublishedDraftNumber] = useState("");
+  const [publishedDraftNumber, setPublishedDraftNumber] = useState("0");
   const [views, setViews] = useState("0");
   const [draftMappings, setDraftMappings] = useState<Array<{ id: number; name: string }>>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -123,7 +123,7 @@ export default function Profile() {
 
         console.log("draftnum: ", resBody.data);
 
-        if (resBody.data !== undefined && resBody.data !== "0") {
+        if (resBody.data !== undefined) {
           setPublishedDraftNumber(resBody.data);
           getViews(resBody.data);
         }
@@ -201,26 +201,26 @@ export default function Profile() {
 
       <main className="mx-auto max-w-screen-xl p-4">
         
-        <div className="absolute top-[130px] left-[50px] pointer-events-none">
-          <h1 className="text-5xl sm:text-[50px] md:text-[100px] lg:text-[150px] xl:text-[200px] font-bold text-black opacity-20 select-none">
-            {username ? username : ""}
-          </h1>
-        </div>
+      <div className="fixed top-[130px] left-[50px] pointer-events-none">
+        <h1 className="text-5xl sm:text-[50px] md:text-[100px] lg:text-[150px] xl:text-[200px] font-bold text-black opacity-20 select-none">
+          {username ? username : ""}
+        </h1>
+      </div>
 
-        <div className="grid sm:grid-cols-1 md:grid-cols-2 justify-evenly gap-7 mt-18">
+        <div className="grid sm:grid-cols-1 md:grid-cols-2 justify-evenly gap-7 mt-20">
 
           <div className="mt-16 p-6 text-center bg-gray-900 sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0 flex flex-col justify-between w-[275px] sm:w-full h-[285px]">
 
             <div className="flex justify-center mt-5 mb-4 text-3xl sm:text-1xl md:text-2xl lg:text-3xl xl:text-3xl font-bold text-white">
               <h2>
-                Your website is: {publishedDraftNumber === ""
+                Your website is: { publishedDraftNumber == "0"
                 ? <div className="text-red-500 flex justify-center">Offline!</div>
                 : <div className="text-green-500 flex justify-center">Online!</div>}
               </h2>
             </div>
 
             <div>
-              { publishedDraftNumber === "" ?
+              { publishedDraftNumber == "0" ?
                 <button disabled className="relative inline-flex px-6 py-4 w-1/2 text-lg font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all shadow-[0_0_10px_rgba(240,135,0,0.4)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 items-center justify-center text-center">
                   My Website
                 </button>
