@@ -14,6 +14,7 @@ import Navbar from "@components/Navbar"
 export default function Home() {
   const [user] = useAuthState(auth);
   const [username, setUsername] = useState("");
+  const [publishedDraftNumber, setPublishedDraftNumber] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -79,6 +80,7 @@ export default function Home() {
                   username={username}
                   onSignOut={handleSignOut}
                   navLinks={[
+                    { label: "Profile", href: "/profile"},
                     { label: "Drafts", href: "/saveddrafts"}
                   ]}
                 /> :
@@ -91,8 +93,9 @@ export default function Home() {
                 />
         }
 			</header>
-			<main className="mx-auto max-w-screen-xl p-4">
-				<div className="grid grid-cols-1 gap-y-16 sm:gap-y-32 justify-items-center md:items-end md:grid-cols-3 md:gap-x-8 pb-64">
+           
+      <main className="mx-auto max-w-screen-xl p-4">
+        <div className="grid grid-cols-1 gap-y-16 sm:gap-y-32 justify-items-center md:items-end md:grid-cols-3 md:gap-x-8 pb-64">
           <div className="perspective-text justify-self-start mt-48 mr-16">
             <div className="perspective-line">
               <p className="text-3xl sm:text-6xl">Your</p>
@@ -129,12 +132,12 @@ export default function Home() {
               </button>
             </div>
           </div>
-				</div>
+        </div>
 
         <div className="mt-16 p-6 text-center bg-gray-900 border border-[#00f2ff] sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0">
-					<h3 className="mb-2 text-3xl font-bold text-white">
+          <h3 className="mb-2 text-3xl font-bold text-white">
             Why Profesite?
-					</h3>
+          </h3>
           <div className="flex justify-center">
             <div className="grid justify-start pl-16 pr-16 gap-x-8" style={{gridTemplateColumns: "auto minmax(0, 1fr)"}}>
               <p className="justify-self-start text-white">Stand Out</p>
@@ -145,12 +148,12 @@ export default function Home() {
               <p className="justify-self-start text-white">Connect your portfolio, LinkedIn, and contact info</p>
             </div>
           </div>
-				</div>
+        </div>
 
         <div className="mt-16 p-6 text-center bg-gray-900 border border-[#00f2ff] sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0">
-					<h3 className="mb-2 text-3xl font-bold text-white">
+          <h3 className="mb-2 text-3xl font-bold text-white">
             How It Works
-					</h3>
+          </h3>
           <div className="flex justify-center">
             <div className="grid justify-start pl-16 pr-16 gap-x-8" style={{gridTemplateColumns: "auto minmax(0, 1fr)"}}>
               <p className="justify-self-start text-white">Pick a template</p>
@@ -161,12 +164,12 @@ export default function Home() {
               <p className="justify-self-start text-white">Launch in one click, impress instantly</p>
             </div>
           </div>
-				</div>
+        </div>
 
         <div className="mt-16 p-6 text-center bg-gray-900 border border-[#00f2ff] sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0">
-					<h3 className="mb-2 text-3xl font-bold text-white">
+          <h3 className="mb-2 text-3xl font-bold text-white">
             Who&apos;s It For?
-					</h3>
+          </h3>
           <div className="flex justify-center">
             <div className="grid justify-start pl-16 pr-16 gap-x-8" style={{gridTemplateColumns: "auto minmax(0, 1fr)"}}>
               <p className="justify-self-start text-white">Job seekers</p>
@@ -179,12 +182,12 @@ export default function Home() {
               <p className="justify-self-start text-white">Build your own personal brand with credibility</p>
             </div>
           </div>
-				</div>
+        </div>
 
         <div className="mt-16 p-6 text-center bg-gray-900 border border-[#00f2ff] sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0">
-					<h3 className="mb-4 text-3xl font-bold text-white">
+          <h3 className="mb-4 text-3xl font-bold text-white">
             Start Your Website Today
-					</h3>
+          </h3>
           <p className="mb-4 text-white">No coding. No hassle. Just results.</p>
           <button
             onClick={handleNewDraft}
@@ -196,8 +199,10 @@ export default function Home() {
               </div>
             </div>
           </button>
-				</div>
-			</main>
+        </div>
+      </main>
+
+			      
 			<footer></footer>
 		</div>
 	);

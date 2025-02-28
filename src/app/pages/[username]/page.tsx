@@ -33,8 +33,22 @@ export default async function PublishedPage({ params }: PublishedPageProps) {
 		if (!resBody.success) {
 			throw new Error(resBody.error);
 		}
-                pages = resBody.data.pages;
-                const firstPage = pages[0];
+
+		console.log("HELLO YES");
+
+		// increase view on page by 1
+		try {
+			await fetch(`/api/db/increase-view-count?username=${username}`, {
+			  headers: {
+				"Content-Type": "application/json",
+			  },
+			});
+		} catch (error) {
+			throw new Error("Error incrementing views");
+		}
+
+		pages = resBody.data.pages;
+		const firstPage = pages[0];
 		components = firstPage.components;
 
 	} catch (error) {
