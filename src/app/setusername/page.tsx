@@ -23,7 +23,7 @@ export default function SetUsername() {
           await setUsername(username);
           setSuccess(true);
           setLocalUsername("");
-          router.push("/");
+          router.push("/profile");
 
         } catch (err) {
           setSuccess(false);

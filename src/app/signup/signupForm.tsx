@@ -29,7 +29,7 @@ export default function SignUpForm() {
       setEmail("");
       setPassword("");
       setUsername("");
-      router.push("/");
+      router.push("/profile");
     } catch (err) {
       setSuccess(false);
       if (err instanceof Error) {

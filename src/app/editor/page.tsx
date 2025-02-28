@@ -232,7 +232,7 @@ export default function Editor() {
 
       setPages(updatedPages);
 
-      const result = await saveDraft(draftNumber, pages);
+      const result = await saveDraft(draftNumber, updatedPages);
 
       if (result === "") {
         setIsLoading(false);

@@ -3,7 +3,7 @@ import { APIResponse } from '@customTypes/apiResponse';
 import { db } from '@lib/firebase/firebaseAdmin';
 import { ComponentItem } from '@customTypes/componentTypes';
 
-// GET /api/db/draft/published-draft?username=string
+// GET /api/db/drafts/published-draft?username=string
 // Returns saved components of a user's published draft
 export async function GET(req: NextRequest) {
 	try {
@@ -42,21 +42,21 @@ export async function GET(req: NextRequest) {
 			throw new Error('No draft found');
 		}
 
-                const draftData = draftSnapshot.docs[0].data();
+		const draftData = draftSnapshot.docs[0].data();
 
-                const pages = draftData.pages.map((page: any) => ({
-                  pageName: page.pageName,
-                  components: page.components.map((c: ComponentItem) => ({
-                    id: c.id,
-                    type: c.type,
-                    position: c.position!,
-                    size: c.size!,
-	            components: c?.components,
-                    content: c?.content
-                  })),
-                }));
+		const pages = draftData.pages.map((page: any) => ({
+			pageName: page.pageName,
+			components: page.components.map((c: ComponentItem) => ({
+			id: c.id,
+			type: c.type,
+			position: c.position!,
+			size: c.size!,
+			components: c?.components,
+			content: c?.content
+			})),
+		}));
 
-                return NextResponse.json<APIResponse<{ pages: typeof pages }>>({
+		return NextResponse.json<APIResponse<{ pages: typeof pages }>>({
 			success: true,
 			data: { pages },
 		});
