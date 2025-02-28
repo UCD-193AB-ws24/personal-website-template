@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { DndContext, DragOverlay, DragStartEvent, DragEndEvent, DragMoveEvent } from '@dnd-kit/core';
 import { restrictToWindowEdges } from '@dnd-kit/modifiers';
 import { ArrowUpIcon, Router, XIcon } from "lucide-react";
-import { ToastContainer } from 'react-toastify';
+import { Flip, toast, ToastContainer } from 'react-toastify';
 
 import EditorDropZone from '@components/EditorDropZone';
 import Sidebar from '@components/sidebar/Sidebar';
@@ -13,7 +13,9 @@ import DraggableResizableTextbox from '@components/DraggableResizableTextbox';
 import SectionTitleTextbox from '@components/SectionTitle';
 import NavigationBar from '@components/NavigationBar';
 import LoadingSpinner from '@components/LoadingSpinner';
-import { toastPublish } from '@components/PublishToast';
+import { toastPublish} from '@components/PublishToast';
+import ImageComponent from '@components/ImageComponent';
+import FileComponent from '@components/FileComponent';
 
 import type { ComponentItem, Page, Position, Size } from '@customTypes/componentTypes';
 
@@ -302,7 +304,8 @@ export default function Editor() {
   const componentSizes: Record<string, { width: number; height: number }> = {
     textBlock: { width: 200, height: 150 },
     sectionTitle: { width: 350, height: 50 },
-    navBar: { width: 5000, height: 48 }
+    image: { width: 200, height: 150},
+    file: {width:425, height:550}
   };
 
   const addComponent = (type: string, position: { x: number; y: number }, id: string) => {
@@ -408,6 +411,10 @@ export default function Editor() {
         return <SectionTitleTextbox />
       case 'navBar':
         return <NavigationBar />
+      case 'image':
+        return <ImageComponent />
+      case 'file':
+        return <FileComponent />
       default:
         return null;
     }
@@ -417,6 +424,8 @@ export default function Editor() {
     textBlock: DraggableResizableTextbox,
     sectionTitle: SectionTitleTextbox,
     navBar: NavigationBar,
+    image: ImageComponent,
+    file: FileComponent
   };
 
   const renderComponent = (comp: ComponentItem) => {
