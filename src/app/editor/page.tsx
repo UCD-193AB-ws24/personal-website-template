@@ -370,6 +370,7 @@ export default function Editor() {
     textBlock: DraggableResizableTextbox,
     sectionTitle: SectionTitleTextbox,
     navBar: NavigationBar,
+    image: ImageComponent,
     file: FileComponent
   };
 

@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { Rnd } from "react-rnd";
 import { GripIcon } from "lucide-react";
+import { toast, Flip } from 'react-toastify';
+
+import ErrorToast from '@components/ErrorToast';
 
 import type { ComponentItem, Position, Size } from "@customTypes/componentTypes";
 import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
@@ -35,6 +38,10 @@ export default function FileComponent({
   const [pdfSrc, setPdfSrc] = useState(content || "");
   const [isOverlayActive, setIsOverlayActive] = useState(true);
 
+  // https://stackoverflow.com/questions/58488416/open-base64-encoded-pdf-file-using-javascript-issue-with-file-size-larger-than
+  const MAX_FILE_SIZE = 5 * 1024 * 1025; // max 5MB upload for now
+
+
   const handleMouseDown = (e: MouseEvent | React.MouseEvent) => {
     e.stopPropagation();
     onMouseDown();
@@ -44,6 +51,21 @@ export default function FileComponent({
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      if (file.size > MAX_FILE_SIZE) {
+        toast((props) => <ErrorToast {...props} message="File size exceeds the 5MB limit. Please upload a smaller file." />, {
+          position: "top-right",
+          autoClose: false,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: false,
+          progress: undefined,
+          theme: "light",
+          transition: Flip,
+        });
+        return;
+      }
+
       const reader = new FileReader();
       reader.onloadend = () => {
         const pdfUrl = reader.result as string;
@@ -91,9 +113,8 @@ export default function FileComponent({
       dragHandleClassName={`${id}-drag-handle`}
     >
       <div
-        className={`w-full h-full border-2 transition-all duration-150 ease-in-out ${
-          isActive ? "border-blue-500 bg-gray-100 shadow-md" : "border-transparent hover:border-gray-300"
-        }`}
+        className={`w-full h-full border-2 transition-all duration-150 ease-in-out ${isActive ? "border-blue-500 bg-gray-100 shadow-md" : "border-transparent hover:border-gray-300"
+          }`}
       >
         {pdfSrc ? (
           <div className="relative w-full h-full">
