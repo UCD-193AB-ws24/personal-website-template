@@ -1,23 +1,27 @@
 import useComponentVisible from '@lib/hooks/useComponentVisible';
-import { EllipsisVertical, PenLine, Trash2 } from 'lucide-react';
-import { Ref, useEffect, useState } from 'react';
+import { EllipsisVertical, PenLine, Trash2, Star, LucideUserRoundX } from 'lucide-react';
+import { Ref, useState } from 'react';
 
 interface DraftItemProps {
 	id: number;
 	name: string;
+	isPublished: boolean;
 	loadEditor: (id: string) => void;
 	handleDeleteDraft: (id: number, name: string) => void;
 	setIsModalHidden: (hidden: boolean) => void;
 	setSelectedDraft: ({ id, name }: { id: number; name: string }) => void;
+	unpublish: () => void;
 }
 
 export default function DraftItem({
 	id,
 	name,
+	isPublished,
 	loadEditor,
 	handleDeleteDraft,
 	setIsModalHidden,
 	setSelectedDraft,
+	unpublish,
 }: DraftItemProps) {
 	// Used for clicking outside
 	const { ref, isComponentVisible, setIsComponentVisible } =
@@ -27,6 +31,11 @@ export default function DraftItem({
 
 	return (
 		<div className="flex flex-col justify-between justify-self-center w-[250px] sm:w-full h-[350px] border-2 border-black shadow-lg hover:bg-[#111827] hover:text-[#f08700] transition duration-300">
+			{ isPublished && 
+				<div className='flex justify-end'>
+					<Star size={24} fill="#ffff00" color="#000000" strokeWidth={1.5} />
+				</div>
+			}
 			<button
 				onClick={() => loadEditor(id.toString())}
 				className="h-full border-none"
@@ -63,6 +72,12 @@ export default function DraftItem({
 						<PenLine size={16} />
 						<p>Rename</p>
 					</button>
+					{ isPublished &&
+						<button onClick={unpublish} className="flex justify-evenly items-center text-black hover:text-black border-none cursor-pointer hover:bg-gray-100">
+							<LucideUserRoundX size={16} />
+							<p>Unpublish</p>
+						</button>	
+					}
 				</div>
 			</div>
 		</div>

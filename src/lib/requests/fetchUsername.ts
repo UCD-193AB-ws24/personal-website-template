@@ -18,6 +18,6 @@ export async function fetchUsername() {
 		}
 	} catch (error: any) {
 		console.log(error.message);
-		return null;
+		return "";
 	}
 }
