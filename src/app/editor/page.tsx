@@ -370,8 +370,12 @@ export default function Editor() {
       return (
         <NavigationBar
           key={comp.id}
+          components={components}
+          setComponents={setComponents}
           pages={pages}
+          setPages={setPages}
           activePageIndex={activePageIndex || 0}
+          setActivePageIndex={setActivePageIndex}
           switchPage={switchPage}
           addPage={addPage}
           deletePage={deletePage}
