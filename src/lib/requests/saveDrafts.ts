@@ -1,27 +1,24 @@
 import { Page } from '@customTypes/componentTypes';
 import { APIResponse } from '@customTypes/apiResponse';
 
-export async function saveDraft(
-	draftNumber: number,
-	pages: Page[]
-) {
-	try {
-		const res = await fetch(`/api/db/drafts?draftNumber=${draftNumber}`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({ pages }),
+export async function saveDraft(draftNumber: number, pages: Page[]) {
+	return fetch(`/api/db/drafts?draftNumber=${draftNumber}`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({ pages }),
+	})
+		.then((res) => res.json())
+		.then((res: APIResponse<string>) => {
+			if (!res.success) {
+				throw new Error(res.error);
+			} else {
+				return "";
+			}
+		})
+		.catch((error) => {
+			console.log(error.message);
+			return error.message;
 		});
-		const resBody = (await res.json()) as APIResponse<string>;
-
-		if (res.ok && resBody.success) {
-			return '';
-		}
-
-		throw new Error('Bad request');
-	} catch (error: any) {
-		console.log('Error:', error.message);
-		return error.message;
-	}
 }

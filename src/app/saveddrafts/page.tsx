@@ -9,6 +9,7 @@ import Navbar from '@components/Navbar';
 import LoadingSpinner from '@components/LoadingSpinner';
 import DraftItem from '@components/DraftItem';
 import { fetchUsername } from '@lib/requests/fetchUsername';
+import { fetchPublishedDraftNumber } from '@lib/requests/fetchPublishedDraftNumber';
 
 export default function SavedDrafts() {
 	const [user] = useAuthState(auth);
@@ -79,26 +80,13 @@ export default function SavedDrafts() {
 			});
 	};
 
-	const getPublishedDraftNumber = () => {
+	const getPublishedDraftNumber = async () => {
 		setIsLoading(true);
-		fetch('/api/user/publish-draft', {
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		})
-			.then((res) => res.json())
-			.then((res) => {
-				if (res.success) {
-					setPublishedDraftNumber(res.data);
-					setIsLoading(false);
-				} else {
-					throw new Error(res.error);
-				}
-			})
-			.catch((error) => {
-				console.log(error.message);
-				setIsLoading(false);
-			});
+
+		const pubDraftNum = await fetchPublishedDraftNumber();
+		setPublishedDraftNumber(pubDraftNum);
+
+		setIsLoading(false);
 	};
 
 	const unpublish = () => {
