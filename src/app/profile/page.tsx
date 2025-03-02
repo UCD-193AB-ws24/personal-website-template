@@ -72,34 +72,34 @@ export default function Profile() {
 			});
 	};
 
-  const handleNewDraft = async () => {
-    if (!user) {
-      router.push("/login");
-    }
+  // const handleNewDraft = async () => {
+  //   if (!user) {
+  //     router.push("/login");
+  //   }
 
-		const timestamp = Date.now();
-		try {
-			const res = await fetch('/api/user/update-drafts', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					timestamp: timestamp,
-				}),
-			});
+	// 	const timestamp = Date.now();
+	// 	try {
+	// 		const res = await fetch('/api/user/update-drafts', {
+	// 			method: 'POST',
+	// 			headers: {
+	// 				'Content-Type': 'application/json',
+	// 			},
+	// 			body: JSON.stringify({
+	// 				timestamp: timestamp,
+	// 			}),
+	// 		});
 
-			const resBody = (await res.json()) as APIResponse<string>;
+	// 		const resBody = (await res.json()) as APIResponse<string>;
 
-			if (res.ok && resBody.success) {
-				router.push('/editor?draftNumber=' + timestamp);
-			} else if (!resBody.success) {
-				throw new Error(resBody.error);
-			}
-		} catch (error: any) {
-			console.log('Error creating new draft:', error.message);
-		}
-	};
+	// 		if (res.ok && resBody.success) {
+	// 			router.push('/editor?draftNumber=' + timestamp);
+	// 		} else if (!resBody.success) {
+	// 			throw new Error(resBody.error);
+	// 		}
+	// 	} catch (error: any) {
+	// 		console.log('Error creating new draft:', error.message);
+	// 	}
+	// };
 
   const handleOpenWebsite = async () => {
     try {
@@ -271,12 +271,12 @@ export default function Profile() {
 
             <div>
               <button
-                onClick={handleNewDraft}
+                onClick={() => router.push("/setupdraft")}
                 className="relative inline-flex px-6 py-4 w-1/2 text-lg font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#f08700] hover:text-black shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50 items-center justify-center text-center"
               >
                 <div className="text-left rtl:text-right">
                   <div className="-mt-1 font-sans text-lg font-semibold">
-                    Create My Site Now
+                    Create My Site
                   </div>
                 </div>
               </button> 

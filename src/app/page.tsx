@@ -48,28 +48,32 @@ export default function Home() {
       router.push("/login");
     }
 
-		const timestamp = Date.now();
-		try {
-			const res = await fetch('/api/user/update-drafts', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					timestamp: timestamp,
-				}),
-			});
 
-			const resBody = (await res.json()) as APIResponse<string>;
+    router.push("/setupdraft");
 
-			if (res.ok && resBody.success) {
-				router.push('/editor?draftNumber=' + timestamp);
-			} else if (!resBody.success) {
-				throw new Error(resBody.error);
-			}
-		} catch (error: any) {
-			console.log('Error creating new draft:', error.message);
-		}
+		// const timestamp = Date.now();
+		// try {
+		// 	const res = await fetch('/api/user/update-drafts', {
+		// 		method: 'POST',
+		// 		headers: {
+		// 			'Content-Type': 'application/json',
+		// 		},
+		// 		body: JSON.stringify({
+		// 			timestamp: timestamp,
+		// 		}),
+		// 	});
+
+		// 	const resBody = (await res.json()) as APIResponse<string>;
+
+		// 	if (res.ok && resBody.success) {
+		// 		router.push('/editor?draftNumber=' + timestamp);
+		// 	} else if (!resBody.success) {
+		// 		throw new Error(resBody.error);
+		// 	}
+		// } catch (error: any) {
+		// 	console.log('Error creating new draft:', error.message);
+		// }
+
 	};
 
 	return (

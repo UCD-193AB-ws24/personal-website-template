@@ -261,6 +261,15 @@ export default function SavedDrafts() {
 					>
 						New Draft
 					</button>
+
+					<button
+						onClick={() => router.push("/templates")}
+						className="bg-[#f08700] hover:bg-[#d67900] transition duration-300 text-white font-bold py-2 px-4 rounded-full border-none text-[#111827]"
+					>
+						Select Template
+					</button>
+
+
 				</div>
 
 				<div
