@@ -16,6 +16,7 @@ import LoadingSpinner from '@components/LoadingSpinner';
 import { toastPublish} from '@components/PublishToast';
 import ImageComponent from '@components/ImageComponent';
 import FileComponent from '@components/FileComponent';
+import VideoComponent from '@components/VideoComponent';
 
 import type { ComponentItem, Page, Position, Size } from '@customTypes/componentTypes';
 
@@ -305,7 +306,8 @@ export default function Editor() {
     textBlock: { width: 200, height: 150 },
     sectionTitle: { width: 350, height: 50 },
     image: { width: 200, height: 150},
-    file: {width:425, height:550}
+    file: {width:425, height:550},
+    video: { width: 450, height: 250 }
   };
 
   const addComponent = (type: string, position: { x: number; y: number }, id: string) => {
@@ -408,13 +410,15 @@ export default function Editor() {
       case 'textBlock':
         return <DraggableResizableTextbox />;
       case 'sectionTitle':
-        return <SectionTitleTextbox />
+        return <SectionTitleTextbox />;
       case 'navBar':
-        return <NavigationBar />
+        return <NavigationBar />;
       case 'image':
-        return <ImageComponent />
+        return <ImageComponent />;
       case 'file':
-        return <FileComponent />
+        return <FileComponent />;
+      case 'video':
+        return <VideoComponent />;
       default:
         return null;
     }
@@ -425,7 +429,8 @@ export default function Editor() {
     sectionTitle: SectionTitleTextbox,
     navBar: NavigationBar,
     image: ImageComponent,
-    file: FileComponent
+    file: FileComponent,
+    video: VideoComponent,
   };
 
   const renderComponent = (comp: ComponentItem) => {
