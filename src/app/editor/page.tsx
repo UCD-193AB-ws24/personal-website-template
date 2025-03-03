@@ -9,18 +9,14 @@ import { Flip, toast, ToastContainer } from 'react-toastify';
 
 import EditorDropZone from '@components/EditorDropZone';
 import Sidebar from '@components/sidebar/Sidebar';
-import DraggableResizableTextbox from '@components/DraggableResizableTextbox';
-import SectionTitleTextbox from '@components/SectionTitle';
 import NavigationBar from '@components/NavigationBar';
 import LoadingSpinner from '@components/LoadingSpinner';
 import { toastPublish} from '@components/PublishToast';
-import ImageComponent from '@components/ImageComponent';
-import FileComponent from '@components/FileComponent';
-import VideoComponent from '@components/VideoComponent';
 
 import type { ComponentItem, Page, Position, Size } from '@customTypes/componentTypes';
 
 import { findBestFreeSpot } from '@utils/collisionUtils';
+import { componentMap, componentSizes, renderOverlayContent } from '@utils/componentUtils';
 import { APIResponse } from '@customTypes/apiResponse';
 import { useSearchParams } from 'next/navigation';
 import { toastSaveSuccess } from '@components/SaveToast';
@@ -302,14 +298,6 @@ export default function Editor() {
   };
 
 
-  const componentSizes: Record<string, { width: number; height: number }> = {
-    textBlock: { width: 200, height: 150 },
-    sectionTitle: { width: 350, height: 50 },
-    image: { width: 200, height: 150},
-    file: {width:425, height:550},
-    video: { width: 450, height: 250 }
-  };
-
   const addComponent = (type: string, position: { x: number; y: number }, id: string) => {
     const size = componentSizes[type] || { width: 200, height: 150 };
 
@@ -403,34 +391,6 @@ export default function Editor() {
     if (cursorY > editorRect.bottom - 100) {
       setEditorHeight(prevHeight => prevHeight + 50);
     }
-  };
-
-  const renderOverlayContent = (activeType: string | null) => {
-    switch (activeType) {
-      case 'textBlock':
-        return <DraggableResizableTextbox />;
-      case 'sectionTitle':
-        return <SectionTitleTextbox />;
-      case 'navBar':
-        return <NavigationBar />;
-      case 'image':
-        return <ImageComponent />;
-      case 'file':
-        return <FileComponent />;
-      case 'video':
-        return <VideoComponent />;
-      default:
-        return null;
-    }
-  }
-
-  const componentMap: Record<string, React.ComponentType<Partial<ComponentItem>>> = {
-    textBlock: DraggableResizableTextbox,
-    sectionTitle: SectionTitleTextbox,
-    navBar: NavigationBar,
-    image: ImageComponent,
-    file: FileComponent,
-    video: VideoComponent,
   };
 
   const renderComponent = (comp: ComponentItem) => {

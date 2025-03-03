@@ -78,7 +78,6 @@ export default function VideoComponent({
     }
   };
 
-
   return isPreview ? (
     <div
       style={{

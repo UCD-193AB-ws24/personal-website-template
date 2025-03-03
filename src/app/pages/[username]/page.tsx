@@ -1,8 +1,8 @@
 import FullWindow from '@components/FullWindow';
 import { ComponentItem } from '@customTypes/componentTypes';
-import DraggableResizableTextbox from '@components/DraggableResizableTextbox';
-import SectionTitleTextbox from '@components/SectionTitle';
 import NavigationBar from '@components/NavigationBar';
+
+import { componentMap } from '@utils/componentUtils';
 
 interface PublishedPageProps {
 	params: Promise<{ username: string }>;
@@ -12,12 +12,6 @@ export default async function PublishedPage({ params }: PublishedPageProps) {
 	const username = (await params).username;
         let components: ComponentItem[] = [];
         let pages: { pageName: string, components: ComponentItem[] }[] = [];
-
-	const componentMap: Record<string, React.ComponentType<Partial<ComponentItem>>> = {
-		textBlock: DraggableResizableTextbox,
-		sectionTitle: SectionTitleTextbox,
-                navBar: NavigationBar,
-	};
 
 	try {
 		const response = await fetch(
@@ -33,8 +27,6 @@ export default async function PublishedPage({ params }: PublishedPageProps) {
 		if (!resBody.success) {
 			throw new Error(resBody.error);
 		}
-
-		console.log("Testing pages");
 
 		pages = resBody.data.pages;
 		const firstPage = pages[0];

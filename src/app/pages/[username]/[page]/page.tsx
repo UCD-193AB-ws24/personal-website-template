@@ -1,8 +1,8 @@
 import FullWindow from "@components/FullWindow";
 import { ComponentItem } from "@customTypes/componentTypes";
-import DraggableResizableTextbox from "@components/DraggableResizableTextbox";
-import SectionTitleTextbox from "@components/SectionTitle";
 import NavigationBar from "@components/NavigationBar";
+
+import { componentMap } from '@utils/componentUtils';
 
 interface PublishedPageProps {
   params: Promise<{ username: string; page: string }>;
@@ -13,12 +13,6 @@ export default async function PublishedPage({ params }: PublishedPageProps) {
   const decodedPageName = decodeURIComponent(page).replace(/-/g, " ");
   let components: ComponentItem[] = [];
   let pages: { pageName: string, components: ComponentItem[] }[] = [];
-
-  const componentMap: Record<string, React.ComponentType<Partial<ComponentItem>>> = {
-    textBlock: DraggableResizableTextbox,
-    sectionTitle: SectionTitleTextbox,
-    navBar: NavigationBar,
-  };
 
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/db/drafts/published-draft?username=${username}`, {
