@@ -25,13 +25,27 @@ import { useSearchParams } from 'next/navigation';
 import { toastSaveSuccess } from '@components/SaveToast';
 import { saveDraft } from '@lib/requests/saveDrafts';
 import SavedDrafts from '../saveddrafts/page';
+import { fetchUsername } from '@lib/requests/fetchUsername';
+import { saveTemplate } from '@lib/requests/saveTemplate';
+import { fetchDraftName } from '@lib/requests/fetchDraftName';
 
-function DraftLoader({ setPages, setActivePageId, setComponents, setIsLoading, setDraftNumber, setHasLoadedDraftOnce }: { setPages: any, setActivePageId: any, setComponents: (c: ComponentItem[]) => void, setIsLoading: (loading: boolean) => void, setDraftNumber: (draftNumber: number) => void, setHasLoadedDraftOnce: (hasLoadedDraftOnce: boolean) => void }) {
+interface DraftLoaderProps {
+  setPages: any
+  setActivePageId: any
+  setComponents: (c: ComponentItem[]) => void,
+  setIsLoading: (loading: boolean) => void,
+  setDraftNumber: (draftNumber: number) => void,
+  setHasLoadedDraftOnce: (hasLoadedDraftOnce: boolean) => void
+  setDraftName: (newDraftName: string) => void
+}
+
+function DraftLoader({ setPages, setActivePageId, setComponents, setIsLoading, setDraftNumber, setHasLoadedDraftOnce, setDraftName }: DraftLoaderProps) {
   const searchParams = useSearchParams();
   const draftNumber = searchParams.get("draftNumber");
 
   useEffect(() => {
     setDraftNumber(parseInt(draftNumber!));
+    fetchDraftName(parseInt(draftNumber!)).then((name) => setDraftName(name))
 
     if (draftNumber) {
       fetch(`/api/db/drafts?draftNumber=${draftNumber}`, {
@@ -85,6 +99,9 @@ export default function Editor() {
   const [isPreview, setIsPreview] = useState(false);
   const [pages, setPages] = useState<Page[]>([]);
   const [activePageIndex, setActivePageIndex] = useState<number | null>(null);
+
+  const [username, setUsername] = useState("");
+  const [draftName, setDraftName] = useState("");
 
 
   useEffect(() => {
@@ -221,6 +238,29 @@ export default function Editor() {
   };
 
   const handleSaveDraft = async () => {
+    // *Temporary admin logic*
+    if (username === "") {
+      const name = await fetchUsername();
+      console.log("name", name)
+      setUsername(name);
+      if (name === "admin") {
+        const updatedPages = pages.map((page, index) =>
+          index === activePageIndex ? { ...page, components: [...components] } : page
+        );
+        
+        await saveTemplate(draftName, updatedPages);
+        return;
+      }
+    } else if (username === "admin") {
+        const updatedPages = pages.map((page, index) =>
+          index === activePageIndex ? { ...page, components: [...components] } : page
+        );
+        
+        await saveTemplate(draftName, updatedPages);
+        return;
+    }
+
+
     if (activePageIndex == null) return;
     setIsLoading(true);
 
@@ -249,6 +289,16 @@ export default function Editor() {
 
   // Saves the current changes and publishes the draft
   const handlePublish = async () => {
+    // *Temporary admin logic*
+    if (username === "") {
+      const name = await fetchUsername();
+      setUsername(name);
+      if (name === "admin") {
+        alert("Admin doesn't have publishing permissions");
+        return;
+      }
+    }
+
     setIsLoading(true);
 
     try {
@@ -513,14 +563,17 @@ export default function Editor() {
             <ToastContainer />
 
             <Suspense fallback={<LoadingSpinner show={true} />}>
-              {!hasLoadedDraftOnce && (<DraftLoader setPages={setPages} setActivePageId={setActivePageIndex} setDraftNumber={setDraftNumber} setComponents={setComponents} setIsLoading={setIsLoading} setHasLoadedDraftOnce={setHasLoadedDraftOnce} />)}
+              {!hasLoadedDraftOnce && (<DraftLoader setPages={setPages} setActivePageId={setActivePageIndex} setDraftNumber={setDraftNumber} setComponents={setComponents} setIsLoading={setIsLoading} setHasLoadedDraftOnce={setHasLoadedDraftOnce} setDraftName={setDraftName} />)}
             </Suspense>
 
             <div className="flex flex-col flex-grow">
               <div className="fixed top-0 right-0 z-50 bg-gray-100 flex justify-between items-center px-6 py-3 w-[calc(100%-256px)] h-[64px]">
-                <Link href="/saveddrafts" className="text-large font-semibold px-4 py-2 rounded-md border border-gray-500 transition-all duration-300 hover:bg-gray-500 hover:text-white shadow-md hover:shadow-lg">
-                  Drafts
-                </Link>
+                <div className="flex items-center gap-10">
+                  <Link href="/saveddrafts" className="text-large font-semibold px-4 py-2 rounded-md border border-gray-500 transition-all duration-300 hover:bg-gray-500 hover:text-white shadow-md hover:shadow-lg">
+                    Drafts
+                  </Link>
+                  <p className="font-bold">{draftName}</p>
+                </div>
                 <div className="flex">
                   <button
                     className={`text-large font-semibold px-4 py-2 rounded-md mr-4 border border-blue-500 transition-all duration-300 hover:bg-blue-500 hover:text-white shadow-md hover:shadow-lg`}

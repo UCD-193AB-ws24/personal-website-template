@@ -10,6 +10,7 @@ import LoadingSpinner from '@components/LoadingSpinner';
 import DraftItem from '@components/DraftItem';
 import { fetchUsername } from '@lib/requests/fetchUsername';
 import { fetchPublishedDraftNumber } from '@lib/requests/fetchPublishedDraftNumber';
+import DraftNameModal from '@components/DraftNameModal';
 
 export default function SavedDrafts() {
 	const [user] = useAuthState(auth);
@@ -132,7 +133,8 @@ export default function SavedDrafts() {
 			const resBody = (await res.json()) as APIResponse<string>;
 
 			if (res.ok && resBody.success) {
-				router.push('/editor?draftNumber=' + timestamp);
+				setSelectedDraft({ id: timestamp, name: "Untitled Draft" });
+				// router.push('/editor?draftNumber=' + timestamp);
 			} else if (!resBody.success) {
 				throw new Error(resBody.error);
 			}
@@ -216,6 +218,17 @@ export default function SavedDrafts() {
 		setSelectedDraft(undefined);
 	};
 
+	const handleNameChange = (newDraftName: string) => {
+		if (selectedDraft) {
+			handleRenameDraft(selectedDraft.id, selectedDraft.name, newDraftName);
+
+			// Selected draft is not in the draft mappings, i.e. new draft is being created
+			if (draftMappings.find((mapping) => mapping.id === selectedDraft.id) === undefined) {
+				router.push('/editor?draftNumber=' + selectedDraft.id);
+			}
+		}
+	}
+
 	return (
 		<div>
 			<header>
@@ -244,7 +257,10 @@ export default function SavedDrafts() {
 				<div className="flex gap-10">
 					<p className="text-2xl sm:text-5xl"> Saved Drafts </p>
 					<button
-						onClick={handleNewDraft}
+						onClick={() => {
+							setIsModalHidden(false);
+							handleNewDraft();
+						}}
 						className="bg-[#f08700] hover:bg-[#d67900] transition duration-300 text-white font-bold py-2 px-4 rounded-full border-none text-[#111827]"
 					>
 						New Draft
@@ -288,7 +304,10 @@ export default function SavedDrafts() {
 					}
 
 				</div>
-				<div
+				
+				<DraftNameModal isHidden={isModalHidden} submitCallback={handleNameChange} setIsModalHidden={setIsModalHidden} />
+
+				{/* <div
 					style={{ display: isModalHidden ? 'none' : 'flex' }}
 					className="fixed inset-0 flex flex-col justify-center items-center bg-gray-900 bg-opacity-50 z-50"
 				>
@@ -335,7 +354,7 @@ export default function SavedDrafts() {
 							</div>
 						</form>
 					</div>
-				</div>
+				</div> */}
 			</main>
 			<footer></footer>
 		</div>

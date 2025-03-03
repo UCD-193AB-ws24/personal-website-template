@@ -52,7 +52,7 @@ export async function GET() {
 		if (userDoc.exists) {
 			return NextResponse.json<APIResponse<string>>({
 				success: true,
-				data: userDoc.data()?.publishedDraftNumber,
+				data: userDoc.data()?.publishedDraftNumber || 0,
 			});
 		} else {
 			throw new Error("Requested document does not exist");
