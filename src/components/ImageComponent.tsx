@@ -71,11 +71,10 @@ export default function ImageComponent({
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const userId = auth.currentUser?.uid;
-    const draftId = `${userId}-${draftNumber}`
 
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      const filePath = `users/${userId}/drafts/${draftId}/${id}-${file.name}`
+      const filePath = `users/${userId}/drafts/${draftNumber}/${id}-${file.name}`
       const storageRef = ref(storage, filePath);
       const uploadTask = uploadBytesResumable(storageRef, file);
 
