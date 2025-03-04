@@ -1,16 +1,20 @@
 /* eslint-disable @next/next/no-img-element */
-"use client"
+"use client";
 
-import React, { useState } from 'react';
-import { Rnd } from 'react-rnd';
+import React, { useState } from "react";
+import { Rnd } from "react-rnd";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams } from "next/navigation";
 
-import SkeletonLoader from '@components/SkeletonLoader';
+import SkeletonLoader from "@components/SkeletonLoader";
 
-import type { ComponentItem, Position, Size } from '@customTypes/componentTypes';
-import { handleDragStop, handleResizeStop } from '@utils/dragResizeUtils';
-import { auth, storage } from '@lib/firebase/firebaseApp';
+import type {
+  ComponentItem,
+  Position,
+  Size,
+} from "@customTypes/componentTypes";
+import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
+import { auth, storage } from "@lib/firebase/firebaseApp";
 
 interface ImageComponentProps {
   id?: string;
@@ -36,11 +40,11 @@ export default function ImageComponent({
   initialSize = { width: 200, height: 150 },
   components = [],
   content = "",
-  updateComponent = () => { },
+  updateComponent = () => {},
   isActive = false,
-  onMouseDown = () => { },
-  setIsDragging = () => { },
-  isPreview = false
+  onMouseDown = () => {},
+  setIsDragging = () => {},
+  isPreview = false,
 }: ImageComponentProps) {
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
@@ -55,7 +59,10 @@ export default function ImageComponent({
     onMouseDown();
   };
 
-  const resizeImage = (imageSrc: string, baseWidth: number = 300): Promise<{ width: number; height: number }> => {
+  const resizeImage = (
+    imageSrc: string,
+    baseWidth: number = 300,
+  ): Promise<{ width: number; height: number }> => {
     return new Promise((resolve) => {
       const img = new Image();
       img.src = imageSrc;
@@ -68,13 +75,12 @@ export default function ImageComponent({
     });
   };
 
-
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const userId = auth.currentUser?.uid;
 
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      const filePath = `users/${userId}/drafts/${draftNumber}/${id}-${file.name}`
+      const filePath = `users/${userId}/drafts/${draftNumber}/${id}-${file.name}`;
       const storageRef = ref(storage, filePath);
       const uploadTask = uploadBytesResumable(storageRef, file);
 
@@ -111,7 +117,7 @@ export default function ImageComponent({
             setSize({ width, height });
           }
           updateComponent(id, position, size, downloadURL);
-        }
+        },
       );
     }
   };
@@ -129,9 +135,20 @@ export default function ImageComponent({
     >
       {loading && <SkeletonLoader width={size.width} height={size.height} />}
       {previewSrc ? (
-        <img src={previewSrc} alt="Uploading Preview" className="w-full h-full object-cover" />
+        <img
+          src={previewSrc}
+          alt="Uploading Preview"
+          className="w-full h-full object-cover"
+        />
       ) : imageSrc ? (
-        <img src={imageSrc} alt="Uploaded" className="w-full h-full object-cover" onLoad={() => setLoading(false)} onError={() => setLoading(false)} style={{ display: loading ? "none" : "block" }} />
+        <img
+          src={imageSrc}
+          alt="Uploaded"
+          className="w-full h-full object-cover"
+          onLoad={() => setLoading(false)}
+          onError={() => setLoading(false)}
+          style={{ display: loading ? "none" : "block" }}
+        />
       ) : (
         <div className="w-full h-full flex items-center justify-center bg-gray-200">
           No Image
@@ -175,17 +192,29 @@ export default function ImageComponent({
       style={{ pointerEvents: "auto" }}
     >
       <div
-        className={`w-full h-full border-2 transition-all duration-150 ease-in-out ${isActive ? 'border-blue-500 bg-gray-100 shadow-md' : 'border-transparent hover:border-gray-300'
-          }`}
+        className={`w-full h-full border-2 transition-all duration-150 ease-in-out ${
+          isActive
+            ? "border-blue-500 bg-gray-100 shadow-md"
+            : "border-transparent hover:border-gray-300"
+        }`}
       >
         {loading && <SkeletonLoader width={size.width} height={size.height} />}
 
         {previewSrc ? (
-          <img src={previewSrc} alt="Uploading Preview" className="w-full h-full object-cover" />
+          <img
+            src={previewSrc}
+            alt="Uploading Preview"
+            className="w-full h-full object-cover"
+          />
         ) : imageSrc ? (
-          <img src={imageSrc} alt="Uploaded" className="w-full h-full object-cover" onLoad={() => setLoading(false)}
+          <img
+            src={imageSrc}
+            alt="Uploaded"
+            className="w-full h-full object-cover"
+            onLoad={() => setLoading(false)}
             onError={() => setLoading(false)}
-            style={{ display: loading ? "none" : "block" }} />
+            style={{ display: loading ? "none" : "block" }}
+          />
         ) : (
           <label className="w-full h-full flex items-center justify-center cursor-pointer bg-gray-200">
             Click to Upload an Image

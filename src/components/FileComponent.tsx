@@ -4,8 +4,11 @@ import React, { useState } from "react";
 import { Rnd } from "react-rnd";
 import { MoveIcon } from "lucide-react";
 import { toast, Flip } from "react-toastify";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { useSearchParams } from "next/navigation";
 
 import ErrorToast from "@components/ErrorToast";
+import SkeletonLoader from "@components/SkeletonLoader";
 
 import type {
   ComponentItem,
@@ -13,6 +16,7 @@ import type {
   Size,
 } from "@customTypes/componentTypes";
 import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
+import { auth, storage } from "@lib/firebase/firebaseApp";
 
 interface FileComponentProps {
   id?: string;
@@ -48,6 +52,10 @@ export default function FileComponent({
   const [size, setSize] = useState(initialSize);
   const [pdfSrc, setPdfSrc] = useState(content || "");
   const [isOverlayActive, setIsOverlayActive] = useState(true);
+  const [loading, setLoading] = useState(!!content);
+  const [previewSrc, setPreviewSrc] = useState<string | null>(null);
+
+  const draftNumber = useSearchParams().get("draftNumber");
 
   // https://stackoverflow.com/questions/58488416/open-base64-encoded-pdf-file-using-javascript-issue-with-file-size-larger-than
   const MAX_FILE_SIZE = 5 * 1024 * 1025; // max 5MB upload for now
@@ -59,6 +67,7 @@ export default function FileComponent({
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const userId = auth.currentUser?.uid;
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       if (file.size > MAX_FILE_SIZE) {
@@ -83,14 +92,36 @@ export default function FileComponent({
         );
         return;
       }
+      const filePath = `users/${userId}/drafts/${draftNumber}/${id}-${file.name}`;
+      const storageRef = ref(storage, filePath);
+      const uploadTask = uploadBytesResumable(storageRef, file);
 
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const pdfUrl = reader.result as string;
-        setPdfSrc(pdfUrl);
-        updateComponent(id, position, size, pdfUrl);
-      };
-      reader.readAsDataURL(file);
+      const localPreview = URL.createObjectURL(file);
+      setPreviewSrc(localPreview);
+      setLoading(false);
+
+      // Cleanup previous preview when component re-renders
+      if (previewSrc) {
+        URL.revokeObjectURL(previewSrc);
+      }
+
+      uploadTask.on(
+        "state_changed",
+        null,
+        (error) => {
+          console.error("Upload failed:", error);
+          setLoading(false);
+          setPreviewSrc(null);
+        },
+        async () => {
+          // Get the download URL once uploaded
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          console.log("Success:", downloadURL);
+          setPdfSrc(downloadURL);
+          setPreviewSrc(null);
+          updateComponent(id, position, size, downloadURL);
+        },
+      );
     }
   };
 
@@ -105,8 +136,17 @@ export default function FileComponent({
       }}
       className="overflow-hidden"
     >
-      {pdfSrc ? (
-        <iframe src={pdfSrc} className="w-full h-full border-none" />
+      {loading && <SkeletonLoader width={size.width} height={size.height} />}
+      {previewSrc ? (
+        <iframe src={previewSrc} className="w-full h-full border-none" />
+      ) : pdfSrc ? (
+        <iframe
+          src={pdfSrc}
+          className="w-full h-full border-none"
+          onLoad={() => setLoading(false)}
+          onError={() => setLoading(false)}
+          style={{ display: loading ? "none" : "block" }}
+        />
       ) : (
         <div className="w-full h-full flex items-center justify-center bg-gray-200">
           No PDF
@@ -151,7 +191,27 @@ export default function FileComponent({
             : "border-transparent hover:border-gray-300"
         }`}
       >
-        {pdfSrc ? (
+        {loading && <SkeletonLoader width={size.width} height={size.height} />}
+        {previewSrc ? (
+          <div className="relative w-full h-full">
+            {/* Transparent Overlay to Capture Clicks */}
+            {isOverlayActive && (
+              <div
+                className="absolute inset-0 bg-transparent z-10 cursor-pointer"
+                onMouseDown={handleMouseDown}
+              />
+            )}
+
+            {/* PDF Viewer */}
+            <iframe
+              id={`pdf-iframe-${id}`}
+              src={previewSrc}
+              className="w-full h-full border-none"
+              style={{ pointerEvents: "auto" }}
+              onMouseLeave={() => setIsOverlayActive(true)} // Re-enable overlay when leaving iframe
+            />
+          </div>
+        ) : pdfSrc ? (
           <div className="relative w-full h-full">
             {/* Transparent Overlay to Capture Clicks */}
             {isOverlayActive && (
@@ -166,8 +226,13 @@ export default function FileComponent({
               id={`pdf-iframe-${id}`}
               src={pdfSrc}
               className="w-full h-full border-none"
-              style={{ pointerEvents: "auto" }}
               onMouseLeave={() => setIsOverlayActive(true)} // Re-enable overlay when leaving iframe
+              onLoad={() => setLoading(false)}
+              onError={() => setLoading(false)}
+              style={{
+                pointerEvents: "auto",
+                display: loading ? "none" : "block",
+              }}
             />
           </div>
         ) : (
