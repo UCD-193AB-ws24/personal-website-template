@@ -1,26 +1,31 @@
 import { toast, ToastContentProps, Flip } from 'react-toastify';
 
-export function toastSaveSuccess() {
-	toast(SaveToast, {
-		position: "top-right",
+export function toastPublishAsTemplateSuccess() {
+	toast(PublishAsTemplateToast, {
+		position: 'top-right',
 		autoClose: 2500,
 		hideProgressBar: true,
 		closeOnClick: false,
 		pauseOnHover: true,
 		draggable: false,
 		progress: undefined,
-		theme: "light",
+		theme: 'light',
 		transition: Flip,
 	});
 }
 
-export default function SaveToast({ closeToast }: ToastContentProps) {
+export default function PublishAsTemplateToast({
+	closeToast,
+}: ToastContentProps) {
 	return (
-		// using a grid with 3 columns
 		<div className="grid grid-cols-[1fr_1px_80px] w-full">
 			<div className="flex flex-col p-4">
-				<h3 className="font-semibold text-lg text-green-500">Success!</h3>
-				<p className="text-sm">Saved successfully</p>
+				<h3 className="font-semibold text-lg text-green-500">
+					Success!
+				</h3>
+				<p className="text-sm">
+					Successfully published draft as a template.
+				</p>
 			</div>
 			<div className="bg-zinc-900/20 h-full" />
 			<div className="flex flex-col justify-center items-center">

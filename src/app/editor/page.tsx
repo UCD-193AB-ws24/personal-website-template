@@ -13,20 +13,16 @@ import DraggableResizableTextbox from '@components/DraggableResizableTextbox';
 import SectionTitleTextbox from '@components/SectionTitle';
 import NavigationBar from '@components/NavigationBar';
 import LoadingSpinner from '@components/LoadingSpinner';
-import { toastPublish} from '@components/PublishToast';
+import { toastPublish} from '@components/toasts/PublishToast';
 import ImageComponent from '@components/ImageComponent';
 import FileComponent from '@components/FileComponent';
 
 import type { ComponentItem, Page, Position, Size } from '@customTypes/componentTypes';
 
 import { findBestFreeSpot } from '@utils/collisionUtils';
-import { APIResponse } from '@customTypes/apiResponse';
 import { useSearchParams } from 'next/navigation';
-import { toastSaveSuccess } from '@components/SaveToast';
+import { toastSaveSuccess } from '@components/toasts/SaveToast';
 import { saveDraft } from '@lib/requests/saveDrafts';
-import SavedDrafts from '../saveddrafts/page';
-import { fetchUsername } from '@lib/requests/fetchUsername';
-import { saveTemplate } from '@lib/requests/saveTemplate';
 import { fetchDraftName } from '@lib/requests/fetchDraftName';
 
 interface DraftLoaderProps {
@@ -238,29 +234,6 @@ export default function Editor() {
   };
 
   const handleSaveDraft = async () => {
-    // *Temporary admin logic*
-    if (username === "") {
-      const name = await fetchUsername();
-      console.log("name", name)
-      setUsername(name);
-      if (name === "admin") {
-        const updatedPages = pages.map((page, index) =>
-          index === activePageIndex ? { ...page, components: [...components] } : page
-        );
-        
-        await saveTemplate(draftName, updatedPages);
-        return;
-      }
-    } else if (username === "admin") {
-        const updatedPages = pages.map((page, index) =>
-          index === activePageIndex ? { ...page, components: [...components] } : page
-        );
-        
-        await saveTemplate(draftName, updatedPages);
-        return;
-    }
-
-
     if (activePageIndex == null) return;
     setIsLoading(true);
 
@@ -289,16 +262,6 @@ export default function Editor() {
 
   // Saves the current changes and publishes the draft
   const handlePublish = async () => {
-    // *Temporary admin logic*
-    if (username === "") {
-      const name = await fetchUsername();
-      setUsername(name);
-      if (name === "admin") {
-        alert("Admin doesn't have publishing permissions");
-        return;
-      }
-    }
-
     setIsLoading(true);
 
     try {

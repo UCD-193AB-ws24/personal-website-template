@@ -19,11 +19,13 @@ export default function DraftNameModal({
 			className="fixed inset-0 flex flex-col justify-center items-center bg-gray-900 bg-opacity-50 z-50"
 		>
 			<div className="center flex flex-col gap-4 mt-5 w-3/4 md:w-1/3 lg:w-1/4 mx-auto bg-gray-100 p-10 rounded-lg">
-				<p className="text-lg">Rename</p>
+				<p className="text-lg">Name your draft</p>
 				<form
 					className="grid gap-4 w-full"
 					onSubmit={(e) => {
 						e.preventDefault();
+						setIsModalHidden(true);
+						setNewDraftName('');
 						submitCallback(newDraftName);
 					}}
 				>
@@ -37,6 +39,7 @@ export default function DraftNameModal({
 					/>
 					<div className="flex justify-end gap-4">
 						<button
+							type="button"
 							onClick={() => {
 								setIsModalHidden(true);
 								setNewDraftName('');

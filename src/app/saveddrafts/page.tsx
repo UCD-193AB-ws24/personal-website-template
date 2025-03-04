@@ -11,6 +11,9 @@ import DraftItem from '@components/DraftItem';
 import { fetchUsername } from '@lib/requests/fetchUsername';
 import { fetchPublishedDraftNumber } from '@lib/requests/fetchPublishedDraftNumber';
 import DraftNameModal from '@components/DraftNameModal';
+import { ToastContainer } from 'react-toastify';
+import { createTemplate } from '@lib/requests/admin/createTemplate';
+import { toastPublishAsTemplateSuccess } from '@components/toasts/PublishAsTemplateToast';
 
 export default function SavedDrafts() {
 	const [user] = useAuthState(auth);
@@ -133,7 +136,7 @@ export default function SavedDrafts() {
 			const resBody = (await res.json()) as APIResponse<string>;
 
 			if (res.ok && resBody.success) {
-				setSelectedDraft({ id: timestamp, name: "Untitled Draft" });
+				setSelectedDraft({ id: timestamp, name: 'Untitled Draft' });
 				// router.push('/editor?draftNumber=' + timestamp);
 			} else if (!resBody.success) {
 				throw new Error(resBody.error);
@@ -220,14 +223,31 @@ export default function SavedDrafts() {
 
 	const handleNameChange = (newDraftName: string) => {
 		if (selectedDraft) {
-			handleRenameDraft(selectedDraft.id, selectedDraft.name, newDraftName);
+			handleRenameDraft(
+				selectedDraft.id,
+				selectedDraft.name,
+				newDraftName
+			);
 
 			// Selected draft is not in the draft mappings, i.e. new draft is being created
-			if (draftMappings.find((mapping) => mapping.id === selectedDraft.id) === undefined) {
+			if (
+				draftMappings.find(
+					(mapping) => mapping.id === selectedDraft.id
+				) === undefined
+			) {
 				router.push('/editor?draftNumber=' + selectedDraft.id);
 			}
 		}
-	}
+	};
+
+	const publishAsTemplate = async (id: number, name: string) => {
+		setIsLoading(true);
+		const result = await createTemplate(id, name);
+		if (result) {
+			toastPublishAsTemplateSuccess();
+		}
+		setIsLoading(false);
+	};
 
 	return (
 		<div>
@@ -239,7 +259,7 @@ export default function SavedDrafts() {
 						onSignOut={handleSignOut}
 						navLinks={[
 							{ label: 'Home', href: '/' },
-							{ label: 'Profile', href: '/profile'}
+							{ label: 'Profile', href: '/profile' },
 						]}
 					/>
 				) : (
@@ -253,6 +273,7 @@ export default function SavedDrafts() {
 				)}
 			</header>
 			<main className="mx-auto max-w-screen-xl p-8">
+				<ToastContainer />
 				<LoadingSpinner show={isLoading} />
 				<div className="flex gap-10">
 					<p className="text-2xl sm:text-5xl"> Saved Drafts </p>
@@ -267,94 +288,45 @@ export default function SavedDrafts() {
 					</button>
 
 					<button
-						onClick={() => router.push("/templates")}
+						onClick={() => router.push('/templates')}
 						className="bg-[#f08700] hover:bg-[#d67900] transition duration-300 text-white font-bold py-2 px-4 rounded-full border-none text-[#111827]"
 					>
 						Select Template
 					</button>
-
-
 				</div>
 
 				<div
 					id="draftsContainer"
 					className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 justify-evenly gap-4 mt-12"
 				>
-					{ draftMappings ?
-
-						draftMappings.map((d, i) => {
-							return (
-								<DraftItem
-									key={i}
-									id={d.id}
-									name={d.name}
-									isPublished={d.id === publishedDraftNumber}
-									loadEditor={loadEditor}
-									handleDeleteDraft={handleDeleteDraft}
-									setIsModalHidden={setIsModalHidden}
-									setSelectedDraft={setSelectedDraft}
-									unpublish={unpublish}
-								/>
-							);
-						})
-
-						:
-						
-						""
-					}
-
-				</div>
-				
-				<DraftNameModal isHidden={isModalHidden} submitCallback={handleNameChange} setIsModalHidden={setIsModalHidden} />
-
-				{/* <div
-					style={{ display: isModalHidden ? 'none' : 'flex' }}
-					className="fixed inset-0 flex flex-col justify-center items-center bg-gray-900 bg-opacity-50 z-50"
-				>
-					<div className="center flex flex-col gap-4 mt-5 w-3/4 md:w-1/3 lg:w-1/4 mx-auto bg-gray-100 p-10 rounded-lg">
-						<p className="text-lg">Rename</p>
-						<form
-							className="grid gap-4 w-full"
-							onSubmit={(e) => {
-								e.preventDefault();
-								handleRenameDraft(
-									selectedDraft!.id,
-									selectedDraft!.name,
-									newDraftName
+					{draftMappings
+						? draftMappings.map((d, i) => {
+								return (
+									<DraftItem
+										key={i}
+										id={d.id}
+										name={d.name}
+										isPublished={
+											d.id === publishedDraftNumber
+										}
+										isAdmin={username === 'admin'}
+										loadEditor={loadEditor}
+										handleDeleteDraft={handleDeleteDraft}
+										setIsModalHidden={setIsModalHidden}
+										setSelectedDraft={setSelectedDraft}
+										unpublish={unpublish}
+										publishAsTemplate={publishAsTemplate}
+									/>
 								);
-							}}
-						>
-							<input
-								type="text"
-								placeholder="New Name"
-								value={newDraftName}
-								onChange={(e) =>
-									setNewDraftName(e.target.value)
-								}
-								required
-								className="p-2 border rounded w-full"
-							/>
-							<div className="flex justify-end gap-4">
-								<button
-									onClick={() => {
-										setIsModalHidden(true);
-										setNewDraftName('');
-										setSelectedDraft(undefined);
-									}}
-									className="px-4 py-2 border border-red-500 text-red-500 rounded-md cursor-pointer hover:bg-red-200 transition duration-200 ease-in-out"
-								>
-									Cancel
-								</button>
-								<button
-									type="submit"
-									className="px-4 py-2 bg-green-500 text-white rounded-md cursor-pointer hover:bg-green-600 transition duration-200 ease-in-out"
-								>
-									Confirm
-								</button>
-							</div>
-						</form>
-					</div>
-				</div> */}
+						  })
+						: ''}
+				</div>
+
+				<DraftNameModal
+					isHidden={isModalHidden}
+					submitCallback={handleNameChange}
+					setIsModalHidden={setIsModalHidden}
+				/>
 			</main>
 			<footer></footer>
 		</div>

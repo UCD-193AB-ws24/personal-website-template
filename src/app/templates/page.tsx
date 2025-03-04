@@ -4,12 +4,16 @@ import { auth } from '@lib/firebase/firebaseApp';
 import { signUserOut } from '@lib/firebase/auth';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { APIResponse } from '@customTypes/apiResponse';
+import { APIResponse, TemplateMapping } from '@customTypes/apiResponse';
 import Navbar from '@components/Navbar';
 import LoadingSpinner from '@components/LoadingSpinner';
 import DraftItem from '@components/DraftItem';
 import { fetchUsername } from '@lib/requests/fetchUsername';
-import { fetchPublishedDraftNumber } from '@lib/requests/fetchPublishedDraftNumber';
+import { fetchTemplateMappings } from '@lib/requests/fetchTemplateMappings';
+import TemplateItem from '@components/TemplateItem';
+import { deleteTemplate } from '@lib/requests/admin/deleteTemplate';
+import DraftNameModal from '@components/DraftNameModal';
+import { renameTemplate } from '@lib/requests/admin/renameTemplate';
 
 export default function Templates() {
 	const [user] = useAuthState(auth);
@@ -17,13 +21,16 @@ export default function Templates() {
 	const [isModalHidden, setIsModalHidden] = useState(true);
 	const [newDraftName, setNewDraftName] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
-	const [publishedDraftNumber, setPublishedDraftNumber] = useState(0);
+	const [templateMappings, setTemplateMappings] = useState<TemplateMapping[]>(
+		[]
+	);
+	const [selectedTemplate, setSelectedTemplate] = useState<TemplateMapping>();
 	const router = useRouter();
 
 	useEffect(() => {
 		if (user) {
 			getUsername();
-			getPublishedDraftNumber();
+			getTemplates();
 		}
 		// else {
 		//   router.push("/")
@@ -50,11 +57,10 @@ export default function Templates() {
 		}
 	};
 
-	const getPublishedDraftNumber = async () => {
+	const getTemplates = async () => {
 		setIsLoading(true);
 
-		const pubDraftNum = await fetchPublishedDraftNumber();
-		setPublishedDraftNumber(pubDraftNum);
+		setTemplateMappings(await fetchTemplateMappings());
 
 		setIsLoading(false);
 	};
@@ -63,28 +69,37 @@ export default function Templates() {
 		router.push('/editor?draftNumber=' + draftNumber);
 	};
 
-	const handleNewDraft = async () => {
-		const timestamp = Date.now();
-		try {
-			const res = await fetch('/api/user/update-drafts', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					timestamp: timestamp,
-				}),
-			});
+	const handleDeleteTemplate = async (mapping: TemplateMapping) => {
+		if (username !== 'admin') {
+			return;
+		}
 
-			const resBody = (await res.json()) as APIResponse<string>;
+		const result = await deleteTemplate(mapping);
+		if (result) {
+			setTemplateMappings((original) =>
+				original.filter((m) => m.number !== mapping.number)
+			);
+		}
+	};
 
-			if (res.ok && resBody.success) {
-				router.push('/editor?draftNumber=' + timestamp);
-			} else if (!resBody.success) {
-				throw new Error(resBody.error);
+	const handleNameChange = async (newName: string) => {
+		if (username !== 'admin') {
+			return;
+		}
+
+		if (selectedTemplate) {
+			const result = await renameTemplate(selectedTemplate, newName);
+
+			if (result) {
+				setTemplateMappings((original) =>
+					original.map((m) => {
+						if (m.number === selectedTemplate.number) {
+							m.name = newName;
+						}
+						return m;
+					})
+				);
 			}
-		} catch (error: any) {
-			console.log('Error creating new draft:', error.message);
 		}
 	};
 
@@ -98,8 +113,8 @@ export default function Templates() {
 						onSignOut={handleSignOut}
 						navLinks={[
 							{ label: 'Home', href: '/' },
-							{ label: 'Profile', href: '/profile'},
-                            { label: "Drafts", href: "/saveddrafts"}
+							{ label: 'Profile', href: '/profile' },
+							{ label: 'Drafts', href: '/saveddrafts' },
 						]}
 					/>
 				) : (
@@ -118,6 +133,31 @@ export default function Templates() {
 					<h1 className="text-2xl sm:text-5xl"> Templates </h1>
 				</div>
 
+				<div
+					id="draftsContainer"
+					className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 justify-evenly gap-4 mt-12"
+				>
+					{templateMappings &&
+						templateMappings.map((m, i) => {
+							return (
+								<TemplateItem
+									key={i}
+									templateMapping={m}
+									isAdmin={username === 'admin'}
+									loadEditor={loadEditor}
+									handleDeleteTemplate={handleDeleteTemplate}
+									setIsModalHidden={setIsModalHidden}
+									setSelectedDraft={setSelectedTemplate}
+								/>
+							);
+						})}
+				</div>
+
+				<DraftNameModal
+					isHidden={isModalHidden}
+					submitCallback={handleNameChange}
+					setIsModalHidden={setIsModalHidden}
+				/>
 			</main>
 			<footer></footer>
 		</div>
