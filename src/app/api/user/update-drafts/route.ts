@@ -4,7 +4,12 @@ import { APIResponse } from '@customTypes/apiResponse';
 import { FieldValue } from 'firebase-admin/firestore';
 
 // POST /api/user/update-drafts:
-// Update drafts with new id
+// Body: {
+//   timestamp: number
+//   name?: string,           // optional
+//   templateNumber?: string  // optional
+// }
+// Update drafts with new id and creates a draft document
 export async function POST(req: NextRequest) {
 	try {
 		const reqJson = await req.json();
@@ -27,15 +32,33 @@ export async function POST(req: NextRequest) {
 		await userDoc.update({
 			draftMappings: FieldValue.arrayUnion({
 				id: timestamp,
-				name: 'Untitled Draft',
+				name: reqJson.name || 'Untitled Draft',
 			}),
 		});
+
+		let pages = [{ components: [], pageName: 'Home' }];
+		if (reqJson.hasOwnProperty('templateNumber')) {
+			// Copy the template's pages into the draft
+			const templateNumber = reqJson.templateNumber;
+
+			const templatesRef = db.collection('templates');
+			const templatesQuery = templatesRef.where(
+				'templateNumber',
+				'==',
+				templateNumber
+			);
+
+			const templatesSnapshot = await templatesQuery.get();
+			if (templatesSnapshot.docs.length !== 0) {
+				pages = templatesSnapshot.docs[0].data().pages;
+			}
+		}
 
 		// Create the new draft
 		const draftsRef = db.collection('drafts');
 		await draftsRef.add({
 			draftId: `${user.uid}-${timestamp}`,
-			pages: [{ components: [], pageName: 'Home' }],
+			pages: pages,
 		});
 
 		return NextResponse.json<APIResponse<string>>({

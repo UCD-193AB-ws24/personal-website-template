@@ -40,9 +40,9 @@ export async function POST(req: NextRequest) {
 		// Get the corresponding template document
 		const templatesRef = db.collection('templates');
 		const templatesQuery = templatesRef.where(
-			'templateId',
+			'templateNumber',
 			'==',
-			`${user.uid}-${number}`
+			number
 		);
 		const templatesSnapshot = await templatesQuery.get();
 		templatesSnapshot.forEach((doc) => {

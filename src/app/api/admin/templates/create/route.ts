@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
 
 		const name = reqBody.name;
 		const number = reqBody.number;
+		const timestamp = Date.now();
 
 		// Get the pages from the draft
 		const draftsRef = db.collection('drafts');
@@ -48,24 +49,21 @@ export async function POST(req: NextRequest) {
 		if (draftSnapshot.docs.length === 0) {
 			throw new Error('No draft document found');
 		}
-		console.log('len', draftSnapshot.docs.length);
 
 		const pages = draftSnapshot.docs[0].data().pages;
-
-		console.log('pages', pages);
 
 		// Create a new document for the template
 		const templatesRef = db.collection('templates');
 		await templatesRef.add({
 			pages: pages,
-			templateId: `${user.uid}-${Date.now()}`,
+			templateNumber: timestamp,
 		});
 
 		// Update the template mappings document with the new template
 		const templateMappingsRef = templatesRef.doc('mappings');
 		templateMappingsRef.update({
 			templateMappings: FieldValue.arrayUnion({
-				number: number,
+				number: timestamp,
 				name: name,
 			}),
 		});

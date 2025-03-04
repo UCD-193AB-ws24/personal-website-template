@@ -14,6 +14,7 @@ import DraftNameModal from '@components/DraftNameModal';
 import { ToastContainer } from 'react-toastify';
 import { createTemplate } from '@lib/requests/admin/createTemplate';
 import { toastPublishAsTemplateSuccess } from '@components/toasts/PublishAsTemplateToast';
+import { createDraft } from '@lib/requests/createDraft';
 
 export default function SavedDrafts() {
 	const [user] = useAuthState(auth);
@@ -122,28 +123,7 @@ export default function SavedDrafts() {
 
 	const handleNewDraft = async () => {
 		const timestamp = Date.now();
-		try {
-			const res = await fetch('/api/user/update-drafts', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					timestamp: timestamp,
-				}),
-			});
-
-			const resBody = (await res.json()) as APIResponse<string>;
-
-			if (res.ok && resBody.success) {
-				setSelectedDraft({ id: timestamp, name: 'Untitled Draft' });
-				// router.push('/editor?draftNumber=' + timestamp);
-			} else if (!resBody.success) {
-				throw new Error(resBody.error);
-			}
-		} catch (error: any) {
-			console.log('Error creating new draft:', error.message);
-		}
+		setSelectedDraft({ id: timestamp, name: 'Untitled Draft' });
 	};
 
 	const handleDeleteDraft = async (
@@ -221,27 +201,29 @@ export default function SavedDrafts() {
 		setSelectedDraft(undefined);
 	};
 
-	const handleNameChange = (newDraftName: string) => {
+	const handleNameChange = async (newDraftName: string) => {
 		if (selectedDraft) {
-			handleRenameDraft(
-				selectedDraft.id,
-				selectedDraft.name,
-				newDraftName
-			);
-
 			// Selected draft is not in the draft mappings, i.e. new draft is being created
 			if (
 				draftMappings.find(
 					(mapping) => mapping.id === selectedDraft.id
 				) === undefined
 			) {
+				await createDraft(selectedDraft.id, newDraftName);
 				router.push('/editor?draftNumber=' + selectedDraft.id);
+			} else {
+				handleRenameDraft(
+					selectedDraft.id,
+					selectedDraft.name,
+					newDraftName
+				);
 			}
 		}
 	};
 
 	const publishAsTemplate = async (id: number, name: string) => {
 		setIsLoading(true);
+
 		const result = await createTemplate(id, name);
 		if (result) {
 			toastPublishAsTemplateSuccess();

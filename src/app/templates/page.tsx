@@ -14,6 +14,7 @@ import TemplateItem from '@components/TemplateItem';
 import { deleteTemplate } from '@lib/requests/admin/deleteTemplate';
 import DraftNameModal from '@components/DraftNameModal';
 import { renameTemplate } from '@lib/requests/admin/renameTemplate';
+import { createDraft } from '@lib/requests/createDraft';
 
 export default function Templates() {
 	const [user] = useAuthState(auth);
@@ -65,8 +66,12 @@ export default function Templates() {
 		setIsLoading(false);
 	};
 
-	const loadEditor = async (draftNumber: string) => {
-		router.push('/editor?draftNumber=' + draftNumber);
+	const loadEditor = async (mapping: TemplateMapping) => {
+		const timestamp = Date.now();
+		const result = await createDraft(timestamp, `Untitled Draft (${mapping.name})`, mapping.number);
+		if (result) {
+			router.push('/editor?draftNumber=' + timestamp);
+		}
 	};
 
 	const handleDeleteTemplate = async (mapping: TemplateMapping) => {

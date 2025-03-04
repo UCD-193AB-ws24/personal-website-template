@@ -6,7 +6,7 @@ import { Ref, useState } from 'react';
 interface TemplateItemProps {
 	templateMapping: TemplateMapping;
 	isAdmin: boolean;
-	loadEditor: (id: string) => void;
+	loadEditor: (templateMapping: TemplateMapping) => void;
 	handleDeleteTemplate: (templateMapping: TemplateMapping) => void;
 	setIsModalHidden: (isHidden: boolean) => void;
 	setSelectedDraft: (templateMapping: TemplateMapping) => void;
@@ -29,7 +29,7 @@ export default function TemplateItem({
 	return (
 		<div className="flex flex-col justify-between justify-self-center w-[250px] sm:w-full h-[350px] border-2 border-black shadow-lg hover:bg-[#111827] hover:text-[#f08700] transition duration-300">
 			<button
-				onClick={() => loadEditor(templateMapping.number.toString())}
+				onClick={() => loadEditor(templateMapping)}
 				className="h-full border-none"
 			>
 				{templateMapping.name}
