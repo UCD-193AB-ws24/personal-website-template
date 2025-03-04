@@ -4,8 +4,7 @@ import { storage } from "@lib/firebase/firebaseApp";
 // Fetches all images stored in Firebase for the draft
 // and determines which images are still referenced in the draft's components.
 const fetchStoredAndReferencedImages = async (userId: string, draftNumber: string, pages: any[]) => {
-  const draftId = `${userId}-${draftNumber}`;
-  const draftStorageRef = ref(storage, `users/${userId}/drafts/${draftId}/`);
+  const draftStorageRef = ref(storage, `users/${userId}/drafts/${draftNumber}/`);
 
   const storedFiles = await listAll(draftStorageRef);
   const storedImagePaths = storedFiles.items.map((file) => file.fullPath); // Paths of stored images
