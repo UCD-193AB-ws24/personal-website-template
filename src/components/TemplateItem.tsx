@@ -1,7 +1,6 @@
 import { TemplateMapping } from '@customTypes/apiResponse';
-import useComponentVisible from '@lib/hooks/useComponentVisible';
 import { EllipsisVertical, PenLine, Trash2 } from 'lucide-react';
-import { Ref, useState } from 'react';
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 
 interface TemplateItemProps {
 	templateMapping: TemplateMapping;
@@ -20,12 +19,6 @@ export default function TemplateItem({
 	setIsModalHidden,
 	setSelectedDraft,
 }: TemplateItemProps) {
-	// Used for clicking outside
-	const { ref, isComponentVisible, setIsComponentVisible } =
-		useComponentVisible(false);
-
-	const [visible, setVisible] = useState(false);
-
 	return (
 		<div className="flex flex-col justify-between justify-self-center w-[250px] sm:w-full h-[350px] border-2 border-black shadow-lg hover:bg-[#111827] hover:text-[#f08700] transition duration-300">
 			<button
@@ -37,43 +30,52 @@ export default function TemplateItem({
 			{isAdmin && (
 				<div className="flex relative justify-between items-center p-2 h-[40px] border-t border-black bg-[#1f2c47]">
 					<p className="text-white">{templateMapping.name}</p>
-					<button
-						className="text-white border-none"
-						onClick={() => {
-							setIsComponentVisible(!isComponentVisible);
-							setVisible(!visible);
-						}}
-					>
-						<EllipsisVertical size={24} color="#f08700" />
-					</button>
+					<Menu as="div" className="relative inline-block text-left">
+						<div className="flex">
+							<MenuButton>
+								<EllipsisVertical size={24} color="#f08700" />
+							</MenuButton>
+						</div>
 
-					<div
-						ref={ref as Ref<HTMLDivElement> | undefined}
-						style={{
-							display: isComponentVisible ? 'flex' : 'none',
-						}}
-						className="flex flex-col justify-evenly absolute z-10 right-[-25px] bottom-[35px] w-[100px] h-[100px] border border-black bg-white"
-					>
-						<button
-							onClick={() =>
-								handleDeleteTemplate(templateMapping)
-							}
-							className="flex justify-evenly items-center text-black hover:text-black border-none cursor-pointer hover:bg-gray-100"
+						<MenuItems
+							transition
+							className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white ring-1 shadow-lg ring-black/5 transition focus:outline-hidden data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
 						>
-							<Trash2 size={16} />
-							<p>Remove</p>
-						</button>
-						<button
-							onClick={() => {
-								setIsModalHidden(false);
-								setSelectedDraft(templateMapping);
-							}}
-							className="flex justify-evenly items-center text-black hover:text-black border-none cursor-pointer hover:bg-gray-100"
-						>
-							<PenLine size={16} />
-							<p>Rename</p>
-						</button>
-					</div>
+							<div className="py-1">
+								<MenuItem>
+									<div className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:text-gray-900 data-focus:outline-hidden">
+										<button
+											onClick={() =>
+												handleDeleteTemplate(
+													templateMapping
+												)
+											}
+											className="flex w-full gap-1 justify-left items-center text-black hover:text-black border-none cursor-pointer hover:bg-gray-100"
+										>
+											<Trash2 size={16} />
+											<p>Remove</p>
+										</button>
+									</div>
+								</MenuItem>
+								<MenuItem>
+									<div className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:text-gray-900 data-focus:outline-hidden">
+										<button
+											onClick={() => {
+												setIsModalHidden(false);
+												setSelectedDraft(
+													templateMapping
+												);
+											}}
+											className="flex w-full gap-1 justify-left items-center text-black hover:text-black border-none cursor-pointer hover:bg-gray-100"
+										>
+											<PenLine size={16} />
+											<p>Rename</p>
+										</button>
+									</div>
+								</MenuItem>
+							</div>
+						</MenuItems>
+					</Menu>
 				</div>
 			)}
 		</div>
