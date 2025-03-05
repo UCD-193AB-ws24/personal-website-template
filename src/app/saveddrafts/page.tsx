@@ -13,7 +13,7 @@ import { fetchPublishedDraftNumber } from '@lib/requests/fetchPublishedDraftNumb
 import DraftNameModal from '@components/DraftNameModal';
 import { ToastContainer } from 'react-toastify';
 import { createTemplate } from '@lib/requests/admin/createTemplate';
-import { toastPublishAsTemplateSuccess } from '@components/toasts/PublishAsTemplateToast';
+import { toastSuccess } from '@components/toasts/SuccessToast';
 import { createDraft } from '@lib/requests/createDraft';
 
 export default function SavedDrafts() {
@@ -107,6 +107,7 @@ export default function SavedDrafts() {
 				if (res.success) {
 					setPublishedDraftNumber(0);
 					setIsLoading(false);
+					toastSuccess("Successfully unpublished your site.")
 				} else {
 					throw new Error(res.error);
 				}
@@ -148,6 +149,7 @@ export default function SavedDrafts() {
 				setDraftMappings((original) =>
 					original.filter((d) => d.id !== draftNumber)
 				);
+				toastSuccess("Successfully deleted your draft.");
 			} else if (!resBody.success) {
 				throw new Error(resBody.error);
 			}
@@ -188,6 +190,7 @@ export default function SavedDrafts() {
 						return d;
 					})
 				);
+				toastSuccess("Successfully renamed your draft.");
 			} else if (!resBody.success) {
 				throw new Error(resBody.error);
 			}
@@ -226,7 +229,7 @@ export default function SavedDrafts() {
 
 		const result = await createTemplate(id, name);
 		if (result) {
-			toastPublishAsTemplateSuccess();
+			toastSuccess("Successfully published draft as a template.");
 		}
 		setIsLoading(false);
 	};

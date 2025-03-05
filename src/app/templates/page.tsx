@@ -15,6 +15,8 @@ import { deleteTemplate } from '@lib/requests/admin/deleteTemplate';
 import DraftNameModal from '@components/DraftNameModal';
 import { renameTemplate } from '@lib/requests/admin/renameTemplate';
 import { createDraft } from '@lib/requests/createDraft';
+import { toastSuccess } from '@components/toasts/SuccessToast';
+import { ToastContainer } from 'react-toastify';
 
 export default function Templates() {
 	const [user] = useAuthState(auth);
@@ -84,6 +86,8 @@ export default function Templates() {
 			setTemplateMappings((original) =>
 				original.filter((m) => m.number !== mapping.number)
 			);
+
+			toastSuccess("Successfully deleted the template.");
 		}
 	};
 
@@ -104,6 +108,9 @@ export default function Templates() {
 						return m;
 					})
 				);
+
+				console.log("rename template")
+				toastSuccess("Successfully renamed the template");
 			}
 		}
 	};
@@ -133,6 +140,7 @@ export default function Templates() {
 				)}
 			</header>
 			<main className="mx-auto max-w-screen-xl p-8">
+				<ToastContainer />
 				<LoadingSpinner show={isLoading} />
 				<div className="flex gap-10">
 					<h1 className="text-2xl sm:text-5xl"> Templates </h1>

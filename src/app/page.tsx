@@ -6,7 +6,6 @@ import { auth } from "@lib/firebase/firebaseApp"
 import { signUserOut } from "@lib/firebase/auth"
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { APIResponse } from "@customTypes/apiResponse";
 import { fetchUsername } from '@lib/requests/fetchUsername'
 import Navbar from "@components/Navbar"
 

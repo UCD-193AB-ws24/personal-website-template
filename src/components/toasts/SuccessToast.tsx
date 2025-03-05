@@ -1,7 +1,7 @@
 import { toast, ToastContentProps, Flip } from 'react-toastify';
 
-export function toastPublishAsTemplateSuccess() {
-	toast(PublishAsTemplateToast, {
+export function toastSuccess(subtext: string) {
+	toast(SuccessToast, {
 		position: 'top-right',
 		autoClose: 2500,
 		hideProgressBar: true,
@@ -11,12 +11,18 @@ export function toastPublishAsTemplateSuccess() {
 		progress: undefined,
 		theme: 'light',
 		transition: Flip,
+		data: { subtext }
 	});
 }
 
-export default function PublishAsTemplateToast({
+interface SuccessToastProps {
+	data: {subtext: string};
+}
+
+export default function SuccessToast({
 	closeToast,
-}: ToastContentProps) {
+	data,
+}: ToastContentProps & SuccessToastProps) {
 	return (
 		<div className="grid grid-cols-[1fr_1px_80px] w-full">
 			<div className="flex flex-col p-4">
@@ -24,7 +30,7 @@ export default function PublishAsTemplateToast({
 					Success!
 				</h3>
 				<p className="text-sm">
-					Successfully published draft as a template.
+					{ data.subtext }
 				</p>
 			</div>
 			<div className="bg-zinc-900/20 h-full" />
