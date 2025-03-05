@@ -9,17 +9,15 @@ import { Flip, toast, ToastContainer } from 'react-toastify';
 
 import EditorDropZone from '@components/EditorDropZone';
 import Sidebar from '@components/sidebar/Sidebar';
-import DraggableResizableTextbox from '@components/DraggableResizableTextbox';
-import SectionTitleTextbox from '@components/SectionTitle';
 import NavigationBar from '@components/NavigationBar';
 import LoadingSpinner from '@components/LoadingSpinner';
-import { toastPublish} from '@components/PublishToast';
-import ImageComponent from '@components/ImageComponent';
-import FileComponent from '@components/FileComponent';
+import { toastPublish } from '@components/PublishToast';
 
 import type { ComponentItem, Page, Position, Size } from '@customTypes/componentTypes';
 
 import { findBestFreeSpot } from '@utils/collisionUtils';
+import { componentMap, componentSizes, renderOverlayContent } from '@utils/componentUtils';
+import { switchPage, updatePageName, addPage, deletePage } from '@utils/pageManagerUtils';
 import { APIResponse } from '@customTypes/apiResponse';
 import { useSearchParams } from 'next/navigation';
 import { toastSaveSuccess } from '@components/SaveToast';
@@ -102,122 +100,20 @@ export default function Editor() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const switchPage = (pageIndex: number) => {
-    if (activePageIndex == null) return;
-
-    setPages(prevPages => {
-      const updatedPages = [...prevPages];
-      updatedPages[activePageIndex].components = components;
-      return updatedPages;
-    });
-
-    setActivePageIndex(pageIndex);
-    setComponents(pages[pageIndex]?.components || []);
-    setActiveComponent(null)
+  const handleSwitchPage = (pageIndex: number) => {
+    switchPage(pageIndex, activePageIndex, pages, setPages, components, setComponents, setActiveComponent, setActivePageIndex);
   };
 
-  const updatePageName = (index: number, newName: string) => {
-    setPages(prevPages => {
-      const updatedPages = [...prevPages];
-      updatedPages[index].pageName = newName;
-      return updatedPages;
-    });
-  };
+  const handleUpdatePageName = (pageIndex: number, newName: string) => {
+    updatePageName(pageIndex, newName, setPages);
+  }
 
-  const addPage = () => {
-    setPages(prevPages => {
-      if (activePageIndex !== null) {
-        prevPages[activePageIndex].components = [...components];
-      }
+  const handleAddPage = () => {
+    addPage(activePageIndex, components, setPages, setActivePageIndex, setComponents);
+  }
 
-      // Enumerate New Page (e.g., New Page 2, New Page 3, ...)
-      const existingNames = new Set(prevPages.map(page => page.pageName));
-      let counter = 2;
-      let newPageName = "New Page";
-      while (existingNames.has(newPageName)) {
-        newPageName = `New Page ${counter++}`;
-      }
-
-      const updatedPages = [...prevPages, { pageName: newPageName, components: [] }]
-
-      setActivePageIndex(updatedPages.length - 1);
-      setComponents([]);
-
-      return updatedPages;
-    });
-  };
-
-  const deletePage = (pageIndex: number) => {
-    if (activePageIndex == null) return;
-
-    // Save components first
-    setPages(prevPages => {
-      const updatedPages = [...prevPages];
-      updatedPages[activePageIndex].components = components;
-      return updatedPages;
-    });
-    const pageToDelete = pages[pageIndex];
-
-    if (pageToDelete.components.length > 1) {
-      toast(
-        <div className="flex flex-col">
-          <h3 className="font-semibold text-lg text-yellow-500">Warning</h3>
-          <p className="text-sm">
-            Are you sure you want to delete this page?
-          </p>
-          <div className="flex justify-between mt-4">
-            <button
-              className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition"
-              onClick={() => toast.dismiss()}
-            >
-              Cancel
-            </button>
-            <button
-              className="flex-1 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition ml-3"
-              onClick={() => {
-                toast.dismiss();
-                confirmDelete(pageIndex);
-              }}
-            >
-              Yes, Delete
-            </button>
-          </div>
-        </div >,
-        {
-          position: "top-center",
-          autoClose: false,
-          closeOnClick: false,
-          draggable: false,
-          closeButton: false,
-          transition: Flip,
-        }
-      );
-      return;
-    }
-    confirmDelete(pageIndex);
-  };
-
-  const confirmDelete = (pageIndex: number) => {
-    if (activePageIndex == null) return;
-
-    setPages(prevPages => {
-      const updatedPages = [...prevPages];
-      updatedPages.splice(pageIndex, 1); // Remove the selected page
-
-      let newActiveIndex = activePageIndex;
-
-      // If the deleted page was the active page, shift active page index
-      if (activePageIndex >= updatedPages.length) {
-        newActiveIndex = updatedPages.length - 1;
-      } else if (activePageIndex === pageIndex) {
-        newActiveIndex = Math.max(0, pageIndex - 1);
-      }
-
-      setActivePageIndex(newActiveIndex);
-      setComponents(updatedPages[newActiveIndex]?.components || []);
-
-      return updatedPages;
-    });
+  const handleDeletePage = (pageIndex: number) => {
+    deletePage(pageIndex, activePageIndex, pages, components, setPages, setActivePageIndex, setComponents);
   };
 
   const handleSaveDraft = async () => {
@@ -298,14 +194,6 @@ export default function Editor() {
 
   const handleComponentSelect = (component: ComponentItem) => {
     setActiveComponent(component);
-  };
-
-
-  const componentSizes: Record<string, { width: number; height: number }> = {
-    textBlock: { width: 200, height: 150 },
-    sectionTitle: { width: 350, height: 50 },
-    image: { width: 200, height: 150},
-    file: {width:425, height:550}
   };
 
   const addComponent = (type: string, position: { x: number; y: number }, id: string) => {
@@ -403,31 +291,6 @@ export default function Editor() {
     }
   };
 
-  const renderOverlayContent = (activeType: string | null) => {
-    switch (activeType) {
-      case 'textBlock':
-        return <DraggableResizableTextbox />;
-      case 'sectionTitle':
-        return <SectionTitleTextbox />
-      case 'navBar':
-        return <NavigationBar />
-      case 'image':
-        return <ImageComponent />
-      case 'file':
-        return <FileComponent />
-      default:
-        return null;
-    }
-  }
-
-  const componentMap: Record<string, React.ComponentType<Partial<ComponentItem>>> = {
-    textBlock: DraggableResizableTextbox,
-    sectionTitle: SectionTitleTextbox,
-    navBar: NavigationBar,
-    image: ImageComponent,
-    file: FileComponent
-  };
-
   const renderComponent = (comp: ComponentItem) => {
     if (comp.type === "navBar") {
       return (
@@ -439,10 +302,10 @@ export default function Editor() {
           setPages={setPages}
           activePageIndex={activePageIndex || 0}
           setActivePageIndex={setActivePageIndex}
-          switchPage={switchPage}
-          addPage={addPage}
-          deletePage={deletePage}
-          updatePageName={updatePageName}
+          switchPage={handleSwitchPage}
+          addPage={handleAddPage}
+          deletePage={handleDeletePage}
+          updatePageName={handleUpdatePageName}
           isPreview={isPreview}
           onMouseDown={() => handleComponentSelect(comp)}
         />

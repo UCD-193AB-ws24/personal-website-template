@@ -125,7 +125,7 @@ export default function NavigationBar({
     return (
       <div className="absolute top-0 left-0 w-full h-12 bg-gray-800 text-white flex items-center px-4 shadow-lg">
         {pages.map((page, index) => {
-          const urlFriendlyPageName = encodeURIComponent(page.pageName.replace(/\s+/g, "-"));
+          const urlFriendlyPageName = encodeURIComponent(page.pageName.replace(/ /g, "-"));
           return (
             <Link key={index} href={`/pages/${username}/${urlFriendlyPageName}`}>
               <button

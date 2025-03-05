@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { BaselineIcon, BriefcaseIcon, CircleArrowRightIcon, ContactIcon, FileUserIcon, ImagesIcon, QuoteIcon, SchoolIcon, SquareMenuIcon, TextIcon } from 'lucide-react';
+import { BaselineIcon, BriefcaseIcon, CircleArrowRightIcon, ContactIcon, FileUserIcon, ImagesIcon, QuoteIcon, SchoolIcon, SquareMenuIcon, TextIcon, VideoIcon } from 'lucide-react';
 
 import SidebarItem from './SidebarItem';
 
@@ -10,16 +10,17 @@ const sidebarItems = [
   { id: 3, type: 'navBar', name: 'Navigation Bar', description: 'Add a customizable menu for easy site navigation.', icon: <SquareMenuIcon /> },
   { id: 4, type: 'image', name: 'Image', description: 'Upload and display an image.', icon: <ImagesIcon /> },
   { id: 5, type: 'file', name: 'File', description: 'Upload and embed a PDF.', icon: <FileUserIcon /> },
-  { id: 6, type: 'navButton', name: 'Navigation Button', description: 'Add a button to link to other pages or sections.', icon: <CircleArrowRightIcon /> },
-  { id: 7, type: 'aboutMeCard', name: 'About Me Card', description: 'Create a quick bio with your photo and contact info.', icon: <ContactIcon /> },
-  { id: 8, type: 'academicEntry', name: 'Academic Entry', description: 'Highlight information about an academic institution, degree, and duration', icon: <SchoolIcon /> },
-  { id: 9, type: 'workEntry', name: 'Work Entry', description: 'Describe a job role, company, and time period.', icon: <BriefcaseIcon /> },
-  { id: 10, type: 'endoresment', name: 'Endoresment', description: 'Add quotes or recommendations from colleagues.', icon: <QuoteIcon /> },
+  { id: 6, type: 'video', name: 'Video', description: 'Upload and embed a video.', icon: <VideoIcon /> },
+  { id: 7, type: 'navButton', name: 'Navigation Button', description: 'Add a button to link to other pages or sections.', icon: <CircleArrowRightIcon /> },
+  { id: 8, type: 'aboutMeCard', name: 'About Me Card', description: 'Create a quick bio with your photo and contact info.', icon: <ContactIcon /> },
+  { id: 9, type: 'academicEntry', name: 'Academic Entry', description: 'Highlight information about an academic institution, degree, and duration', icon: <SchoolIcon /> },
+  { id: 10, type: 'workEntry', name: 'Work Entry', description: 'Describe a job role, company, and time period.', icon: <BriefcaseIcon /> },
+  { id: 11, type: 'endoresment', name: 'Endoresment', description: 'Add quotes or recommendations from colleagues.', icon: <QuoteIcon /> },
 ];
 
 export default function Sidebar() {
   return (
-    <div className={`flex w-64 bg-gray-100 h-screen sticky top-0 transition-width duration-300`}>
+    <div className={`flex w-64 bg-gray-100 max-h-screen sticky top-0 transition-width duration-300`}>
       <div className="overflow-y-auto w-64 bg-gray-100 px-4 pt-3 pb-4 border-r h-screen">
         <Link href="/" className="flex items-center gap-x-3 mb-4">
           <Image src="/logo.png" width={32} height={32} alt="Profesite Logo" />
