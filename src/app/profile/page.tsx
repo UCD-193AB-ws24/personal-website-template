@@ -11,12 +11,13 @@ import { fetchUsername } from '@lib/requests/fetchUsername';
 import LoadingSpinner from '@components/LoadingSpinner';
 
 import Navbar from "@components/Navbar"
+import { fetchPublishedDraftNumber } from "@lib/requests/fetchPublishedDraftNumber";
 
 
 export default function Profile() {
   const [user] = useAuthState(auth);
   const [username, setUsername] = useState("");
-  const [publishedDraftNumber, setPublishedDraftNumber] = useState("0");
+  const [publishedDraftNumber, setPublishedDraftNumber] = useState(0);
   const [views, setViews] = useState("0");
   const [draftMappings, setDraftMappings] = useState<Array<{ id: number; name: string }>>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -72,74 +73,51 @@ export default function Profile() {
 			});
 	};
 
-  const handleNewDraft = async () => {
-    if (!user) {
-      router.push("/login");
-    }
+  // const handleNewDraft = async () => {
+  //   if (!user) {
+  //     router.push("/login");
+  //   }
 
-		const timestamp = Date.now();
-		try {
-			const res = await fetch('/api/user/update-drafts', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					timestamp: timestamp,
-				}),
-			});
+	// 	const timestamp = Date.now();
+	// 	try {
+	// 		const res = await fetch('/api/user/update-drafts', {
+	// 			method: 'POST',
+	// 			headers: {
+	// 				'Content-Type': 'application/json',
+	// 			},
+	// 			body: JSON.stringify({
+	// 				timestamp: timestamp,
+	// 			}),
+	// 		});
 
-			const resBody = (await res.json()) as APIResponse<string>;
+	// 		const resBody = (await res.json()) as APIResponse<string>;
 
-			if (res.ok && resBody.success) {
-				router.push('/editor?draftNumber=' + timestamp);
-			} else if (!resBody.success) {
-				throw new Error(resBody.error);
-			}
-		} catch (error: any) {
-			console.log('Error creating new draft:', error.message);
-		}
-	};
+	// 		if (res.ok && resBody.success) {
+	// 			router.push('/editor?draftNumber=' + timestamp);
+	// 		} else if (!resBody.success) {
+	// 			throw new Error(resBody.error);
+	// 		}
+	// 	} catch (error: any) {
+	// 		console.log('Error creating new draft:', error.message);
+	// 	}
+	// };
 
   const handleOpenWebsite = async () => {
     try {
-      window.open(`https://www.profesite.online/pages/${username}`, "_blank");
+      window.open(`/pages/${username}`, "_blank");
     } catch (error: any) {
       console.log('Error opening website:', error.message);
     }
   };
 
   const getPublishedDraftNumber = async () => {
-    try {
-      const response = await fetch("/api/user/get-published-draftnumber", {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      const resBody = await response.json() as APIResponse<string>;
-
-      if (response.ok && resBody.success) {
-
-        console.log("draftnum: ", resBody.data);
-
-        if (resBody.data !== undefined) {
-          setPublishedDraftNumber(resBody.data);
-          getViews(resBody.data);
-        }
-
-      } else {
-        throw new Error("Unknown draftNumber");
-      }
-    } catch (error: any) {
-      setPublishedDraftNumber("");
-      console.log(error.message);
-    }
+    const pubDraftNum = await fetchPublishedDraftNumber();
+    getViews(pubDraftNum);
+    setPublishedDraftNumber(pubDraftNum);
   }
 
-  const getViews = async (publishedDraftNumber: string) => {
-
-    if (publishedDraftNumber == "") {
+  const getViews = async (publishedDraftNumber: number) => {
+    if (publishedDraftNumber === 0) {
       return;
     }
 
@@ -213,14 +191,14 @@ export default function Profile() {
 
             <div className="flex justify-center mt-5 mb-4 text-3xl sm:text-1xl md:text-2xl lg:text-3xl xl:text-3xl font-bold text-white">
               <h2>
-                Your website is: { publishedDraftNumber == "0"
+                Your website is: { publishedDraftNumber === 0
                 ? <div className="text-red-500 flex justify-center">Offline!</div>
                 : <div className="text-green-500 flex justify-center">Online!</div>}
               </h2>
             </div>
 
             <div>
-              { publishedDraftNumber == "0" ?
+              { publishedDraftNumber === 0 ?
                 <button disabled className="relative inline-flex px-6 py-4 w-1/2 text-lg font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all shadow-[0_0_10px_rgba(240,135,0,0.4)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 items-center justify-center text-center">
                   My Website
                 </button>
@@ -271,12 +249,12 @@ export default function Profile() {
 
             <div>
               <button
-                onClick={handleNewDraft}
+                onClick={() => router.push("/setupdraft")}
                 className="relative inline-flex px-6 py-4 w-1/2 text-lg font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#f08700] hover:text-black shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50 items-center justify-center text-center"
               >
                 <div className="text-left rtl:text-right">
                   <div className="-mt-1 font-sans text-lg font-semibold">
-                    Create My Site Now
+                    Create My Site
                   </div>
                 </div>
               </button> 

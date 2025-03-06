@@ -1,24 +1,23 @@
-import { Page } from '@customTypes/componentTypes';
 import { APIResponse } from '@customTypes/apiResponse';
 
-export async function saveDraft(draftNumber: number, pages: Page[]) {
-	return fetch(`/api/db/drafts?draftNumber=${draftNumber}`, {
+export async function createTemplate(draftId: number, draftName: string) {
+	return fetch(`/api/admin/templates/create`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
 		},
-		body: JSON.stringify({ pages }),
+		body: JSON.stringify({ name: draftName, number: draftId }),
 	})
 		.then((res) => res.json())
 		.then((res: APIResponse<string>) => {
 			if (!res.success) {
 				throw new Error(res.error);
 			} else {
-				return "";
+				return true;
 			}
 		})
 		.catch((error) => {
 			console.log(error.message);
-			return error.message;
+			return false;
 		});
 }

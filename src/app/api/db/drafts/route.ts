@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { APIResponse } from '@customTypes/apiResponse';
 import { db, getCurrentUser } from '@lib/firebase/firebaseAdmin';
-import { ComponentItem } from '@customTypes/componentTypes';
 
 // GET /api/db/drafts?draftNumber=number
 // Returns saved components

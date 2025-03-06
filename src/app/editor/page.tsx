@@ -11,7 +11,9 @@ import EditorDropZone from '@components/EditorDropZone';
 import Sidebar from '@components/sidebar/Sidebar';
 import NavigationBar from '@components/NavigationBar';
 import LoadingSpinner from '@components/LoadingSpinner';
-import { toastPublish } from '@components/PublishToast';
+import { toastPublish} from '@components/toasts/PublishToast';
+import ImageComponent from '@components/ImageComponent';
+import FileComponent from '@components/FileComponent';
 
 import type { ComponentItem, Page, Position, Size } from '@customTypes/componentTypes';
 
@@ -20,16 +22,27 @@ import { componentMap, componentSizes, renderOverlayContent } from '@utils/compo
 import { switchPage, updatePageName, addPage, deletePage } from '@utils/pageManagerUtils';
 import { APIResponse } from '@customTypes/apiResponse';
 import { useSearchParams } from 'next/navigation';
-import { toastSaveSuccess } from '@components/SaveToast';
+import { toastSaveSuccess } from '@components/toasts/SaveToast';
 import { saveDraft } from '@lib/requests/saveDrafts';
-import SavedDrafts from '../saveddrafts/page';
+import { fetchDraftName } from '@lib/requests/fetchDraftName';
 
-function DraftLoader({ setPages, setActivePageId, setComponents, setIsLoading, setDraftNumber, setHasLoadedDraftOnce }: { setPages: any, setActivePageId: any, setComponents: (c: ComponentItem[]) => void, setIsLoading: (loading: boolean) => void, setDraftNumber: (draftNumber: number) => void, setHasLoadedDraftOnce: (hasLoadedDraftOnce: boolean) => void }) {
+interface DraftLoaderProps {
+  setPages: any
+  setActivePageId: any
+  setComponents: (c: ComponentItem[]) => void,
+  setIsLoading: (loading: boolean) => void,
+  setDraftNumber: (draftNumber: number) => void,
+  setHasLoadedDraftOnce: (hasLoadedDraftOnce: boolean) => void
+  setDraftName: (newDraftName: string) => void
+}
+
+function DraftLoader({ setPages, setActivePageId, setComponents, setIsLoading, setDraftNumber, setHasLoadedDraftOnce, setDraftName }: DraftLoaderProps) {
   const searchParams = useSearchParams();
   const draftNumber = searchParams.get("draftNumber");
 
   useEffect(() => {
     setDraftNumber(parseInt(draftNumber!));
+    fetchDraftName(parseInt(draftNumber!)).then((name) => setDraftName(name))
 
     if (draftNumber) {
       fetch(`/api/db/drafts?draftNumber=${draftNumber}`, {
@@ -83,6 +96,9 @@ export default function Editor() {
   const [isPreview, setIsPreview] = useState(false);
   const [pages, setPages] = useState<Page[]>([]);
   const [activePageIndex, setActivePageIndex] = useState<number | null>(null);
+
+  const [username, setUsername] = useState("");
+  const [draftName, setDraftName] = useState("");
 
 
   useEffect(() => {
@@ -376,14 +392,17 @@ export default function Editor() {
             <ToastContainer />
 
             <Suspense fallback={<LoadingSpinner show={true} />}>
-              {!hasLoadedDraftOnce && (<DraftLoader setPages={setPages} setActivePageId={setActivePageIndex} setDraftNumber={setDraftNumber} setComponents={setComponents} setIsLoading={setIsLoading} setHasLoadedDraftOnce={setHasLoadedDraftOnce} />)}
+              {!hasLoadedDraftOnce && (<DraftLoader setPages={setPages} setActivePageId={setActivePageIndex} setDraftNumber={setDraftNumber} setComponents={setComponents} setIsLoading={setIsLoading} setHasLoadedDraftOnce={setHasLoadedDraftOnce} setDraftName={setDraftName} />)}
             </Suspense>
 
             <div className="flex flex-col flex-grow">
               <div className="fixed top-0 right-0 z-50 bg-gray-100 flex justify-between items-center px-6 py-3 w-[calc(100%-256px)] h-[64px]">
-                <Link href="/saveddrafts" className="text-large font-semibold px-4 py-2 rounded-md border border-gray-500 transition-all duration-300 hover:bg-gray-500 hover:text-white shadow-md hover:shadow-lg">
-                  Drafts
-                </Link>
+                <div className="flex items-center gap-10">
+                  <Link href="/saveddrafts" className="text-large font-semibold px-4 py-2 rounded-md border border-gray-500 transition-all duration-300 hover:bg-gray-500 hover:text-white shadow-md hover:shadow-lg">
+                    Drafts
+                  </Link>
+                  <p className="font-bold">{draftName}</p>
+                </div>
                 <div className="flex">
                   <button
                     className={`text-large font-semibold px-4 py-2 rounded-md mr-4 border border-blue-500 transition-all duration-300 hover:bg-blue-500 hover:text-white shadow-md hover:shadow-lg`}
