@@ -85,6 +85,8 @@ export default function Templates() {
       return;
     }
 
+    setIsLoading(true);
+
     const result = await deleteTemplate(mapping);
     if (result) {
       setTemplateMappings((original) =>
@@ -93,12 +95,16 @@ export default function Templates() {
 
       toastSuccess("Successfully deleted the template.");
     }
+
+    setIsLoading(false);
   };
 
   const handleNameChange = async (newName: string) => {
     if (username !== "admin") {
       return;
     }
+
+    setIsLoading(true);
 
     if (selectedTemplate) {
       const result = await renameTemplate(selectedTemplate, newName);
@@ -117,6 +123,8 @@ export default function Templates() {
         toastSuccess("Successfully renamed the template");
       }
     }
+
+    setIsLoading(false);
   };
 
   return (
@@ -176,7 +184,7 @@ export default function Templates() {
           setIsModalHidden={setIsModalHidden}
         />
       </main>
-      <footer className="mt-[50px]"></footer>
+      <footer className="mt-[20vh]"></footer>
     </div>
   );
 }
