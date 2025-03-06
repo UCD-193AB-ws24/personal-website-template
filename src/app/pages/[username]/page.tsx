@@ -1,6 +1,7 @@
-import FullWindow from "@components/FullWindow";
-import { ComponentItem } from "@customTypes/componentTypes";
-import NavigationBar from "@components/NavigationBar";
+import FullWindow from '@components/FullWindow';
+import { ComponentItem } from '@customTypes/componentTypes';
+import NavigationBar from '@components/NavigationBar';
+import Custom404 from "@components/Custom404";
 
 import { componentMap } from "@utils/componentUtils";
 
@@ -57,6 +58,7 @@ export default async function PublishedPage({ params }: PublishedPageProps) {
     }
   } catch (error) {
     console.log("Error:", error);
+    return <Custom404 />;
   }
 
   const renderComponent = (comp: ComponentItem) => {
