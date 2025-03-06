@@ -1,12 +1,11 @@
-'use client'
+"use client";
 
 import Image from "next/image";
 import googleLogo from "@public/googlelogo.png";
 import Link from "next/link";
-import { signInWithGoogle, signInWithEmail } from "@lib/firebase/auth"
-import { useState } from "react"
+import { signInWithGoogle, signInWithEmail } from "@lib/firebase/auth";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-
 
 export default function LogInForm() {
   const [email, setEmail] = useState("");
@@ -16,24 +15,24 @@ export default function LogInForm() {
 
   const router = useRouter();
 
-  const handleSignIn = async (e: { preventDefault: () => void; }) => {
+  const handleSignIn = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
     const response = await signInWithEmail(email, password);
     if (response.success === true) {
-      router.push("/profile")
+      router.push("/profile");
       return;
     } else {
       setError(response.error);
     }
   };
 
-  const handleSignInWithGoogle = async (e: { preventDefault: () => void; }) => {
+  const handleSignInWithGoogle = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
     const isOk = await signInWithGoogle();
     if (isOk) {
-      router.push("/profile")
+      router.push("/profile");
       return;
     }
   };
@@ -62,11 +61,14 @@ export default function LogInForm() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <button type="submit" className="relative w-full px-6 py-4 font-semibold text-white bg-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#d67500] hover:border-[#d67500] shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50">
+          <button
+            type="submit"
+            className="relative w-full px-6 py-4 font-semibold text-white bg-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#d67500] hover:border-[#d67500] shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50"
+          >
             <div className="text-center">
-                <div className="-mt-1 font-sans text-lg font-semibold">
-                  Log In
-                </div>
+              <div className="-mt-1 font-sans text-lg font-semibold">
+                Log In
+              </div>
             </div>
           </button>
         </form>
@@ -78,20 +80,26 @@ export default function LogInForm() {
         <div className="flex flex-col items-center gap-2 mt-4">
           <button
             onClick={handleSignInWithGoogle}
-           className="flex items-center w-full max-w-xs px-4 py-3 bg-white border border-gray-300 rounded-md shadow-md transition duration-300 hover:bg-gray-100 focus:outline-none"
+            className="flex items-center w-full max-w-xs px-4 py-3 bg-white border border-gray-300 rounded-md shadow-md transition duration-300 hover:bg-gray-100 focus:outline-none"
           >
-           <img src="googlelogo.png" alt="Google logo" className="w-6 h-6 mr-3" />
-            <span className="text-gray-700 font-medium">Continue with Google</span>
+            <img
+              src="googlelogo.png"
+              alt="Google logo"
+              className="w-6 h-6 mr-3"
+            />
+            <span className="text-gray-700 font-medium">
+              Continue with Google
+            </span>
           </button>
         </div>
 
         {/* Horizontal Divider & Text */}
-          <div className="relative flex items-center my-6">
-            <hr className="w-full border-gray-600" />
-            <span className="absolute left-1/2 -translate-x-1/2 bg-gray-900 px-4 py-1 text-gray-400 text-sm">
-              Don&apos;t have an account?
-            </span>
-          </div>
+        <div className="relative flex items-center my-6">
+          <hr className="w-full border-gray-600" />
+          <span className="absolute left-1/2 -translate-x-1/2 bg-gray-900 px-4 py-1 text-gray-400 text-sm">
+            Don&apos;t have an account?
+          </span>
+        </div>
 
         <Link href="/signup" className="flex justify-center">
           <button className="relative px-6 py-3 font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#f08700] hover:text-black shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50">
@@ -102,7 +110,6 @@ export default function LogInForm() {
             </div>
           </button>
         </Link>
-
       </div>
     </div>
   );

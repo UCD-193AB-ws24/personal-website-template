@@ -2,7 +2,7 @@ import FullWindow from "@components/FullWindow";
 import { ComponentItem } from "@customTypes/componentTypes";
 import NavigationBar from "@components/NavigationBar";
 
-import { componentMap } from '@utils/componentUtils';
+import { componentMap } from "@utils/componentUtils";
 
 interface PublishedPageProps {
   params: Promise<{ username: string; page: string }>;
@@ -12,12 +12,15 @@ export default async function PublishedPage({ params }: PublishedPageProps) {
   const { username, page } = await params;
   const decodedPageName = decodeURIComponent(page).replace(/-/g, " ");
   let components: ComponentItem[] = [];
-  let pages: { pageName: string, components: ComponentItem[] }[] = [];
+  let pages: { pageName: string; components: ComponentItem[] }[] = [];
 
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/db/drafts/published-draft?username=${username}`, {
-      headers: { 'Content-Type': 'application/json' },
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_URL}/api/db/drafts/published-draft?username=${username}`,
+      {
+        headers: { "Content-Type": "application/json" },
+      },
+    );
 
     const resBody = await response.json();
 
@@ -38,7 +41,8 @@ export default async function PublishedPage({ params }: PublishedPageProps) {
     return <h1>Error 500: Failed to load page</h1>;
   }
 
-  const activePageIndex = pages.findIndex((p) => p.pageName === decodedPageName) || 0;
+  const activePageIndex =
+    pages.findIndex((p) => p.pageName === decodedPageName) || 0;
 
   const renderComponent = (comp: ComponentItem) => {
     if (comp.type === "navBar") {

@@ -1,10 +1,14 @@
-"use client"
+"use client";
 
-import React, { useState } from 'react';
-import { Rnd } from 'react-rnd';
+import React, { useState } from "react";
+import { Rnd } from "react-rnd";
 
-import type { ComponentItem, Position, Size } from '@customTypes/componentTypes';
-import { handleDragStop, handleResizeStop } from '@utils/dragResizeUtils';
+import type {
+  ComponentItem,
+  Position,
+  Size,
+} from "@customTypes/componentTypes";
+import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
 
 interface ImageComponentProps {
   id?: string;
@@ -12,7 +16,12 @@ interface ImageComponentProps {
   initialSize?: Size;
   components?: ComponentItem[];
   content?: string;
-  updateComponent?: (id: string, newPos: Position, newSize: Size, content?: string) => void;
+  updateComponent?: (
+    id: string,
+    newPos: Position,
+    newSize: Size,
+    content?: string,
+  ) => void;
   isActive?: boolean;
   onMouseDown?: () => void;
   setIsDragging?: (dragging: boolean) => void;
@@ -29,7 +38,7 @@ export default function ImageComponent({
   isActive = false,
   onMouseDown = () => {},
   setIsDragging = () => {},
-  isPreview = false
+  isPreview = false,
 }: ImageComponentProps) {
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
@@ -51,12 +60,17 @@ export default function ImageComponent({
 
         img.onload = () => {
           const aspectRatio = img.width / img.height;
-          const newWidth = 300 // Default width
+          const newWidth = 300; // Default width
           const newHeight = newWidth / aspectRatio; // Maintain aspect ratio
 
           setImageSrc(imageUrl);
-          setSize({ width: newWidth, height: newHeight});
-          updateComponent(id, position, { width: newWidth, height: newHeight }, imageUrl);
+          setSize({ width: newWidth, height: newHeight });
+          updateComponent(
+            id,
+            position,
+            { width: newWidth, height: newHeight },
+            imageUrl,
+          );
         };
       };
 
@@ -76,7 +90,11 @@ export default function ImageComponent({
       className="overflow-hidden"
     >
       {imageSrc ? (
-        <img src={imageSrc} alt="Uploaded" className="w-full h-full object-cover" />
+        <img
+          src={imageSrc}
+          alt="Uploaded"
+          className="w-full h-full object-cover"
+        />
       ) : (
         <div className="w-full h-full flex items-center justify-center bg-gray-200">
           No Image
@@ -93,31 +111,47 @@ export default function ImageComponent({
       }}
       onDragStop={(e, d) => {
         setIsDragging(false);
-        handleDragStop(id, size, components, updateComponent, setPosition)(e, d);
+        handleDragStop(
+          id,
+          size,
+          components,
+          updateComponent,
+          setPosition,
+        )(e, d);
       }}
       onResizeStart={() => setIsDragging(true)}
       onResizeStop={(e, d, ref, delta, newPosition) => {
         setIsDragging(false);
-        handleResizeStop(id, components, updateComponent, setSize, setPosition)(e, d, ref, delta, newPosition);
+        handleResizeStop(id, components, updateComponent, setSize, setPosition)(
+          e,
+          d,
+          ref,
+          delta,
+          newPosition,
+        );
       }}
       lockAspectRatio={true}
       minWidth={100}
       minHeight={100}
       bounds="parent"
       onMouseDown={handleMouseDown}
-      style={{ pointerEvents: 'auto' }}
+      style={{ pointerEvents: "auto" }}
     >
       <div
         className={`w-full h-full border-2 transition-all duration-150 ease-in-out ${
-          isActive ? 'border-blue-500 bg-gray-100 shadow-md' : 'border-transparent hover:border-gray-300'
+          isActive
+            ? "border-blue-500 bg-gray-100 shadow-md"
+            : "border-transparent hover:border-gray-300"
         }`}
       >
         {imageSrc ? (
-          <img src={imageSrc} alt="Uploaded" className="w-full h-full object-cover" />
+          <img
+            src={imageSrc}
+            alt="Uploaded"
+            className="w-full h-full object-cover"
+          />
         ) : (
-          <label
-            className="w-full h-full flex items-center justify-center cursor-pointer bg-gray-200"
-          >
+          <label className="w-full h-full flex items-center justify-center cursor-pointer bg-gray-200">
             Click to Upload an Image
             <input
               type="file"

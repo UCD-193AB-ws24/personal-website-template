@@ -14,18 +14,26 @@ interface NavbarProps {
   navLinks?: NavLink[];
 }
 
-export default function Navbar({ user, username, onSignOut, logoHref = "/", navLinks = [] }: NavbarProps) {
+export default function Navbar({
+  user,
+  username,
+  onSignOut,
+  logoHref = "/",
+  navLinks = [],
+}: NavbarProps) {
   return (
     <nav className="border-[#00f2ff] bg-gray-900 overflow-hidden top-0 left-0 w-full z-50">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-4 py-3">
         {/* Logo */}
-        <a href={logoHref} className="flex items-center space-x-3 rtl:space-x-reverse">
+        <a
+          href={logoHref}
+          className="flex items-center space-x-3 rtl:space-x-reverse"
+        >
           <Image src="/logo.png" width={32} height={32} alt="Profesite Logo" />
           <span className="self-center text-4xl font-light tracking-wide whitespace-nowrap text-white iceland-font">
             PROFESITE
           </span>
         </a>
-
 
         {/* Nav Links */}
         <div className="flex w-auto space-x-8 items-center">
@@ -58,4 +66,4 @@ export default function Navbar({ user, username, onSignOut, logoHref = "/", navL
       </div>
     </nav>
   );
-};
+}

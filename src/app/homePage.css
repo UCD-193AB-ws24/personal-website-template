@@ -2,7 +2,7 @@
 
 .perspective-text {
   color: white;
-  font-family: Arial; 
+  font-family: Arial;
   letter-spacing: -2px;
   text-transform: uppercase;
 }
@@ -13,7 +13,7 @@
   position: relative;
 }
 
-.perspective-line>p {
+.perspective-line > p {
   margin: 0;
   height: 50px;
   line-height: 50px;

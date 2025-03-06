@@ -1,6 +1,9 @@
 import { ToastContentProps } from "react-toastify";
 
-export default function ErrorToast({ closeToast, message }: ToastContentProps & { message: string }) {
+export default function ErrorToast({
+  closeToast,
+  message,
+}: ToastContentProps & { message: string }) {
   return (
     <div className="grid grid-cols-[1fr_1px_80px] w-full">
       <div className="flex flex-col p-4">
@@ -9,7 +12,10 @@ export default function ErrorToast({ closeToast, message }: ToastContentProps & 
       </div>
       <div className="bg-zinc-900/20 h-full" />
       <div className="flex flex-col justify-center items-center">
-        <button className="border-none cursor-pointer" onClick={() => closeToast("close")}>
+        <button
+          className="border-none cursor-pointer"
+          onClick={() => closeToast("close")}
+        >
           Close
         </button>
       </div>

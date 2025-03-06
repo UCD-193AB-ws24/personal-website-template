@@ -1,6 +1,6 @@
 import { toast, Flip } from "react-toastify";
 
-import type { ComponentItem, Page } from '@customTypes/componentTypes';
+import type { ComponentItem, Page } from "@customTypes/componentTypes";
 
 // Switch to another page, saving the current page's components before switching.
 export const switchPage = (
@@ -10,8 +10,10 @@ export const switchPage = (
   setPages: React.Dispatch<React.SetStateAction<Page[]>>,
   components: ComponentItem[],
   setComponents: React.Dispatch<React.SetStateAction<ComponentItem[]>>,
-  setActiveComponent: React.Dispatch<React.SetStateAction<ComponentItem | null>>,
-  setActivePageIndex: React.Dispatch<React.SetStateAction<number | null>>
+  setActiveComponent: React.Dispatch<
+    React.SetStateAction<ComponentItem | null>
+  >,
+  setActivePageIndex: React.Dispatch<React.SetStateAction<number | null>>,
 ) => {
   if (activePageIndex == null) return;
 
@@ -30,7 +32,7 @@ export const switchPage = (
 export const updatePageName = (
   pageIndex: number,
   newName: string,
-  setPages: React.Dispatch<React.SetStateAction<Page[]>>
+  setPages: React.Dispatch<React.SetStateAction<Page[]>>,
 ) => {
   setPages((prevPages) => {
     const updatedPages = [...prevPages];
@@ -45,7 +47,7 @@ export const addPage = (
   components: ComponentItem[],
   setPages: React.Dispatch<React.SetStateAction<Page[]>>,
   setActivePageIndex: React.Dispatch<React.SetStateAction<number | null>>,
-  setComponents: React.Dispatch<React.SetStateAction<ComponentItem[]>>
+  setComponents: React.Dispatch<React.SetStateAction<ComponentItem[]>>,
 ) => {
   setPages((prevPages) => {
     if (activePageIndex !== null) {
@@ -60,7 +62,10 @@ export const addPage = (
       newPageName = `New Page ${counter++}`;
     }
 
-    const updatedPages = [...prevPages, { pageName: newPageName, components: [] }];
+    const updatedPages = [
+      ...prevPages,
+      { pageName: newPageName, components: [] },
+    ];
 
     setActivePageIndex(updatedPages.length - 1);
     setComponents([]);
@@ -77,7 +82,7 @@ export const deletePage = (
   components: ComponentItem[],
   setPages: React.Dispatch<React.SetStateAction<Page[]>>,
   setActivePageIndex: React.Dispatch<React.SetStateAction<number | null>>,
-  setComponents: React.Dispatch<React.SetStateAction<ComponentItem[]>>
+  setComponents: React.Dispatch<React.SetStateAction<ComponentItem[]>>,
 ) => {
   if (activePageIndex == null) return;
 
@@ -91,9 +96,9 @@ export const deletePage = (
 
   if (pageToDelete.components.length > 1) {
     toast(
-      <div className="flex flex-col" >
-        <h3 className="font-semibold text-lg text-yellow-500" > Warning </h3>
-        <p className="text-sm" >Are you sure you want to delete this page?</p>
+      <div className="flex flex-col">
+        <h3 className="font-semibold text-lg text-yellow-500"> Warning </h3>
+        <p className="text-sm">Are you sure you want to delete this page?</p>
         <div className="flex justify-between mt-4">
           <button
             className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition"
@@ -101,11 +106,17 @@ export const deletePage = (
           >
             Cancel
           </button>
-          < button
+          <button
             className="flex-1 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition ml-3"
             onClick={() => {
               toast.dismiss();
-              confirmDelete(pageIndex, activePageIndex, setPages, setActivePageIndex, setComponents);
+              confirmDelete(
+                pageIndex,
+                activePageIndex,
+                setPages,
+                setActivePageIndex,
+                setComponents,
+              );
             }}
           >
             Yes, Delete
@@ -119,11 +130,17 @@ export const deletePage = (
         draggable: false,
         closeButton: false,
         transition: Flip,
-      }
+      },
     );
     return;
   }
-  confirmDelete(pageIndex, activePageIndex, setPages, setActivePageIndex, setComponents);
+  confirmDelete(
+    pageIndex,
+    activePageIndex,
+    setPages,
+    setActivePageIndex,
+    setComponents,
+  );
 };
 
 /**
@@ -134,7 +151,7 @@ export const confirmDelete = (
   activePageIndex: number | null,
   setPages: React.Dispatch<React.SetStateAction<Page[]>>,
   setActivePageIndex: React.Dispatch<React.SetStateAction<number | null>>,
-  setComponents: React.Dispatch<React.SetStateAction<ComponentItem[]>>
+  setComponents: React.Dispatch<React.SetStateAction<ComponentItem[]>>,
 ) => {
   if (activePageIndex == null) return;
 

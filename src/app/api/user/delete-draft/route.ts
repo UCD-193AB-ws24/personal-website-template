@@ -1,8 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getCurrentUser, db } from '@lib/firebase/firebaseAdmin';
-import { APIResponse } from '@customTypes/apiResponse';
-import { FieldValue } from 'firebase-admin/firestore';
-
+import { NextRequest, NextResponse } from "next/server";
+import { getCurrentUser, db } from "@lib/firebase/firebaseAdmin";
+import { APIResponse } from "@customTypes/apiResponse";
+import { FieldValue } from "firebase-admin/firestore";
 
 // POST /api/user/delete-drafts:
 // Deletes a draft given a draftId
@@ -17,7 +16,7 @@ export async function POST(req: NextRequest) {
     // Get the draft mapping
     const draftObj = reqJson["draftObj"];
     if (!draftObj.hasOwnProperty("id") || !draftObj.hasOwnProperty("name")) {
-        throw new Error("Invalid request");
+      throw new Error("Invalid request");
     }
 
     // Get the user who sent the request and their uid to get their user document
@@ -25,32 +24,33 @@ export async function POST(req: NextRequest) {
     if (user === null) {
       throw new Error("No user found");
     }
-    const userDoc = db.collection('users').doc(user.uid);
+    const userDoc = db.collection("users").doc(user.uid);
 
     // Delete the draftId from the user's doc
     await userDoc.update({
-      draftMappings: FieldValue.arrayRemove(draftObj)
+      draftMappings: FieldValue.arrayRemove(draftObj),
     });
 
     // Delete the draft document
-    const draftsRef = db.collection('drafts');
+    const draftsRef = db.collection("drafts");
     const query = draftsRef.where(
-        'draftId',
-        '==',
-        `${user.uid}-${draftObj.id}`
+      "draftId",
+      "==",
+      `${user.uid}-${draftObj.id}`,
     );
     const snapshot = await query.get();
     snapshot.forEach((doc) => {
-        doc.ref.delete();
-    })
+      doc.ref.delete();
+    });
 
     return NextResponse.json<APIResponse<string>>({
-      success: true, data: "Success"
+      success: true,
+      data: "Success",
     });
   } catch (error: any) {
     return NextResponse.json<APIResponse<string>>(
       { success: false, error: error.message },
-      { status: 400 }
-    )
+      { status: 400 },
+    );
   }
 }

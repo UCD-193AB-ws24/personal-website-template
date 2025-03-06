@@ -5,22 +5,33 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { PlusIcon } from "lucide-react";
-import { toast, Flip } from 'react-toastify';
-import { DndContext, closestCenter, useSensor, useSensors, PointerSensor } from "@dnd-kit/core";
+import { toast, Flip } from "react-toastify";
+import {
+  DndContext,
+  closestCenter,
+  useSensor,
+  useSensors,
+  PointerSensor,
+} from "@dnd-kit/core";
 import { arrayMove, SortableContext } from "@dnd-kit/sortable";
-import { restrictToHorizontalAxis, restrictToParentElement } from '@dnd-kit/modifiers';
+import {
+  restrictToHorizontalAxis,
+  restrictToParentElement,
+} from "@dnd-kit/modifiers";
 
-import ErrorToast from '@components/ErrorToast';
-import SortablePageItem from '@components/SortablePageItem';
+import ErrorToast from "@components/ErrorToast";
+import SortablePageItem from "@components/SortablePageItem";
 
-import type { ComponentItem } from '@customTypes/componentTypes';
+import type { ComponentItem } from "@customTypes/componentTypes";
 
 interface NavigationBarProps {
   username?: string;
-  components?: ComponentItem[],
+  components?: ComponentItem[];
   setComponents?: React.Dispatch<React.SetStateAction<ComponentItem[]>>;
-  pages?: { pageName: string, components: ComponentItem[] }[];
-  setPages?: React.Dispatch<React.SetStateAction<{ pageName: string, components: ComponentItem[] }[]>>;
+  pages?: { pageName: string; components: ComponentItem[] }[];
+  setPages?: React.Dispatch<
+    React.SetStateAction<{ pageName: string; components: ComponentItem[] }[]>
+  >;
   activePageIndex?: number;
   setActivePageIndex?: React.Dispatch<React.SetStateAction<number | null>>;
   switchPage?: (index: number) => void;
@@ -35,15 +46,15 @@ interface NavigationBarProps {
 export default function NavigationBar({
   username = "",
   components = [],
-  setComponents: setComponents = () => { },
+  setComponents: setComponents = () => {},
   pages = [],
-  setPages: setPages = () => { },
+  setPages: setPages = () => {},
   activePageIndex,
-  setActivePageIndex: setActivePageIndex = () => { },
-  switchPage: switchPage = () => { },
-  addPage: addPage = () => { },
-  deletePage: deletePage = () => { },
-  updatePageName: updatePageName = () => { },
+  setActivePageIndex: setActivePageIndex = () => {},
+  switchPage: switchPage = () => {},
+  addPage: addPage = () => {},
+  deletePage: deletePage = () => {},
+  updatePageName: updatePageName = () => {},
   isPreview,
   isPublish = false,
   onMouseDown,
@@ -69,19 +80,26 @@ export default function NavigationBar({
     if (!editedName.trim()) {
       setEditedName(pages[index].pageName); // Revert to existing name if new name is empty string
     } else {
-      const isDuplicate = pages.some((page, i) => i !== index && page.pageName === editedName.trim());
+      const isDuplicate = pages.some(
+        (page, i) => i !== index && page.pageName === editedName.trim(),
+      );
       if (isDuplicate) {
-        toast((props) => <ErrorToast {...props} message="Page name must be unique!" />, {
-          position: "top-right",
-          autoClose: false,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: false,
-          progress: undefined,
-          theme: "light",
-          transition: Flip,
-        });
+        toast(
+          (props) => (
+            <ErrorToast {...props} message="Page name must be unique!" />
+          ),
+          {
+            position: "top-right",
+            autoClose: false,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: false,
+            progress: undefined,
+            theme: "light",
+            transition: Flip,
+          },
+        );
         return;
       }
       updatePageName(index, editedName.trim());
@@ -101,8 +119,8 @@ export default function NavigationBar({
     const { active, over } = event;
     if (!over || active.id === over.id || activePageIndex === undefined) return;
 
-    const oldIndex = pages.findIndex(page => page.pageName === active.id);
-    const newIndex = pages.findIndex(page => page.pageName === over.id);
+    const oldIndex = pages.findIndex((page) => page.pageName === active.id);
+    const newIndex = pages.findIndex((page) => page.pageName === over.id);
     if (oldIndex === -1 || newIndex === -1) return;
 
     // Create a new pages array and store the active page's components
@@ -125,12 +143,20 @@ export default function NavigationBar({
     return (
       <div className="absolute top-0 left-0 w-full h-12 bg-gray-800 text-white flex items-center px-4 shadow-lg">
         {pages.map((page, index) => {
-          const urlFriendlyPageName = encodeURIComponent(page.pageName.replace(/ /g, "-"));
+          const urlFriendlyPageName = encodeURIComponent(
+            page.pageName.replace(/ /g, "-"),
+          );
           return (
-            <Link key={index} href={`/pages/${username}/${urlFriendlyPageName}`}>
+            <Link
+              key={index}
+              href={`/pages/${username}/${urlFriendlyPageName}`}
+            >
               <button
-                className={`px-4 py-2 mx-1 rounded-md transition-all duration-200 ${activePageIndex === index ? "bg-blue-500" : "bg-gray-700 hover:bg-gray-600"
-                  }`}
+                className={`px-4 py-2 mx-1 rounded-md transition-all duration-200 ${
+                  activePageIndex === index
+                    ? "bg-blue-500"
+                    : "bg-gray-700 hover:bg-gray-600"
+                }`}
               >
                 {page.pageName}
               </button>
@@ -141,9 +167,7 @@ export default function NavigationBar({
     );
   } else if (isPreview) {
     return (
-      <div
-        className="absolute top-0 left-0 w-full h-12 bg-gray-800 text-white flex items-center px-4 shadow-lg"
-      >
+      <div className="absolute top-0 left-0 w-full h-12 bg-gray-800 text-white flex items-center px-4 shadow-lg">
         {pages.map((page, index) => (
           <div key={index} className="flex items-center space-x-2">
             <button
@@ -158,10 +182,14 @@ export default function NavigationBar({
     );
   }
 
-
   /* Editor Mode */
   return (
-    <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd} sensors={sensors} modifiers={[restrictToHorizontalAxis, restrictToParentElement]}>
+    <DndContext
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+      sensors={sensors}
+      modifiers={[restrictToHorizontalAxis, restrictToParentElement]}
+    >
       <div
         className="absolute top-0 left-0 w-full h-12 bg-gray-800 text-white flex items-center px-4 shadow-lg"
         onMouseDown={handleMouseDown}

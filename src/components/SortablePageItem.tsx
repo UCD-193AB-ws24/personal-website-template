@@ -29,19 +29,28 @@ export default function SortablePageItem({
   handleEditChange,
   handleEditSubmit,
   deletePage,
-  pages
+  pages,
 }: SortablePageItemProps) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: page.pageName });
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: page.pageName });
 
   const style = {
-    transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+    transform: transform
+      ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
+      : undefined,
     transition,
     width: "auto",
     minWidth: "80px",
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="flex items-center space-x-2 cursor-grab">
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className="flex items-center space-x-2 cursor-grab"
+    >
       {editingIndex === index ? (
         <input
           type="text"

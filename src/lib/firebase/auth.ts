@@ -1,18 +1,26 @@
-import { createUserWithEmailAndPassword, 
-  GoogleAuthProvider, 
-  signInWithEmailAndPassword, 
-  signInWithPopup } from "firebase/auth";
-import { doc, 
-  setDoc, 
+import {
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+} from "firebase/auth";
+import {
+  doc,
+  setDoc,
   getDocs,
-  query, 
-  collection, 
-  where } from "firebase/firestore"; 
+  query,
+  collection,
+  where,
+} from "firebase/firestore";
 
-import {auth, db} from "./firebaseApp";
+import { auth, db } from "./firebaseApp";
 import { APIResponse } from "@customTypes/apiResponse";
 
-export const signUpWithEmail = async (email: string, username: string, password: string) => {
+export const signUpWithEmail = async (
+  email: string,
+  username: string,
+  password: string,
+) => {
   try {
     const q = query(collection(db, "users"), where("username", "==", username));
     const querySnapshot = await getDocs(q);
@@ -21,7 +29,11 @@ export const signUpWithEmail = async (email: string, username: string, password:
       throw new Error("Username is already taken.");
     }
 
-    const userCredentials = await createUserWithEmailAndPassword(auth, email, password);
+    const userCredentials = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password,
+    );
     console.log("User signed up:", userCredentials.user);
 
     await setDoc(doc(db, "users", userCredentials.user.uid), {
@@ -35,7 +47,7 @@ export const signUpWithEmail = async (email: string, username: string, password:
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ idToken })
+      body: JSON.stringify({ idToken }),
     });
 
     const resBody = (await response.json()) as APIResponse<string>;
@@ -44,17 +56,19 @@ export const signUpWithEmail = async (email: string, username: string, password:
       return true;
     }
     return false;
-
   } catch (error: any) {
     console.log("Error signing up:", error.message);
     throw error;
   }
 };
 
-
 export const signInWithEmail = async (email: string, password: string) => {
   try {
-    const userCredentials = await signInWithEmailAndPassword(auth, email, password);
+    const userCredentials = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password,
+    );
 
     const idToken = await userCredentials.user.getIdToken();
     const response = await fetch("/api/auth/login", {
@@ -62,18 +76,17 @@ export const signInWithEmail = async (email: string, password: string) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ idToken })
+      body: JSON.stringify({ idToken }),
     });
 
     const resBody = (await response.json()) as APIResponse<string>;
     return resBody;
   } catch (error: any) {
     console.log("Error signing in:", error.message);
-    
-    return {success: false, error: error.message};
+
+    return { success: false, error: error.message };
   }
 };
-
 
 export const signInWithGoogle = async () => {
   const provider = new GoogleAuthProvider();
@@ -89,7 +102,7 @@ export const signInWithGoogle = async () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ idToken })
+      body: JSON.stringify({ idToken }),
     });
 
     const resBody = (await response.json()) as APIResponse<string>;
@@ -100,11 +113,10 @@ export const signInWithGoogle = async () => {
     return false;
   } catch (error: any) {
     console.log("Error signing in:", error.message);
-    
+
     return false;
   }
 };
-
 
 export const setUsername = async (username: any) => {
   try {
@@ -122,14 +134,16 @@ export const setUsername = async (username: any) => {
     const email = auth.currentUser.email;
     const userId = auth.currentUser.uid;
 
-    await setDoc(doc(db, "users", userId), { username, email }, { merge: true });
-
+    await setDoc(
+      doc(db, "users", userId),
+      { username, email },
+      { merge: true },
+    );
   } catch (error: any) {
     console.log("Error setting username:", error.message);
     throw error;
   }
-}
-
+};
 
 // export const signUserOut = async () => {
 //   try {
@@ -140,7 +154,6 @@ export const setUsername = async (username: any) => {
 //     throw error;
 //   }
 // };
-
 
 export async function signUserOut() {
   try {

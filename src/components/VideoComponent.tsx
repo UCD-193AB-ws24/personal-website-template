@@ -1,14 +1,18 @@
-"use client"
+"use client";
 
-import React, { useState } from 'react';
-import { Rnd } from 'react-rnd';
+import React, { useState } from "react";
+import { Rnd } from "react-rnd";
 import { MoveIcon } from "lucide-react";
-import { toast, Flip } from 'react-toastify';
+import { toast, Flip } from "react-toastify";
 
-import ErrorToast from '@components/ErrorToast';
+import ErrorToast from "@components/ErrorToast";
 
-import type { ComponentItem, Position, Size } from '@customTypes/componentTypes';
-import { handleDragStop, handleResizeStop } from '@utils/dragResizeUtils';
+import type {
+  ComponentItem,
+  Position,
+  Size,
+} from "@customTypes/componentTypes";
+import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
 
 interface VideoComponentProps {
   id?: string;
@@ -16,7 +20,12 @@ interface VideoComponentProps {
   initialSize?: Size;
   components?: ComponentItem[];
   content?: string;
-  updateComponent?: (id: string, newPos: Position, newSize: Size, content?: string) => void;
+  updateComponent?: (
+    id: string,
+    newPos: Position,
+    newSize: Size,
+    content?: string,
+  ) => void;
   isActive?: boolean;
   onMouseDown?: () => void;
   setIsDragging?: (dragging: boolean) => void;
@@ -29,11 +38,11 @@ export default function VideoComponent({
   initialSize = { width: 225, height: 125 },
   components = [],
   content = "",
-  updateComponent = () => { },
+  updateComponent = () => {},
   isActive = false,
-  onMouseDown = () => { },
-  setIsDragging = () => { },
-  isPreview = false
+  onMouseDown = () => {},
+  setIsDragging = () => {},
+  isPreview = false,
 }: VideoComponentProps) {
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
@@ -48,13 +57,16 @@ export default function VideoComponent({
 
   const extractYouTubeId = (url: string) => {
     // https://stackoverflow.com/questions/3452546/how-do-i-get-the-youtube-video-id-from-a-url
-    const videoIDRegEx = /.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|live\/|watch\?v=)([^#\&\?]*).*/;
+    const videoIDRegEx =
+      /.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|live\/|watch\?v=)([^#\&\?]*).*/;
     const match = url.match(videoIDRegEx);
     return match ? match[1] : null;
   };
 
   const handleYouTubeLink = () => {
-    const inputElement = document.getElementById(`${id}-youtube-input`) as HTMLInputElement;
+    const inputElement = document.getElementById(
+      `${id}-youtube-input`,
+    ) as HTMLInputElement;
     const url = inputElement?.value.trim();
     if (!url) return;
 
@@ -64,17 +76,25 @@ export default function VideoComponent({
       setVideoSrc(embedUrl);
       updateComponent(id, position, size, embedUrl);
     } else {
-      toast((props) => <ErrorToast {...props} message="Invalid YouTube video URL. Please enter a valid URL." />, {
-        position: "top-right",
-        autoClose: false,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: false,
-        progress: undefined,
-        theme: "light",
-        transition: Flip,
-      });
+      toast(
+        (props) => (
+          <ErrorToast
+            {...props}
+            message="Invalid YouTube video URL. Please enter a valid URL."
+          />
+        ),
+        {
+          position: "top-right",
+          autoClose: false,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: false,
+          progress: undefined,
+          theme: "light",
+          transition: Flip,
+        },
+      );
     }
   };
 
@@ -90,7 +110,11 @@ export default function VideoComponent({
       className="overflow-hidden"
     >
       {videoSrc ? (
-        <iframe className="w-full h-full" src={videoSrc} allowFullScreen></iframe>
+        <iframe
+          className="w-full h-full"
+          src={videoSrc}
+          allowFullScreen
+        ></iframe>
       ) : (
         <div className="w-full h-full flex items-center justify-center bg-gray-200">
           No Video
@@ -107,24 +131,39 @@ export default function VideoComponent({
       }}
       onDragStop={(e, d) => {
         setIsDragging(false);
-        handleDragStop(id, size, components, updateComponent, setPosition)(e, d);
+        handleDragStop(
+          id,
+          size,
+          components,
+          updateComponent,
+          setPosition,
+        )(e, d);
       }}
       onResizeStart={() => setIsDragging(true)}
       onResizeStop={(e, d, ref, delta, newPosition) => {
         setIsDragging(false);
-        handleResizeStop(id, components, updateComponent, setSize, setPosition)(e, d, ref, delta, newPosition);
+        handleResizeStop(id, components, updateComponent, setSize, setPosition)(
+          e,
+          d,
+          ref,
+          delta,
+          newPosition,
+        );
       }}
       lockAspectRatio={true}
       minWidth={250}
       minHeight={125}
       bounds="parent"
       onMouseDown={handleMouseDown}
-      style={{ pointerEvents: 'auto' }}
+      style={{ pointerEvents: "auto" }}
       dragHandleClassName={`${id}-drag-handle`}
     >
       <div
-        className={`w-full h-full border-2 transition-all duration-150 ease-in-out ${isActive ? "border-blue-500 bg-gray-100 shadow-lg" : "border-transparent hover:border-gray-300"
-          }`}
+        className={`w-full h-full border-2 transition-all duration-150 ease-in-out ${
+          isActive
+            ? "border-blue-500 bg-gray-100 shadow-lg"
+            : "border-transparent hover:border-gray-300"
+        }`}
       >
         {videoSrc ? (
           <div className="relative w-full h-full">
