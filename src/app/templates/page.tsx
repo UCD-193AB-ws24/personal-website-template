@@ -172,7 +172,7 @@ export default function Templates() {
 					setIsModalHidden={setIsModalHidden}
 				/>
 			</main>
-			<footer></footer>
+			<footer className="mt-[50px]"></footer>
 		</div>
 	);
 }
