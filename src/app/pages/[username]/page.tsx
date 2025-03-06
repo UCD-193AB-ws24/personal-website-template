@@ -1,6 +1,7 @@
 import FullWindow from "@components/FullWindow";
 import { ComponentItem } from "@customTypes/componentTypes";
 import NavigationBar from "@components/NavigationBar";
+import Custom404 from "@components/Custom404";
 
 import { componentMap } from "@utils/componentUtils";
 
@@ -33,11 +34,7 @@ export default async function PublishedPage({ params }: PublishedPageProps) {
     components = firstPage.components;
   } catch (error) {
     console.log("Error:", error);
-    return (
-      <div>
-        <h1>Error 404: Page not found</h1>
-      </div>
-    );
+    return <Custom404 />;
   }
 
   try {
@@ -57,6 +54,7 @@ export default async function PublishedPage({ params }: PublishedPageProps) {
     }
   } catch (error) {
     console.log("Error:", error);
+    return <Custom404 />;
   }
 
   const renderComponent = (comp: ComponentItem) => {
