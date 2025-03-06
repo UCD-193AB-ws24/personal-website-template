@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { useDraggable } from '@dnd-kit/core';
+import { useDraggable } from "@dnd-kit/core";
 
 interface SidebarItemProps {
   name: string;
@@ -8,13 +8,19 @@ interface SidebarItemProps {
   type: string;
 }
 
-export default function SidebarItem({ name, description, icon, type }: SidebarItemProps) {
+export default function SidebarItem({
+  name,
+  description,
+  icon,
+  type,
+}: SidebarItemProps) {
   const uniqueId = `${type}-${Date.now()}`;
 
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: uniqueId,
-    data: { type },
-  });
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
+    useDraggable({
+      id: uniqueId,
+      data: { type },
+    });
 
   const style = {
     transform: transform
@@ -39,4 +45,3 @@ export default function SidebarItem({ name, description, icon, type }: SidebarIt
     </div>
   );
 }
-

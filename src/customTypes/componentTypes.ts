@@ -20,11 +20,16 @@ export interface ComponentItem {
     id: string,
     newPos: { x: number; y: number },
     newSize: { width: number; height: number },
-    content?: any
+    content?: any,
   ) => void;
-  isActive?: boolean
-  onMouseDown?: any
+  isActive?: boolean;
+  onMouseDown?: any;
   setIsDragging?: (dragging: boolean) => void;
-  content?: any
+  content?: any;
+  isPreview?: boolean;
 }
 
+export interface Page {
+  pageName: string;
+  components: ComponentItem[];
+}

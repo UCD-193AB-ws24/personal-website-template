@@ -1,169 +1,309 @@
-'use client';
-
-import Link from 'next/link';
+"use client";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@firebase/firebaseApp"
-import { signUserOut } from "@firebase/auth"
+import { auth } from "@lib/firebase/firebaseApp";
+import { signUserOut } from "@lib/firebase/auth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { APIResponse } from "@customTypes/apiResponse";
-
+import Navbar from "@components/Navbar";
+import LoadingSpinner from "@components/LoadingSpinner";
+import DraftItem from "@components/DraftItem";
+import { fetchUsername } from "@lib/requests/fetchUsername";
+import { fetchPublishedDraftNumber } from "@lib/requests/fetchPublishedDraftNumber";
+import DraftNameModal from "@components/DraftNameModal";
+import { ToastContainer } from "react-toastify";
+import { createTemplate } from "@lib/requests/admin/createTemplate";
+import { toastSuccess } from "@components/toasts/SuccessToast";
+import { createDraft } from "@lib/requests/createDraft";
 
 export default function SavedDrafts() {
   const [user] = useAuthState(auth);
   const [username, setUsername] = useState("");
+  const [draftMappings, setDraftMappings] = useState<
+    Array<{ id: number; name: string }>
+  >([]);
+  const [isModalHidden, setIsModalHidden] = useState(true);
+  const [selectedDraft, setSelectedDraft] = useState<{
+    id: number;
+    name: string;
+  }>();
+  const [newDraftName, setNewDraftName] = useState("");
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [publishedDraftNumber, setPublishedDraftNumber] = useState(0);
 
   useEffect(() => {
     if (user) {
       getUsername();
+      getDraftMappings();
+      getPublishedDraftNumber();
     }
+    // else {
+    //   router.push("/")
+    // }
   }, [user]);
 
   const handleSignOut = async () => {
     try {
       await signUserOut();
-      setUsername("")
+      setUsername("");
       router.push("/");
     } catch (error) {
       console.error("Error logging out:", error);
     }
-  }
+  };
 
   const getUsername = async () => {
-    try {
-      const response = await fetch("/api/user/username", {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      const resBody = await response.json() as APIResponse<string>;
-
-      if (response.ok && resBody.success) {
-        setUsername(resBody.data);
-      } else {
-        throw new Error("Unknown username");
-      }
-    } catch (error: any) {
+    const name = await fetchUsername();
+    if (name === null) {
       setUsername("Unknown");
-      router.push("/setusername")
-      console.log(error.message);
+      router.push("/setusername");
+    } else {
+      setUsername(name);
     }
-  }
+  };
+
+  const getDraftMappings = () => {
+    setIsLoading(true);
+    fetch("/api/user/get-drafts", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.success) {
+          setDraftMappings(res.data);
+          setIsLoading(false);
+        } else {
+          throw new Error(res.error);
+        }
+      })
+      .catch((error) => {
+        console.log(error.message);
+        setIsLoading(false);
+      });
+  };
+
+  const getPublishedDraftNumber = async () => {
+    setIsLoading(true);
+
+    const pubDraftNum = await fetchPublishedDraftNumber();
+    setPublishedDraftNumber(pubDraftNum);
+
+    setIsLoading(false);
+  };
+
+  const unpublish = () => {
+    setIsLoading(true);
+    fetch("/api/user/unpublish-draft", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.success) {
+          setPublishedDraftNumber(0);
+          setIsLoading(false);
+          toastSuccess("Successfully unpublished your site.");
+        } else {
+          throw new Error(res.error);
+        }
+      })
+      .catch((error) => {
+        console.log(error.message);
+        setIsLoading(false);
+      });
+  };
 
   const loadEditor = async (draftNumber: string) => {
     router.push("/editor?draftNumber=" + draftNumber);
-  }
-  
-	return (
-		<div>
-			<header>
-				<nav className="bg-white border-gray-200 dark:bg-gray-900">
-					<div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-						<a
-							href="."
-							className="flex items-center space-x-3 rtl:space-x-reverse"
-						>
-							<img
-								src="logo.png"
-								className="h-8"
-								alt="Profesite Logo"
-							/>
+  };
 
-							<span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-								Profesite
-							</span>
-						</a>
-						<button
-							data-collapse-toggle="navbar-default"
-							type="button"
-							className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-							aria-controls="navbar-default"
-							aria-expanded="false"
-						>
-							<span className="sr-only">Open main menu</span>
-							<svg
-								className="w-5 h-5"
-								aria-hidden="true"
-								xmlns="http://www.w3.org/2000/svg"
-								fill="none"
-								viewBox="0 0 17 14"
-							>
-								<path
-									stroke="currentColor"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth="2"
-									d="M1 1h15M1 7h15M1 13h15"
-								/>
-							</svg>
-						</button>
-						<div
-							className="hidden w-full md:block md:w-auto"
-							id="navbar-default"
-						>
-              { user ? 
-                <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-                  <li>
-                    <p>{username}</p>
-                  </li>
-                  <li>
-                    <Link
-                      href="/"
-                      className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
-                      aria-current="page"
-                    >
-                      Home
-                    </Link>
-                  </li>
-                  <li onClick={handleSignOut} className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent cursor-pointer">
-                    Log Out
-                  </li> 
-                </ul> 
-                :
-                <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-                  <li>
-                    <Link
-                      href="/login"
-                      className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
-                      aria-current="page"
-                    >
-                      Log In
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/signup"
-                      className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
-                    >
-                      Sign Up
-                    </Link>
-                  </li>
-                </ul>
-              }
-						</div>
-					</div>
-				</nav>
-			</header>
-			<main className="mx-auto max-w-screen-xl p-4">
+  const handleNewDraft = async () => {
+    const timestamp = Date.now();
+    setSelectedDraft({ id: timestamp, name: "Untitled Draft" });
+  };
 
-                <div>
-                   <p className="text-2xl sm:text-5xl"> Saved Drafts </p>
-                </div>
+  const handleDeleteDraft = async (draftNumber: number, draftName: string) => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/user/delete-draft", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          draftObj: { id: draftNumber, name: draftName },
+        }),
+      });
 
-                <div id="draftsContainer" className="flex justify-evenly gap-4 mt-12"> 
+      const resBody = (await res.json()) as APIResponse<string>;
 
-                    <button onClick={() => loadEditor("1")} className="w-[250px] h-[350px] border-2 border-black shadow-lg p-2 hover:bg-[#111827] hover:text-[#f08700] transition duration-300">Draft 1</button>
+      if (res.ok && resBody.success) {
+        setDraftMappings((original) =>
+          original.filter((d) => d.id !== draftNumber),
+        );
+        toastSuccess("Successfully deleted your draft.");
+      } else if (!resBody.success) {
+        throw new Error(resBody.error);
+      }
+      setIsLoading(false);
+    } catch (error: any) {
+      console.log("Error creating new draft:", error.message);
+      setIsLoading(false);
+    }
+  };
 
-                    <button onClick={() => loadEditor("2")} className="w-[250px] h-[350px] border-2 border-black shadow-lg p-2 hover:bg-[#111827] hover:text-[#f08700] transition duration-300">Draft 2</button>
+  const handleRenameDraft = async (
+    draftNumber: number,
+    oldName: string,
+    newName: string,
+  ) => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/user/rename-draft", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          number: draftNumber,
+          oldName: oldName,
+          newName: newName,
+        }),
+      });
 
-                    <button onClick={() => loadEditor("3")} className="w-[250px] h-[350px] border-2 border-black shadow-lg p-2 hover:bg-[#111827] hover:text-[#f08700] transition duration-300">Draft 3</button>
+      const resBody = (await res.json()) as APIResponse<string>;
 
-                </div>
+      if (res.ok && resBody.success) {
+        setDraftMappings((original) =>
+          original.map((d) => {
+            if (d.id === draftNumber) {
+              d.name = newName;
+            }
+            return d;
+          }),
+        );
+        toastSuccess("Successfully renamed your draft.");
+      } else if (!resBody.success) {
+        throw new Error(resBody.error);
+      }
+      setIsLoading(false);
+    } catch (error: any) {
+      console.log("Error creating new draft:", error.message);
+      setIsLoading(false);
+    }
+    setIsModalHidden(true);
+    setNewDraftName("");
+    setSelectedDraft(undefined);
+  };
 
-			</main>
-			<footer></footer>
-		</div>
-	);
+  const handleNameChange = async (newDraftName: string) => {
+    if (selectedDraft) {
+      // Selected draft is not in the draft mappings, i.e. new draft is being created
+      if (
+        draftMappings.find((mapping) => mapping.id === selectedDraft.id) ===
+        undefined
+      ) {
+        await createDraft(selectedDraft.id, newDraftName);
+        router.push("/editor?draftNumber=" + selectedDraft.id);
+      } else {
+        handleRenameDraft(selectedDraft.id, selectedDraft.name, newDraftName);
+      }
+    }
+  };
+
+  const publishAsTemplate = async (id: number, name: string) => {
+    setIsLoading(true);
+
+    const result = await createTemplate(id, name);
+    if (result) {
+      toastSuccess("Successfully published draft as a template.");
+    }
+    setIsLoading(false);
+  };
+
+  return (
+    <div>
+      <header>
+        {user ? (
+          <Navbar
+            user={true}
+            username={username}
+            onSignOut={handleSignOut}
+            navLinks={[
+              { label: "Home", href: "/" },
+              { label: "Profile", href: "/profile" },
+            ]}
+          />
+        ) : (
+          <Navbar
+            user={false}
+            navLinks={[
+              { label: "Log In", href: "/login" },
+              { label: "Sign Up", href: "/signup" },
+            ]}
+          />
+        )}
+      </header>
+      <main className="mx-auto max-w-screen-xl p-8">
+        <ToastContainer />
+        <LoadingSpinner show={isLoading} />
+        <div className="flex gap-10">
+          <p className="text-2xl sm:text-5xl"> Saved Drafts </p>
+          <button
+            onClick={() => {
+              setIsModalHidden(false);
+              handleNewDraft();
+            }}
+            className="bg-[#f08700] hover:bg-[#d67900] transition duration-300 text-white font-bold py-2 px-4 rounded-full border-none text-[#111827]"
+          >
+            New Draft
+          </button>
+
+          <button
+            onClick={() => router.push("/templates")}
+            className="bg-[#f08700] hover:bg-[#d67900] transition duration-300 text-white font-bold py-2 px-4 rounded-full border-none text-[#111827]"
+          >
+            Select Template
+          </button>
+        </div>
+
+        <div
+          id="draftsContainer"
+          className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 justify-evenly gap-4 mt-12"
+        >
+          {draftMappings
+            ? draftMappings.map((d, i) => {
+                return (
+                  <DraftItem
+                    key={i}
+                    id={d.id}
+                    name={d.name}
+                    isPublished={d.id === publishedDraftNumber}
+                    isAdmin={username === "admin"}
+                    loadEditor={loadEditor}
+                    handleDeleteDraft={handleDeleteDraft}
+                    setIsModalHidden={setIsModalHidden}
+                    setSelectedDraft={setSelectedDraft}
+                    unpublish={unpublish}
+                    publishAsTemplate={publishAsTemplate}
+                  />
+                );
+              })
+            : ""}
+        </div>
+
+        <DraftNameModal
+          isHidden={isModalHidden}
+          submitCallback={handleNameChange}
+          setIsModalHidden={setIsModalHidden}
+        />
+      </main>
+      <footer className="mt-[50px]"></footer>
+    </div>
+  );
 }
