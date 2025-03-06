@@ -6,7 +6,6 @@ import firebaseConfig from "./firebaseConfig";
 // Ensure Firebase isn't initialized multiple times
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-
 // Initialize Firebase Authentication and Firestore
 const auth = getAuth(app);
 const db = getFirestore(app);
