@@ -34,11 +34,7 @@ export default async function PublishedPage({ params }: PublishedPageProps) {
     components = firstPage.components;
   } catch (error) {
     console.log("Error:", error);
-    return (
-      <div>
-        <h1>Error 404: Page not found</h1>
-      </div>
-    );
+    return <Custom404 />;
   }
 
   try {
