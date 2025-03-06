@@ -1,6 +1,8 @@
+"use client"
+
 import React, { useState } from "react";
 import { Rnd } from "react-rnd";
-import { GripIcon } from "lucide-react";
+import { MoveIcon } from "lucide-react";
 import { toast, Flip } from 'react-toastify';
 
 import ErrorToast from '@components/ErrorToast';
@@ -147,7 +149,7 @@ export default function FileComponent({
         <div
           className={`${id}-drag-handle absolute top-10 right-[-30px] w-6 h-6 bg-gray-300 rounded-md cursor-move flex items-center justify-center z-10`}
         >
-          <GripIcon />
+          <MoveIcon />
         </div>
       )}
     </Rnd>
