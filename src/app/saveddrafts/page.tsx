@@ -303,7 +303,7 @@ export default function SavedDrafts() {
           setIsModalHidden={setIsModalHidden}
         />
       </main>
-      <footer className="mt-[50px]"></footer>
+      <footer className="mt-[20vh]"></footer>
     </div>
   );
 }
