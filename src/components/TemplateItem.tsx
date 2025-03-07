@@ -23,13 +23,13 @@ export default function TemplateItem({
     <div className="flex flex-col justify-between justify-self-center w-[250px] sm:w-full h-[350px] border-2 border-black shadow-lg hover:bg-[#111827] hover:text-[#f08700] transition duration-300">
       <button
         onClick={() => loadEditor(templateMapping)}
-        className="h-full border-none"
+        className="h-full border-none truncate"
       >
         {templateMapping.name}
       </button>
       {isAdmin && (
         <div className="flex relative justify-between items-center p-2 h-[40px] border-t border-black bg-[#1f2c47]">
-          <p className="text-white">{templateMapping.name}</p>
+          <p className="text-white truncate">{templateMapping.name}</p>
           <Menu as="div" className="relative inline-block text-left">
             <div className="flex">
               <MenuButton>

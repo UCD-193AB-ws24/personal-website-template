@@ -42,7 +42,7 @@ export default function DraftItem({
       )}
       <button
         onClick={() => loadEditor(id.toString())}
-        className="h-full border-none"
+        className="h-full border-none truncate"
       >
         {name}
       </button>
