@@ -45,6 +45,9 @@ import { useSearchParams } from "next/navigation";
 import { toastSaveSuccess } from "@components/toasts/SaveToast";
 import { saveDraft } from "@lib/requests/saveDrafts";
 import { fetchDraftName } from "@lib/requests/fetchDraftName";
+import SavedDrafts from "../saveddrafts/page";
+import { auth } from "@lib/firebase/firebaseApp";
+import { deleteUnusedDraftFiles } from "@lib/requests/deleteUnusedFiles";
 
 interface DraftLoaderProps {
   setPages: any;
@@ -197,6 +200,11 @@ export default function Editor() {
       );
 
       setPages(updatedPages);
+
+      // Delete deleted images from Firebase Storage
+      const userId = auth.currentUser?.uid;
+      if (!userId) throw new Error("User not authenticated");
+      deleteUnusedDraftFiles(userId, String(draftNumber), updatedPages);
 
       const result = await saveDraft(draftNumber, updatedPages);
 
