@@ -7,16 +7,29 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { APIResponse } from "@customTypes/apiResponse";
 import { fetchUsername } from "@lib/requests/fetchUsername";
+import LoadingSpinner from "@components/LoadingSpinner";
+import DraftNameModal from "@components/DraftNameModal";
 import Navbar from "@components/Navbar";
+import { createDraft } from "@lib/requests/createDraft";
 
 export default function SetupDraft() {
   const [user] = useAuthState(auth);
   const [username, setUsername] = useState("");
+  const [draftMappings, setDraftMappings] = useState<
+    Array<{ id: number; name: string }>
+  >([]);
+  const [isModalHidden, setIsModalHidden] = useState(true);
+  const [selectedDraft, setSelectedDraft] = useState<{
+    id: number;
+    name: string;
+  }>();
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     if (user) {
       getUsername();
+      getDraftMappings();
     }
   }, [user]);
 
@@ -40,32 +53,87 @@ export default function SetupDraft() {
     }
   };
 
-  const handleNewDraft = async () => {
-    if (!user) {
-      router.push("/login");
-    }
-
-    const timestamp = Date.now();
-    try {
-      const res = await fetch("/api/user/update-drafts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          timestamp: timestamp,
-        }),
+  const getDraftMappings = () => {
+    setIsLoading(true);
+    fetch("/api/user/get-drafts", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.success) {
+          setDraftMappings(res.data);
+          setIsLoading(false);
+        } else {
+          throw new Error(res.error);
+        }
+      })
+      .catch((error) => {
+        console.log(error.message);
+        setIsLoading(false);
       });
+  };
 
-      const resBody = (await res.json()) as APIResponse<string>;
+  const handleNewDraft = async () => {
+    const timestamp = Date.now();
+    setSelectedDraft({ id: timestamp, name: "Untitled Draft" });
+  };
 
-      if (res.ok && resBody.success) {
-        router.push("/editor?draftNumber=" + timestamp);
-      } else if (!resBody.success) {
-        throw new Error(resBody.error);
+  const handleRenameDraft = async (
+      draftNumber: number,
+      oldName: string,
+      newName: string,
+    ) => {
+      setIsLoading(true);
+      try {
+        const res = await fetch("/api/user/rename-draft", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            number: draftNumber,
+            oldName: oldName,
+            newName: newName,
+          }),
+        });
+  
+        const resBody = (await res.json()) as APIResponse<string>;
+  
+        if (res.ok && resBody.success) {
+          setDraftMappings((original) =>
+            original.map((d) => {
+              if (d.id === draftNumber) {
+                d.name = newName;
+              }
+              return d;
+            }),
+          );
+        } else if (!resBody.success) {
+          throw new Error(resBody.error);
+        }
+        setIsLoading(false);
+      } catch (error: any) {
+        console.log("Error creating new draft:", error.message);
+        setIsLoading(false);
       }
-    } catch (error: any) {
-      console.log("Error creating new draft:", error.message);
+      setIsModalHidden(true);
+      setSelectedDraft(undefined);
+  };
+
+  const handleNameChange = async (newDraftName: string) => {
+    if (selectedDraft) {
+      // Selected draft is not in the draft mappings, i.e. new draft is being created
+      if (
+        draftMappings.find((mapping) => mapping.id === selectedDraft.id) ===
+        undefined
+      ) {
+        await createDraft(selectedDraft.id, newDraftName);
+        router.push("/editor?draftNumber=" + selectedDraft.id);
+      } else {
+        handleRenameDraft(selectedDraft.id, selectedDraft.name, newDraftName);
+      }
     }
   };
 
@@ -95,6 +163,7 @@ export default function SetupDraft() {
       </header>
 
       <main className="mx-auto max-w-screen-xl p-4">
+        <LoadingSpinner show={isLoading} />
         <div className="flex w-full max-w-screen-xl p-4 h-1/2">
           <div className="flex w-full max-w-screen-xl p-4">
             {/* Left Content */}
@@ -111,7 +180,13 @@ export default function SetupDraft() {
 
                 <div className="flex justify-center mt-16">
                   <button
-                    onClick={() => router.push("/templates")}
+                    onClick={() => {
+                      if (!user) {
+                        router.push("/login");
+                      } else {
+                        router.push("/templates");
+                      }
+                    }}
                     className="relative inline-flex px-6 py-4 w-1/2 text-md font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#f08700] hover:text-black shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50 items-center justify-center text-center"
                   >
                     Templates
@@ -137,7 +212,10 @@ export default function SetupDraft() {
 
                 <div className="flex justify-center mt-16">
                   <button
-                    onClick={handleNewDraft}
+                    onClick={() => {
+                      setIsModalHidden(false);
+                      handleNewDraft();
+                    }}
                     className="relative inline-flex px-6 py-4 w-1/2 text-md font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#f08700] hover:text-black shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50 items-center justify-center text-center"
                   >
                     Create
@@ -147,6 +225,13 @@ export default function SetupDraft() {
             </div>
           </div>
         </div>
+
+        <DraftNameModal
+          isHidden={isModalHidden}
+          submitCallback={handleNameChange}
+          setIsModalHidden={setIsModalHidden}
+        />
+
       </main>
 
       <footer></footer>
