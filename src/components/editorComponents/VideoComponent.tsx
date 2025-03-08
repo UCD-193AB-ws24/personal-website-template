@@ -6,7 +6,7 @@ import { MoveIcon } from "lucide-react";
 import { toast, Flip } from "react-toastify";
 
 import ActiveOutlineContainer from "@components/editorComponents/ActiveOutlineContainer";
-import ErrorToast from "@components/ErrorToast";
+import ErrorToast from "@components/toasts/ErrorToast";
 
 import type {
   ComponentItem,

@@ -8,7 +8,7 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useSearchParams } from "next/navigation";
 
 import ActiveOutlineContainer from "@components/editorComponents/ActiveOutlineContainer";
-import ErrorToast from "@components/ErrorToast";
+import ErrorToast from "@components/toasts/ErrorToast";
 import SkeletonLoader from "@components/editorComponents/SkeletonLoader";
 
 import type {
