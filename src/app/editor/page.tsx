@@ -10,7 +10,7 @@ import {
   DragMoveEvent,
 } from "@dnd-kit/core";
 import { restrictToWindowEdges } from "@dnd-kit/modifiers";
-import { ArrowUpIcon, Router, XIcon } from "lucide-react";
+import { ArrowUpIcon, Router, XIcon, GridIcon } from "lucide-react";
 import { Flip, toast, ToastContainer } from "react-toastify";
 
 import EditorDropZone from "@components/editorComponents/EditorDropZone";
@@ -38,6 +38,7 @@ import {
   addPage,
   deletePage,
 } from "@utils/pageManagerUtils";
+import { GRID_SIZE } from "@utils/constants";
 import { APIResponse } from "@customTypes/apiResponse";
 import { useSearchParams } from "next/navigation";
 import { toastSaveSuccess } from "@components/toasts/SaveToast";
@@ -127,6 +128,7 @@ export default function Editor() {
   const [isPreview, setIsPreview] = useState(false);
   const [pages, setPages] = useState<Page[]>([]);
   const [activePageIndex, setActivePageIndex] = useState<number | null>(null);
+  const [isGridVisible, setIsGridVisible] = useState(false);
 
   const [username, setUsername] = useState("");
   const [draftName, setDraftName] = useState("");
@@ -541,6 +543,15 @@ export default function Editor() {
                 </div>
                 <div className="flex">
                   <button
+                    onClick={() => setIsGridVisible((prev) => !prev)}
+                    className="flex items-center gap-2 px-3 py-1 mr-4 border border-gray-400 rounded-md bg-white shadow-md hover:bg-gray-200 transition"
+                  >
+                    <GridIcon size={18} />
+                    <span className="text-sm">
+                      {isGridVisible ? "Grid On" : "Grid Off"}
+                    </span>
+                  </button>
+                  <button
                     className={`text-large font-semibold px-4 py-2 rounded-md mr-4 border border-blue-500 transition-all duration-300 hover:bg-blue-500 hover:text-white shadow-md hover:shadow-lg`}
                     onClick={() => setIsPreview(!isPreview)}
                   >
@@ -555,14 +566,28 @@ export default function Editor() {
                   </button>
                 </div>
               </div>
+
               <EditorDropZone
                 ref={editorRef}
                 onClick={handleBackgroundClick}
                 style={{
+                  backgroundSize: isGridVisible ? "20px 20px" : "auto",
                   minHeight: `${editorHeight}px`,
                   height: "auto",
                   marginTop: "64px",
                 }}
+                // https://ibelick.com/blog/create-grid-and-dot-backgrounds-with-css-tailwind-css
+                // className={`relative transition-all ${
+                //   isGridVisible
+                //     ? `absolute inset-0 h-full w-full bg-white bg-[radial-gradient(#d1d5db_1px,transparent_1px)] [background-size:${GRID_SIZE}px_${GRID_SIZE}px] [background-position:-${GRID_SIZE}px_-${GRID_SIZE}px]`
+                //     : "bg-white"
+                // }`}
+                // ? `absolute inset-0 h-full w-full bg-white bg-[linear-gradient(to_right,#d1d5db_1px,transparent_1px) linear-gradient(to_bottom,#d1d5db_1px,transparent_1px)] [background-size:${GRID_SIZE}px_${GRID_SIZE}px] [background-position:-${GRID_SIZE}px_-${GRID_SIZE}px]`
+                className={`relative transition-all ${
+                  isGridVisible
+                    ? `absolute inset-0 h-full w-full bg-white bg-[linear-gradient(to_right,#e2e5e9_1px,transparent_1px),linear-gradient(to_bottom,#e2e5e9_1px,transparent_1px)] bg-[size:${GRID_SIZE}px_${GRID_SIZE}px]`
+                    : "bg-white"
+                }`}
               >
                 {!isLoading && components.length === 0 && pages.length < 2 ? (
                   <h1 className="text-2xl font-bold mb-4 text-gray-400 text-center mt-20">
