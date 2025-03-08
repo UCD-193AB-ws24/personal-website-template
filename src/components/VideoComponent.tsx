@@ -5,6 +5,7 @@ import { Rnd } from "react-rnd";
 import { MoveIcon } from "lucide-react";
 import { toast, Flip } from "react-toastify";
 
+import ActiveOutlineContainer from "@components/ActiveOutlineContainer";
 import ErrorToast from "@components/ErrorToast";
 
 import type {
@@ -158,13 +159,7 @@ export default function VideoComponent({
       style={{ pointerEvents: "auto" }}
       dragHandleClassName={`${id}-drag-handle`}
     >
-      <div
-        className={`w-full h-full transition-all duration-150 ease-in-out ${
-          isActive
-            ? "outline outline-2 outline-blue-500 bg-gray-100 shadow-md"
-            : "outline outline-2 outline-transparent  bg-transparent hover:outline hover:outline-2 hover:outline-gray-300"
-        }`}
-      >
+      <ActiveOutlineContainer isActive={isActive}>
         {videoSrc ? (
           <div className="relative w-full h-full">
             {/* Transparent Overlay to Capture Clicks */}
@@ -210,7 +205,7 @@ export default function VideoComponent({
             </div>
           </div>
         )}
-      </div>
+      </ActiveOutlineContainer>
       {isActive && (
         <div
           className={`${id}-drag-handle absolute top-10 right-[-30px] w-6 h-6 bg-gray-300 rounded-md cursor-move flex items-center justify-center z-10`}

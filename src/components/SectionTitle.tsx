@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { Rnd } from "react-rnd";
 
+import ActiveOutlineContainer from "@components/ActiveOutlineContainer";
+
 import type {
   ComponentItem,
   Position,
@@ -111,13 +113,7 @@ export default function SectionTitleTextbox({
       }}
       style={{ pointerEvents: "auto" }}
     >
-      <div
-        className={`w-full h-full flex items-center transition-all duration-150 ease-in-out ${
-          isActive
-            ? "outline outline-2 outline-blue-500 bg-gray-100 shadow-md"
-            : "outline outline-2 outline-transparent  bg-transparent hover:outline hover:outline-2 hover:outline-gray-300"
-        }`}
-      >
+      <ActiveOutlineContainer isActive={isActive}>
         <h1
           contentEditable
           suppressContentEditableWarning
@@ -126,7 +122,7 @@ export default function SectionTitleTextbox({
         >
           {text}
         </h1>
-      </div>
+      </ActiveOutlineContainer>
     </Rnd>
   );
 }
