@@ -12,6 +12,7 @@ import type {
 } from "@customTypes/componentTypes";
 
 import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
+import { GRID_SIZE } from "@utils/constants";
 
 interface DraggableResizableTextboxProps {
   id?: string;
@@ -99,6 +100,8 @@ export default function DraggableResizableTextbox({
       bounds="parent"
       onMouseDown={handleMouseDown}
       style={{ pointerEvents: "auto" }}
+      dragGrid={[GRID_SIZE, GRID_SIZE]}
+      resizeGrid={[GRID_SIZE, GRID_SIZE]}
     >
       <ActiveOutlineContainer isActive={isActive}>
         <textarea

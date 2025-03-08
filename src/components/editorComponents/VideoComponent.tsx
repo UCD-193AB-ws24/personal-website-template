@@ -14,6 +14,7 @@ import type {
   Size,
 } from "@customTypes/componentTypes";
 import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
+import { GRID_SIZE } from "@utils/constants";
 
 interface VideoComponentProps {
   id?: string;
@@ -158,6 +159,8 @@ export default function VideoComponent({
       onMouseDown={handleMouseDown}
       style={{ pointerEvents: "auto" }}
       dragHandleClassName={`${id}-drag-handle`}
+      dragGrid={[GRID_SIZE, GRID_SIZE]}
+      resizeGrid={[GRID_SIZE, GRID_SIZE]}
     >
       <ActiveOutlineContainer isActive={isActive}>
         {videoSrc ? (

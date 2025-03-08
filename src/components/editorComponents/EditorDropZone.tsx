@@ -6,10 +6,12 @@ function EditorDropZone(
     children,
     onClick,
     style,
+    className = "",
   }: {
     children: React.ReactNode;
     onClick: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
     style?: React.CSSProperties;
+    className?: string;
   },
   ref: Ref<HTMLDivElement>,
 ) {
@@ -26,7 +28,9 @@ function EditorDropZone(
         }
       }}
       onMouseDown={onClick}
-      className={`overflow-hidden w-full p-4 relative transition-all duration-300 ${isOver ? "bg-gray-100" : "bg-white"}`}
+      className={`overflow-hidden w-full relative transition-all duration-300 ${
+        isOver ? "bg-gray-100" : "bg-white"
+      } ${className}`}
       style={style}
     >
       {children}
