@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Rnd } from "react-rnd";
 
-import ActiveOutlineContainer from "@components/ActiveOutlineContainer";
+import ActiveOutlineContainer from "@components/editorComponents/ActiveOutlineContainer";
 
 import type {
   ComponentItem,

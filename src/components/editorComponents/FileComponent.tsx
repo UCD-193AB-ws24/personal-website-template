@@ -1,13 +1,15 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import React, { useState } from "react";
 import { Rnd } from "react-rnd";
+import { MoveIcon } from "lucide-react";
+import { toast, Flip } from "react-toastify";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useSearchParams } from "next/navigation";
 
-import ActiveOutlineContainer from "@components/ActiveOutlineContainer";
-import SkeletonLoader from "@components/SkeletonLoader";
+import ActiveOutlineContainer from "@components/editorComponents/ActiveOutlineContainer";
+import ErrorToast from "@components/ErrorToast";
+import SkeletonLoader from "@components/editorComponents/SkeletonLoader";
 
 import type {
   ComponentItem,
@@ -17,7 +19,7 @@ import type {
 import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
 import { auth, storage } from "@lib/firebase/firebaseApp";
 
-interface ImageComponentProps {
+interface FileComponentProps {
   id?: string;
   initialPos?: Position;
   initialSize?: Size;
@@ -35,10 +37,10 @@ interface ImageComponentProps {
   isPreview?: boolean;
 }
 
-export default function ImageComponent({
+export default function FileComponent({
   id = "",
-  initialPos = { x: -1, y: -1 },
-  initialSize = { width: 200, height: 150 },
+  initialPos = { x: -1, y: -100 },
+  initialSize = { width: 200, height: 300 },
   components = [],
   content = "",
   updateComponent = () => {},
@@ -46,41 +48,51 @@ export default function ImageComponent({
   onMouseDown = () => {},
   setIsDragging = () => {},
   isPreview = false,
-}: ImageComponentProps) {
+}: FileComponentProps) {
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
-  const [imageSrc, setImageSrc] = useState(content || "");
+  const [pdfSrc, setPdfSrc] = useState(content || "");
+  const [isOverlayActive, setIsOverlayActive] = useState(true);
   const [loading, setLoading] = useState(!!content);
   const [previewSrc, setPreviewSrc] = useState<string | null>(null);
 
   const draftNumber = useSearchParams().get("draftNumber");
 
-  const handleMouseDown = (e: MouseEvent) => {
+  // https://stackoverflow.com/questions/58488416/open-base64-encoded-pdf-file-using-javascript-issue-with-file-size-larger-than
+  const MAX_FILE_SIZE = 5 * 1024 * 1025; // max 5MB upload for now
+
+  const handleMouseDown = (e: MouseEvent | React.MouseEvent) => {
     e.stopPropagation();
     onMouseDown();
+    setIsOverlayActive(false); // Hide overlay when clicked
   };
 
-  const resizeImage = (
-    imageSrc: string,
-    baseWidth: number = 300,
-  ): Promise<{ width: number; height: number }> => {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.src = imageSrc;
-      img.onload = () => {
-        const aspectRatio = img.width / img.height;
-        const newWidth = baseWidth;
-        const newHeight = newWidth / aspectRatio;
-        resolve({ width: newWidth, height: newHeight });
-      };
-    });
-  };
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const userId = auth.currentUser?.uid;
-
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      if (file.size > MAX_FILE_SIZE) {
+        toast(
+          (props) => (
+            <ErrorToast
+              {...props}
+              message="File size exceeds the 5MB limit. Please upload a smaller file."
+            />
+          ),
+          {
+            position: "top-right",
+            autoClose: false,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: false,
+            progress: undefined,
+            theme: "light",
+            transition: Flip,
+          },
+        );
+        return;
+      }
       const filePath = `users/${userId}/drafts/${draftNumber}/${id}-${file.name}`;
       const storageRef = ref(storage, filePath);
       const uploadTask = uploadBytesResumable(storageRef, file);
@@ -94,11 +106,6 @@ export default function ImageComponent({
         URL.revokeObjectURL(previewSrc);
       }
 
-      let sizeSet = false;
-      const size = await resizeImage(localPreview);
-      setSize(size);
-      sizeSet = true;
-
       uploadTask.on(
         "state_changed",
         null,
@@ -110,13 +117,9 @@ export default function ImageComponent({
         async () => {
           // Get the download URL once uploaded
           const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          setImageSrc(downloadURL);
+          console.log("Success:", downloadURL);
+          setPdfSrc(downloadURL);
           setPreviewSrc(null);
-
-          if (!sizeSet) {
-            const { width, height } = await resizeImage(downloadURL);
-            setSize({ width, height });
-          }
           updateComponent(id, position, size, downloadURL);
         },
       );
@@ -136,23 +139,18 @@ export default function ImageComponent({
     >
       {loading && <SkeletonLoader width={size.width} height={size.height} />}
       {previewSrc ? (
-        <img
-          src={previewSrc}
-          alt="Uploading Preview"
-          className="w-full h-full object-cover"
-        />
-      ) : imageSrc ? (
-        <img
-          src={imageSrc}
-          alt="Uploaded"
-          className="w-full h-full object-cover"
+        <iframe src={previewSrc} className="w-full h-full border-none" />
+      ) : pdfSrc ? (
+        <iframe
+          src={pdfSrc}
+          className="w-full h-full border-none"
           onLoad={() => setLoading(false)}
           onError={() => setLoading(false)}
           style={{ display: loading ? "none" : "block" }}
         />
       ) : (
         <div className="w-full h-full flex items-center justify-center bg-gray-200">
-          No Image
+          No PDF
         </div>
       )}
     </div>
@@ -160,10 +158,7 @@ export default function ImageComponent({
     <Rnd
       size={{ width: size.width, height: size.height }}
       position={{ x: position.x, y: position.y }}
-      onDragStart={(e) => {
-        setIsDragging(true);
-        e.preventDefault();
-      }}
+      onDragStart={() => setIsDragging(true)}
       onDragStop={(e, d) => {
         setIsDragging(false);
         handleDragStop(
@@ -185,43 +180,76 @@ export default function ImageComponent({
           newPosition,
         );
       }}
-      lockAspectRatio={true}
-      minWidth={100}
-      minHeight={100}
       bounds="parent"
       onMouseDown={handleMouseDown}
       style={{ pointerEvents: "auto" }}
+      dragHandleClassName={`${id}-drag-handle`}
     >
       <ActiveOutlineContainer isActive={isActive}>
         {loading && <SkeletonLoader width={size.width} height={size.height} />}
-
         {previewSrc ? (
-          <img
-            src={previewSrc}
-            alt="Uploading Preview"
-            className="w-full h-full object-cover"
-          />
-        ) : imageSrc ? (
-          <img
-            src={imageSrc}
-            alt="Uploaded"
-            className="w-full h-full object-cover"
-            onLoad={() => setLoading(false)}
-            onError={() => setLoading(false)}
-            style={{ display: loading ? "none" : "block" }}
-          />
+          <div className="relative w-full h-full">
+            {/* Transparent Overlay to Capture Clicks */}
+            {isOverlayActive && (
+              <div
+                className="absolute inset-0 bg-transparent z-10 cursor-pointer"
+                onMouseDown={handleMouseDown}
+              />
+            )}
+
+            {/* PDF Viewer */}
+            <iframe
+              id={`pdf-iframe-${id}`}
+              src={previewSrc}
+              className="w-full h-full border-none"
+              style={{ pointerEvents: "auto" }}
+              onMouseLeave={() => setIsOverlayActive(true)} // Re-enable overlay when leaving iframe
+            />
+          </div>
+        ) : pdfSrc ? (
+          <div className="relative w-full h-full">
+            {/* Transparent Overlay to Capture Clicks */}
+            {isOverlayActive && (
+              <div
+                className="absolute inset-0 bg-transparent z-10 cursor-pointer"
+                onMouseDown={handleMouseDown}
+              />
+            )}
+
+            {/* PDF Viewer */}
+            <iframe
+              id={`pdf-iframe-${id}`}
+              src={pdfSrc}
+              className="w-full h-full border-none"
+              onMouseLeave={() => setIsOverlayActive(true)} // Re-enable overlay when leaving iframe
+              onLoad={() => setLoading(false)}
+              onError={() => setLoading(false)}
+              style={{
+                pointerEvents: "auto",
+                display: loading ? "none" : "block",
+              }}
+            />
+          </div>
         ) : (
           <label className="w-full h-full flex items-center justify-center cursor-pointer bg-gray-200">
-            Click to Upload an Image
+            Click to Upload a PDF
             <input
               type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
+              accept="application/pdf"
+              onChange={handleFileUpload}
               className="hidden"
             />
           </label>
         )}
       </ActiveOutlineContainer>
+
+      {isActive && (
+        <div
+          className={`${id}-drag-handle absolute top-10 right-[-30px] w-6 h-6 bg-gray-300 rounded-md cursor-move flex items-center justify-center z-10`}
+        >
+          <MoveIcon />
+        </div>
+      )}
     </Rnd>
   );
 }
