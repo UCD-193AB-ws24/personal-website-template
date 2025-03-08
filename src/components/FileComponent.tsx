@@ -7,6 +7,7 @@ import { toast, Flip } from "react-toastify";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useSearchParams } from "next/navigation";
 
+import ActiveOutlineContainer from "@components/ActiveOutlineContainer";
 import ErrorToast from "@components/ErrorToast";
 import SkeletonLoader from "@components/SkeletonLoader";
 
@@ -184,13 +185,7 @@ export default function FileComponent({
       style={{ pointerEvents: "auto" }}
       dragHandleClassName={`${id}-drag-handle`}
     >
-      <div
-        className={`w-full h-full transition-all duration-150 ease-in-out ${
-          isActive
-            ? "outline outline-2 outline-blue-500 bg-gray-100 shadow-md"
-            : "outline outline-2 outline-transparent  bg-transparent hover:outline hover:outline-2 hover:outline-gray-300"
-        }`}
-      >
+      <ActiveOutlineContainer isActive={isActive}>
         {loading && <SkeletonLoader width={size.width} height={size.height} />}
         {previewSrc ? (
           <div className="relative w-full h-full">
@@ -246,7 +241,7 @@ export default function FileComponent({
             />
           </label>
         )}
-      </div>
+      </ActiveOutlineContainer>
 
       {isActive && (
         <div
