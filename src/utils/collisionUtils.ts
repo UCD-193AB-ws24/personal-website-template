@@ -11,7 +11,7 @@ export const isColliding = (
   components: ComponentItem[],
   activeComponentId: string,
 ): boolean => {
-  const buffer = 5;
+  const buffer = 0;
 
   return components.some((comp) => {
     if (comp.id === activeComponentId) return false;
@@ -63,7 +63,7 @@ export const findBestFreeSpot = (
     return startPos;
   }
 
-  const step = 10;
+  const step = 5;
   let angle = 0;
   let radius = 0;
 

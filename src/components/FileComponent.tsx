@@ -185,10 +185,10 @@ export default function FileComponent({
       dragHandleClassName={`${id}-drag-handle`}
     >
       <div
-        className={`w-full h-full border-2 transition-all duration-150 ease-in-out ${
+        className={`w-full h-full transition-all duration-150 ease-in-out ${
           isActive
-            ? "border-blue-500 bg-gray-100 shadow-md"
-            : "border-transparent hover:border-gray-300"
+            ? "outline outline-2 outline-blue-500 bg-gray-100 shadow-md"
+            : "outline outline-2 outline-transparent  bg-transparent hover:outline hover:outline-2 hover:outline-gray-300"
         }`}
       >
         {loading && <SkeletonLoader width={size.width} height={size.height} />}
