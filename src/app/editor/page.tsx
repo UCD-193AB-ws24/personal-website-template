@@ -13,13 +13,11 @@ import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 import { ArrowUpIcon, Router, XIcon } from "lucide-react";
 import { Flip, toast, ToastContainer } from "react-toastify";
 
-import EditorDropZone from "@components/EditorDropZone";
+import EditorDropZone from "@components/editorComponents/EditorDropZone";
 import Sidebar from "@components/sidebar/Sidebar";
-import NavigationBar from "@components/NavigationBar";
+import NavigationBar from "@components/editorComponents/NavigationBar";
 import LoadingSpinner from "@components/LoadingSpinner";
 import { toastPublish } from "@components/toasts/PublishToast";
-import ImageComponent from "@components/ImageComponent";
-import FileComponent from "@components/FileComponent";
 
 import type {
   ComponentItem,

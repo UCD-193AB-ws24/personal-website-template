@@ -5,7 +5,7 @@ import { Rnd } from "react-rnd";
 import { MoveIcon } from "lucide-react";
 import { toast, Flip } from "react-toastify";
 
-import ActiveOutlineContainer from "@components/ActiveOutlineContainer";
+import ActiveOutlineContainer from "@components/editorComponents/ActiveOutlineContainer";
 import ErrorToast from "@components/ErrorToast";
 
 import type {

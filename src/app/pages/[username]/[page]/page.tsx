@@ -1,6 +1,6 @@
 import FullWindow from "@components/FullWindow";
 import { ComponentItem } from "@customTypes/componentTypes";
-import NavigationBar from "@components/NavigationBar";
+import NavigationBar from "@components/editorComponents/NavigationBar";
 import Custom404 from "@components/Custom404";
 
 import { componentMap } from "@utils/componentUtils";
