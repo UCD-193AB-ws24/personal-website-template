@@ -99,14 +99,14 @@ export default function DraggableResizableTextbox({
       style={{ pointerEvents: "auto" }}
     >
       <div
-        className={`w-full h-full transition-all duration-150 ease-in-out border-2 ${
+        className={`w-full h-full transition-all duration-150 ease-in-out ${
           isActive
-            ? "border-blue-500 bg-gray-100 shadow-md outline-none"
-            : "border-transparent bg-transparent outline-none hover:outline-2 hover:outline-gray-300"
+            ? "outline outline-2 outline-blue-500 bg-gray-100 shadow-md"
+            : "outline outline-2 outline-transparent bg-transparent hover:outline hover:outline-2 hover:outline-gray-300"
         }`}
       >
         <textarea
-          className={`overflow-hidden w-full h-full resize-none border-none outline-none bg-transparent text-lg`}
+          className={`overflow-hidden w-full h-full resize-none border-none outline-none bg-transparent text-lg leading-none`}
           placeholder="Type here..."
           defaultValue={content}
           onChange={handleChange}

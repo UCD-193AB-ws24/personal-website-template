@@ -81,45 +81,45 @@ export default function SetupDraft() {
   };
 
   const handleRenameDraft = async (
-      draftNumber: number,
-      oldName: string,
-      newName: string,
-    ) => {
-      setIsLoading(true);
-      try {
-        const res = await fetch("/api/user/rename-draft", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            number: draftNumber,
-            oldName: oldName,
-            newName: newName,
+    draftNumber: number,
+    oldName: string,
+    newName: string,
+  ) => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/user/rename-draft", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          number: draftNumber,
+          oldName: oldName,
+          newName: newName,
+        }),
+      });
+
+      const resBody = (await res.json()) as APIResponse<string>;
+
+      if (res.ok && resBody.success) {
+        setDraftMappings((original) =>
+          original.map((d) => {
+            if (d.id === draftNumber) {
+              d.name = newName;
+            }
+            return d;
           }),
-        });
-  
-        const resBody = (await res.json()) as APIResponse<string>;
-  
-        if (res.ok && resBody.success) {
-          setDraftMappings((original) =>
-            original.map((d) => {
-              if (d.id === draftNumber) {
-                d.name = newName;
-              }
-              return d;
-            }),
-          );
-        } else if (!resBody.success) {
-          throw new Error(resBody.error);
-        }
-        setIsLoading(false);
-      } catch (error: any) {
-        console.log("Error creating new draft:", error.message);
-        setIsLoading(false);
+        );
+      } else if (!resBody.success) {
+        throw new Error(resBody.error);
       }
-      setIsModalHidden(true);
-      setSelectedDraft(undefined);
+      setIsLoading(false);
+    } catch (error: any) {
+      console.log("Error creating new draft:", error.message);
+      setIsLoading(false);
+    }
+    setIsModalHidden(true);
+    setSelectedDraft(undefined);
   };
 
   const handleNameChange = async (newDraftName: string) => {
@@ -231,7 +231,6 @@ export default function SetupDraft() {
           submitCallback={handleNameChange}
           setIsModalHidden={setIsModalHidden}
         />
-
       </main>
 
       <footer></footer>
