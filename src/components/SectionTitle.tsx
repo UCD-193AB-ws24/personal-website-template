@@ -32,7 +32,7 @@ interface SectionTitleProps {
 export default function SectionTitleTextbox({
   id = "",
   initialPos = { x: -1, y: -1 },
-  initialSize = { width: 350, height: 50 },
+  initialSize = { width: 350, height: 40 },
   components = [],
   content = "Type section title here...",
   updateComponent = () => {},
@@ -105,7 +105,6 @@ export default function SectionTitleTextbox({
         topLeft: false,
       }}
       minWidth={100}
-      minHeight={50}
       bounds="parent"
       onMouseDown={(e: MouseEvent) => {
         handleMouseDown(e);
@@ -113,16 +112,16 @@ export default function SectionTitleTextbox({
       style={{ pointerEvents: "auto" }}
     >
       <div
-        className={`w-full h-full flex items-center justify-center transition-all duration-150 ease-in-out border-2 ${
+        className={`w-full h-full flex items-center transition-all duration-150 ease-in-out ${
           isActive
-            ? "border-blue-500 bg-gray-100 shadow-md outline-none"
-            : "border-transparent bg-transparent outline-none hover:outline-2 hover:outline-gray-300"
+            ? "outline outline-2 outline-blue-500 bg-gray-100 shadow-md"
+            : "outline outline-2 outline-transparent  bg-transparent hover:outline hover:outline-2 hover:outline-gray-300"
         }`}
       >
         <h1
           contentEditable
           suppressContentEditableWarning
-          className="overflow-hidden w-full h-full text-black text-2xl font-bold outline-none cursor-text"
+          className="overflow-hidden w-full h-full text-black text-2xl font-bold outline-none cursor-text p-0 m-0 leading-none"
           onBlur={handleBlur}
         >
           {text}
