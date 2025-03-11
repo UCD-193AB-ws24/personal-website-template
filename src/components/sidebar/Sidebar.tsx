@@ -12,6 +12,7 @@ import {
   SquareMenuIcon,
   TextIcon,
   VideoIcon,
+  AppWindowIcon,
 } from "lucide-react";
 
 import SidebarItem from "./SidebarItem";
@@ -61,20 +62,27 @@ const sidebarItems = [
   },
   {
     id: 7,
+    type: "webPage",
+    name: "Web Page",
+    description: "Display a web page.",
+    icon: <AppWindowIcon />,
+  },
+  {
+    id: 8,
     type: "navButton",
     name: "Navigation Button",
     description: "Add a button to link to other pages or sections.",
     icon: <CircleArrowRightIcon />,
   },
   {
-    id: 8,
+    id: 9,
     type: "aboutMeCard",
     name: "About Me Card",
     description: "Create a quick bio with your photo and contact info.",
     icon: <ContactIcon />,
   },
   {
-    id: 9,
+    id: 10,
     type: "academicEntry",
     name: "Academic Entry",
     description:
@@ -82,14 +90,14 @@ const sidebarItems = [
     icon: <SchoolIcon />,
   },
   {
-    id: 10,
+    id: 11,
     type: "workEntry",
     name: "Work Entry",
     description: "Describe a job role, company, and time period.",
     icon: <BriefcaseIcon />,
   },
   {
-    id: 11,
+    id: 12,
     type: "endoresment",
     name: "Endoresment",
     description: "Add quotes or recommendations from colleagues.",
