@@ -1,9 +1,9 @@
-import DraggableResizableTextbox from "@components/DraggableResizableTextbox";
-import SectionTitleTextbox from "@components/SectionTitle";
-import NavigationBar from "@components/NavigationBar";
-import ImageComponent from "@components/ImageComponent";
-import FileComponent from "@components/FileComponent";
-import VideoComponent from "@components/VideoComponent";
+import DraggableResizableTextbox from "@components/editorComponents/DraggableResizableTextbox";
+import SectionTitleTextbox from "@components/editorComponents/SectionTitle";
+import NavigationBar from "@components/editorComponents/NavigationBar";
+import ImageComponent from "@components/editorComponents/ImageComponent";
+import FileComponent from "@components/editorComponents/FileComponent";
+import VideoComponent from "@components/editorComponents/VideoComponent";
 
 import { ComponentItem } from "@customTypes/componentTypes";
 

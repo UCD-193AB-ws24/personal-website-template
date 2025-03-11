@@ -19,7 +19,7 @@ import {
   restrictToParentElement,
 } from "@dnd-kit/modifiers";
 
-import ErrorToast from "@components/ErrorToast";
+import ErrorToast from "@components/toasts/ErrorToast";
 import SortablePageItem from "@components/SortablePageItem";
 
 import type { ComponentItem } from "@customTypes/componentTypes";

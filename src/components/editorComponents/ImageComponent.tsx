@@ -6,7 +6,8 @@ import { Rnd } from "react-rnd";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useSearchParams } from "next/navigation";
 
-import SkeletonLoader from "@components/SkeletonLoader";
+import ActiveOutlineContainer from "@components/editorComponents/ActiveOutlineContainer";
+import SkeletonLoader from "@components/editorComponents/SkeletonLoader";
 
 import type {
   ComponentItem,
@@ -191,13 +192,7 @@ export default function ImageComponent({
       onMouseDown={handleMouseDown}
       style={{ pointerEvents: "auto" }}
     >
-      <div
-        className={`w-full h-full transition-all duration-150 ease-in-out ${
-          isActive
-            ? "outline outline-2 outline-blue-500 bg-gray-100 shadow-md"
-            : "outline outline-2 outline-transparent  bg-transparent hover:outline hover:outline-2 hover:outline-gray-300"
-        }`}
-      >
+      <ActiveOutlineContainer isActive={isActive}>
         {loading && <SkeletonLoader width={size.width} height={size.height} />}
 
         {previewSrc ? (
@@ -226,7 +221,7 @@ export default function ImageComponent({
             />
           </label>
         )}
-      </div>
+      </ActiveOutlineContainer>
     </Rnd>
   );
 }
