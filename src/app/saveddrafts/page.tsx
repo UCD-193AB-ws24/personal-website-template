@@ -10,6 +10,7 @@ import LoadingSpinner from "@components/LoadingSpinner";
 import DraftItem from "@components/DraftItem";
 import { fetchUsername } from "@lib/requests/fetchUsername";
 import { fetchPublishedDraftNumber } from "@lib/requests/fetchPublishedDraftNumber";
+import { deleteDraftStorage } from "@lib/requests/deleteDraftStorage";
 import DraftNameModal from "@components/DraftNameModal";
 import { ToastContainer } from "react-toastify";
 import { createTemplate } from "@lib/requests/admin/createTemplate";
@@ -143,6 +144,12 @@ export default function SavedDrafts() {
       const resBody = (await res.json()) as APIResponse<string>;
 
       if (res.ok && resBody.success) {
+        // Delete the Firebase Storage directory since draft is
+        // now successfully deleted
+        const user = auth.currentUser;
+        if (user) {
+          await deleteDraftStorage(user.uid, draftNumber);
+        }
         setDraftMappings((original) =>
           original.filter((d) => d.id !== draftNumber),
         );
