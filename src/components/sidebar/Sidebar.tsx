@@ -9,10 +9,12 @@ import {
   ImagesIcon,
   QuoteIcon,
   SchoolIcon,
-  SquareMenuIcon,
+  RectangleEllipsisIcon,
   TextIcon,
   VideoIcon,
   AppWindowIcon,
+  Rows2Icon,
+  Columns2Icon
 } from "lucide-react";
 
 import SidebarItem from "./SidebarItem";
@@ -37,7 +39,7 @@ const sidebarItems = [
     type: "navBar",
     name: "Navigation Bar",
     description: "Add a customizable menu for easy site navigation.",
-    icon: <SquareMenuIcon />,
+    icon: <RectangleEllipsisIcon />,
   },
   {
     id: 4,
@@ -69,20 +71,34 @@ const sidebarItems = [
   },
   {
     id: 8,
+    type: "horizontalLine",
+    name: "Horizontal Line",
+    description: "Add a ine to separate sections horizontally.",
+    icon: <Rows2Icon />
+  },
+  {
+    id: 9,
+    type: "verticalLine",
+    name: "Vertical Line",
+    description: "Add a line to separate sections vertically.",
+    icon: <Columns2Icon />
+  },
+  {
+    id: 9,
     type: "navButton",
     name: "Navigation Button",
     description: "Add a button to link to other pages or sections.",
     icon: <CircleArrowRightIcon />,
   },
   {
-    id: 9,
+    id: 10,
     type: "aboutMeCard",
     name: "About Me Card",
     description: "Create a quick bio with your photo and contact info.",
     icon: <ContactIcon />,
   },
   {
-    id: 10,
+    id: 11,
     type: "academicEntry",
     name: "Academic Entry",
     description:
@@ -90,14 +106,14 @@ const sidebarItems = [
     icon: <SchoolIcon />,
   },
   {
-    id: 11,
+    id: 12,
     type: "workEntry",
     name: "Work Entry",
     description: "Describe a job role, company, and time period.",
     icon: <BriefcaseIcon />,
   },
   {
-    id: 12,
+    id: 13,
     type: "endoresment",
     name: "Endoresment",
     description: "Add quotes or recommendations from colleagues.",
