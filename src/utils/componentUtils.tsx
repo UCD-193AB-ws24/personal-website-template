@@ -4,6 +4,7 @@ import NavigationBar from "@components/editorComponents/NavigationBar";
 import ImageComponent from "@components/editorComponents/ImageComponent";
 import FileComponent from "@components/editorComponents/FileComponent";
 import VideoComponent from "@components/editorComponents/VideoComponent";
+import WebPageComponent from "@components/editorComponents/WebPageComponent";
 
 import { ComponentItem } from "@customTypes/componentTypes";
 
@@ -17,6 +18,7 @@ export const componentMap: Record<
   image: ImageComponent,
   file: FileComponent,
   video: VideoComponent,
+  webPage: WebPageComponent,
 };
 
 export const componentSizes: Record<string, { width: number; height: number }> =
@@ -27,6 +29,7 @@ export const componentSizes: Record<string, { width: number; height: number }> =
     file: { width: 425, height: 550 },
     video: { width: 450, height: 250 },
     navBar: { width: 100000, height: 48 },
+    webPage: { width: 800, height: 600 },
   };
 
 export const renderOverlayContent = (activeType: string | null) => {
@@ -43,6 +46,8 @@ export const renderOverlayContent = (activeType: string | null) => {
       return <FileComponent />;
     case "video":
       return <VideoComponent />;
+    case "webPage":
+      return <WebPageComponent />;
     default:
       return null;
   }
