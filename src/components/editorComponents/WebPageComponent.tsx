@@ -60,7 +60,7 @@ export default function WebPageComponent({
   const isValidURL = (url: string) => {
     // https://regex101.com/r/3fYy3x/1
     const validURLRegex =
-      /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/;
+      /((([A-Za-z]{3,9}:(?:\/\/)?)?(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+\.[A-Za-z]{2,6}|(?:www\.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+\.[A-Za-z]{2,6})((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/;
     const match = url.match(validURLRegex);
     return match ? true : false;
   };
@@ -69,8 +69,13 @@ export default function WebPageComponent({
     const inputElement = document.getElementById(
       `${id}-webpage-input`,
     ) as HTMLInputElement;
-    const url = inputElement?.value.trim();
+    let url = inputElement?.value.trim();
     if (!url) return;
+
+    // Prepend http:// or https:// if url doesn't have it
+    if (!/^https?:\/\//i.test(url)) {
+      url = `https://${url}`;
+    }
 
     if (isValidURL(url)) {
       setWebPageSrc(url);
