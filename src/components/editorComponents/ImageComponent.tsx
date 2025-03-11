@@ -15,6 +15,7 @@ import type {
   Size,
 } from "@customTypes/componentTypes";
 import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
+import { GRID_SIZE } from "@utils/constants";
 import { auth, storage } from "@lib/firebase/firebaseApp";
 
 interface ImageComponentProps {
@@ -191,6 +192,8 @@ export default function ImageComponent({
       bounds="parent"
       onMouseDown={handleMouseDown}
       style={{ pointerEvents: "auto" }}
+      dragGrid={[GRID_SIZE, GRID_SIZE]}
+      resizeGrid={[GRID_SIZE, GRID_SIZE]}
     >
       <ActiveOutlineContainer isActive={isActive}>
         {loading && <SkeletonLoader width={size.width} height={size.height} />}

@@ -12,6 +12,7 @@ import type {
 } from "@customTypes/componentTypes";
 
 import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
+import { GRID_SIZE } from "@utils/constants";
 
 interface SectionTitleProps {
   id?: string;
@@ -47,7 +48,7 @@ export default function SectionTitleTextbox({
   const [size, setSize] = useState(initialSize);
   const [text, setText] = useState(content);
 
-  const handleMouseDown = (e: MouseEvent) => {
+  const handleMouseDown = (e: MouseEvent | React.MouseEvent) => {
     e.stopPropagation();
     onMouseDown();
   };
@@ -112,11 +113,14 @@ export default function SectionTitleTextbox({
         handleMouseDown(e);
       }}
       style={{ pointerEvents: "auto" }}
+      dragGrid={[GRID_SIZE, GRID_SIZE]}
+      resizeGrid={[GRID_SIZE, GRID_SIZE]}
     >
       <ActiveOutlineContainer isActive={isActive}>
         <h1
           contentEditable
           suppressContentEditableWarning
+          draggable="false"
           className="overflow-hidden w-full h-full text-black text-2xl font-bold outline-none cursor-text p-0 m-0 leading-none"
           onBlur={handleBlur}
         >
