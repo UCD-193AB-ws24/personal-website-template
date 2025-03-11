@@ -135,9 +135,16 @@ export default function Editor() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setEditorHeight(window.innerHeight - 64); // top bar is 64px
+      const defaultHeight = window.innerHeight - 64;
+
+      const lowestY = Math.max(
+        ...components.map((comp) => comp.position.y + comp.size.height),
+        window.innerHeight - 64, // top bar is 64px
+      );
+
+      setEditorHeight(lowestY > defaultHeight ? lowestY + 100 : defaultHeight);
     }
-  }, []);
+  }, [components]);
 
   useEffect(() => {
     const handleScroll = () => {
