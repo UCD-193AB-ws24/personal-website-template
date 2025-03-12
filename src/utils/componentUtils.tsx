@@ -6,6 +6,8 @@ import FileComponent from "@components/editorComponents/FileComponent";
 import VideoComponent from "@components/editorComponents/VideoComponent";
 import AcademicEntry from "@components/editorComponents/AcademicEntry";
 import WebPageComponent from "@components/editorComponents/WebPageComponent";
+import HorizontalLine from "@components/editorComponents/HorizontalLine";
+import VerticalLine from "@components/editorComponents/VerticalLine";
 
 import { ComponentItem } from "@customTypes/componentTypes";
 
@@ -21,6 +23,8 @@ export const componentMap: Record<
   video: VideoComponent,
   academicEntry: AcademicEntry,
   webPage: WebPageComponent,
+  horizontalLine: HorizontalLine,
+  verticalLine: VerticalLine
 };
 
 export const componentSizes: Record<string, { width: number; height: number }> =
@@ -33,6 +37,8 @@ export const componentSizes: Record<string, { width: number; height: number }> =
     navBar: { width: 100000, height: 48 },
     academicEntry: { width: 600, height: 70 },
     webPage: { width: 800, height: 600 },
+    horizontalLine: { width: 800, height: 4 },
+    verticalLine: {width:4 , height: 800 }
   };
 
 export const renderOverlayContent = (activeType: string | null) => {
@@ -53,6 +59,10 @@ export const renderOverlayContent = (activeType: string | null) => {
       return <AcademicEntry />;
     case "webPage":
       return <WebPageComponent />;
+    case "horizontalLine":
+      return <HorizontalLine />;
+    case "verticalLine":
+      return <VerticalLine />;
     default:
       return null;
   }
