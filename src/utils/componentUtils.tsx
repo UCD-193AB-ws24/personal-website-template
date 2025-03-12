@@ -24,7 +24,7 @@ export const componentMap: Record<
   academicEntry: AcademicEntry,
   webPage: WebPageComponent,
   horizontalLine: HorizontalLine,
-  verticalLine: VerticalLine
+  verticalLine: VerticalLine,
 };
 
 export const componentSizes: Record<string, { width: number; height: number }> =
@@ -38,7 +38,7 @@ export const componentSizes: Record<string, { width: number; height: number }> =
     academicEntry: { width: 600, height: 70 },
     webPage: { width: 800, height: 600 },
     horizontalLine: { width: 800, height: 4 },
-    verticalLine: {width:4 , height: 800 }
+    verticalLine: { width: 4, height: 800 },
   };
 
 export const renderOverlayContent = (activeType: string | null) => {

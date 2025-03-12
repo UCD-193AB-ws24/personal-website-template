@@ -16,7 +16,6 @@ export const isColliding = (
   return components.some((comp) => {
     if (comp.id === activeComponentId) return false;
 
-
     const rect1 = {
       left: newPos.x - buffer,
       top: newPos.y - buffer,
