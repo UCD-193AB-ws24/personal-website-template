@@ -5,7 +5,8 @@ import { Rnd } from "react-rnd";
 import { MoveIcon } from "lucide-react";
 import { toast, Flip } from "react-toastify";
 
-import ErrorToast from "@components/ErrorToast";
+import ActiveOutlineContainer from "@components/editorComponents/ActiveOutlineContainer";
+import ErrorToast from "@components/toasts/ErrorToast";
 
 import type {
   ComponentItem,
@@ -13,8 +14,9 @@ import type {
   Size,
 } from "@customTypes/componentTypes";
 import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
+import { GRID_SIZE } from "@utils/constants";
 
-interface VideoComponentProps {
+interface WebPageComponent {
   id?: string;
   initialPos?: Position;
   initialSize?: Size;
@@ -32,7 +34,7 @@ interface VideoComponentProps {
   isPreview?: boolean;
 }
 
-export default function VideoComponent({
+export default function WebPageComponent({
   id = "",
   initialPos = { x: -1, y: -1 },
   initialSize = { width: 225, height: 125 },
@@ -43,10 +45,10 @@ export default function VideoComponent({
   onMouseDown = () => {},
   setIsDragging = () => {},
   isPreview = false,
-}: VideoComponentProps) {
+}: WebPageComponent) {
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
-  const [videoSrc, setVideoSrc] = useState(content || "");
+  const [webpageSrc, setWebPageSrc] = useState(content || "");
   const [isOverlayActive, setIsOverlayActive] = useState(true);
 
   const handleMouseDown = (e: MouseEvent | React.MouseEvent) => {
@@ -55,32 +57,35 @@ export default function VideoComponent({
     setIsOverlayActive(false); // Hide overlay when clicked
   };
 
-  const extractYouTubeId = (url: string) => {
-    // https://stackoverflow.com/questions/3452546/how-do-i-get-the-youtube-video-id-from-a-url
-    const videoIDRegEx =
-      /.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|live\/|watch\?v=)([^#\&\?]*).*/;
-    const match = url.match(videoIDRegEx);
-    return match ? match[1] : null;
+  const isValidURL = (url: string) => {
+    // https://regex101.com/r/3fYy3x/1
+    const validURLRegex =
+      /((([A-Za-z]{3,9}:(?:\/\/)?)?(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+\.[A-Za-z]{2,6}|(?:www\.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+\.[A-Za-z]{2,6})((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/;
+    const match = url.match(validURLRegex);
+    return match ? true : false;
   };
 
-  const handleYouTubeLink = () => {
+  const handleWebPageLink = () => {
     const inputElement = document.getElementById(
-      `${id}-youtube-input`,
+      `${id}-webpage-input`,
     ) as HTMLInputElement;
-    const url = inputElement?.value.trim();
+    let url = inputElement?.value.trim();
     if (!url) return;
 
-    const videoId = extractYouTubeId(url);
-    if (videoId) {
-      const embedUrl = `https://www.youtube.com/embed/${videoId}`;
-      setVideoSrc(embedUrl);
-      updateComponent(id, position, size, embedUrl);
+    // Prepend http:// or https:// if url doesn't have it
+    if (!/^https?:\/\//i.test(url)) {
+      url = `https://${url}`;
+    }
+
+    if (isValidURL(url)) {
+      setWebPageSrc(url);
+      updateComponent(id, position, size, url);
     } else {
       toast(
         (props) => (
           <ErrorToast
             {...props}
-            message="Invalid YouTube video URL. Please enter a valid URL."
+            message="Invalid URL. Please enter a valid URL."
           />
         ),
         {
@@ -109,15 +114,16 @@ export default function VideoComponent({
       }}
       className="overflow-hidden"
     >
-      {videoSrc ? (
+      {webpageSrc ? (
         <iframe
           className="w-full h-full"
-          src={videoSrc}
+          src={webpageSrc}
           allowFullScreen
+          style={{ pointerEvents: "auto" }}
         ></iframe>
       ) : (
         <div className="w-full h-full flex items-center justify-center bg-gray-200">
-          No Video
+          No URL
         </div>
       )}
     </div>
@@ -150,22 +156,17 @@ export default function VideoComponent({
           newPosition,
         );
       }}
-      lockAspectRatio={true}
       minWidth={250}
       minHeight={125}
       bounds="parent"
       onMouseDown={handleMouseDown}
       style={{ pointerEvents: "auto" }}
       dragHandleClassName={`${id}-drag-handle`}
+      dragGrid={[GRID_SIZE, GRID_SIZE]}
+      resizeGrid={[GRID_SIZE, GRID_SIZE]}
     >
-      <div
-        className={`w-full h-full transition-all duration-150 ease-in-out ${
-          isActive
-            ? "outline outline-2 outline-blue-500 bg-gray-100 shadow-md"
-            : "outline outline-2 outline-transparent  bg-transparent hover:outline hover:outline-2 hover:outline-gray-300"
-        }`}
-      >
-        {videoSrc ? (
+      <ActiveOutlineContainer isActive={isActive}>
+        {webpageSrc ? (
           <div className="relative w-full h-full">
             {/* Transparent Overlay to Capture Clicks */}
             {isOverlayActive && (
@@ -175,10 +176,10 @@ export default function VideoComponent({
               />
             )}
 
-            {/* Youtube Viewer */}
+            {/* Web Page Viewer */}
             <iframe
               className="w-full h-full"
-              src={videoSrc}
+              src={webpageSrc}
               allowFullScreen
               style={{ pointerEvents: "auto" }}
               onMouseLeave={() => setIsOverlayActive(true)} // Re-enable overlay when leaving iframe
@@ -187,22 +188,22 @@ export default function VideoComponent({
         ) : (
           <div className="w-full h-full flex flex-col justify-center items-center bg-gray-200 p-4">
             <label className="text-lg font-medium text-gray-700 mb-2">
-              Enter a YouTube Link
+              Enter a Link
             </label>
             <div className="flex w-full max-w-md space-x-2">
               <input
                 type="text"
-                placeholder="Paste YouTube link here..."
+                placeholder="Paste link here..."
                 className="flex-1 p-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") handleYouTubeLink();
+                  if (e.key === "Enter") handleWebPageLink();
                 }}
-                id={`${id}-youtube-input`}
+                id={`${id}-webpage-input`}
                 onMouseDown={(e) => e.stopPropagation()}
               />
               <button
                 className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                onClick={handleYouTubeLink}
+                onClick={handleWebPageLink}
                 onMouseDown={(e) => e.stopPropagation()}
               >
                 Embed
@@ -210,7 +211,7 @@ export default function VideoComponent({
             </div>
           </div>
         )}
-      </div>
+      </ActiveOutlineContainer>
       {isActive && (
         <div
           className={`${id}-drag-handle absolute top-10 right-[-30px] w-6 h-6 bg-gray-300 rounded-md cursor-move flex items-center justify-center z-10`}

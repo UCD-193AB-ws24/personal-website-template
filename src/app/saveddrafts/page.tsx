@@ -10,6 +10,7 @@ import LoadingSpinner from "@components/LoadingSpinner";
 import DraftItem from "@components/DraftItem";
 import { fetchUsername } from "@lib/requests/fetchUsername";
 import { fetchPublishedDraftNumber } from "@lib/requests/fetchPublishedDraftNumber";
+import { deleteDraftStorage } from "@lib/requests/deleteDraftStorage";
 import DraftNameModal from "@components/DraftNameModal";
 import { ToastContainer } from "react-toastify";
 import { createTemplate } from "@lib/requests/admin/createTemplate";
@@ -143,6 +144,12 @@ export default function SavedDrafts() {
       const resBody = (await res.json()) as APIResponse<string>;
 
       if (res.ok && resBody.success) {
+        // Delete the Firebase Storage directory since draft is
+        // now successfully deleted
+        const user = auth.currentUser;
+        if (user) {
+          await deleteDraftStorage(user.uid, draftNumber);
+        }
         setDraftMappings((original) =>
           original.filter((d) => d.id !== draftNumber),
         );
@@ -259,14 +266,14 @@ export default function SavedDrafts() {
               setIsModalHidden(false);
               handleNewDraft();
             }}
-            className="bg-[#f08700] hover:bg-[#d67900] transition duration-300 text-white font-bold py-2 px-4 rounded-full border-none text-[#111827]"
+            className="bg-[#f08700] hover:bg-[#d67900] transition duration-300 text-white font-bold py-2 px-4 rounded-md border-none text-[#111827]"
           >
             New Draft
           </button>
 
           <button
             onClick={() => router.push("/templates")}
-            className="bg-[#f08700] hover:bg-[#d67900] transition duration-300 text-white font-bold py-2 px-4 rounded-full border-none text-[#111827]"
+            className="bg-[#f08700] hover:bg-[#d67900] transition duration-300 text-white font-bold py-2 px-4 rounded-md border-none text-[#111827]"
           >
             Select Template
           </button>

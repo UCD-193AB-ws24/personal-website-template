@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { Rnd } from "react-rnd";
 
+import ActiveOutlineContainer from "@components/editorComponents/ActiveOutlineContainer";
+
 import type {
   ComponentItem,
   Position,
@@ -10,8 +12,9 @@ import type {
 } from "@customTypes/componentTypes";
 
 import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
+import { GRID_SIZE } from "@utils/constants";
 
-interface SectionTitleProps {
+interface DraggableResizableTextboxProps {
   id?: string;
   initialPos?: Position;
   initialSize?: Size;
@@ -29,34 +32,32 @@ interface SectionTitleProps {
   isPreview?: boolean;
 }
 
-export default function SectionTitleTextbox({
+export default function DraggableResizableTextbox({
   id = "",
   initialPos = { x: -1, y: -1 },
-  initialSize = { width: 350, height: 40 },
+  initialSize = { width: 200, height: 50 },
   components = [],
-  content = "Type section title here...",
+  content = "",
   updateComponent = () => {},
   isActive = true,
   onMouseDown: onMouseDown = () => {},
   setIsDragging = () => {},
   isPreview = false,
-}: SectionTitleProps) {
+}: DraggableResizableTextboxProps) {
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
-  const [text, setText] = useState(content);
 
   const handleMouseDown = (e: MouseEvent) => {
     e.stopPropagation();
     onMouseDown();
   };
 
-  const handleBlur = (e: React.FocusEvent<HTMLHeadingElement, Element>) => {
-    setText(e.currentTarget.innerText);
-    updateComponent(id, position, size, e.currentTarget.innerText);
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    updateComponent(id, position, size, e.target.value);
   };
 
   return isPreview ? (
-    <h1
+    <div
       style={{
         position: "absolute",
         left: position.x,
@@ -64,10 +65,10 @@ export default function SectionTitleTextbox({
         width: size.width,
         height: size.height,
       }}
-      className="whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-2xl font-bold"
+      className="whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg leading-none"
     >
       {content}
-    </h1>
+    </div>
   ) : (
     <Rnd
       size={{ width: size.width, height: size.height }}
@@ -94,39 +95,22 @@ export default function SectionTitleTextbox({
           newPosition,
         );
       }}
-      enableResizing={{
-        top: false,
-        right: true,
-        bottom: false,
-        left: true,
-        topRight: false,
-        bottomRight: false,
-        bottomLeft: false,
-        topLeft: false,
-      }}
       minWidth={100}
+      minHeight={50}
       bounds="parent"
-      onMouseDown={(e: MouseEvent) => {
-        handleMouseDown(e);
-      }}
+      onMouseDown={handleMouseDown}
       style={{ pointerEvents: "auto" }}
+      dragGrid={[GRID_SIZE, GRID_SIZE]}
+      resizeGrid={[GRID_SIZE, GRID_SIZE]}
     >
-      <div
-        className={`w-full h-full flex items-center transition-all duration-150 ease-in-out ${
-          isActive
-            ? "outline outline-2 outline-blue-500 bg-gray-100 shadow-md"
-            : "outline outline-2 outline-transparent  bg-transparent hover:outline hover:outline-2 hover:outline-gray-300"
-        }`}
-      >
-        <h1
-          contentEditable
-          suppressContentEditableWarning
-          className="overflow-hidden w-full h-full text-black text-2xl font-bold outline-none cursor-text p-0 m-0 leading-none"
-          onBlur={handleBlur}
-        >
-          {text}
-        </h1>
-      </div>
+      <ActiveOutlineContainer isActive={isActive}>
+        <textarea
+          className={`overflow-hidden w-full h-full resize-none border-none outline-none bg-transparent text-lg leading-none`}
+          placeholder="Type here..."
+          defaultValue={content}
+          onChange={handleChange}
+        />
+      </ActiveOutlineContainer>
     </Rnd>
   );
 }

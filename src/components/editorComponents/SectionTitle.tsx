@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { Rnd } from "react-rnd";
 
+import ActiveOutlineContainer from "@components/editorComponents/ActiveOutlineContainer";
+
 import type {
   ComponentItem,
   Position,
@@ -10,8 +12,9 @@ import type {
 } from "@customTypes/componentTypes";
 
 import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
+import { GRID_SIZE } from "@utils/constants";
 
-interface DraggableResizableTextboxProps {
+interface SectionTitleProps {
   id?: string;
   initialPos?: Position;
   initialSize?: Size;
@@ -29,32 +32,34 @@ interface DraggableResizableTextboxProps {
   isPreview?: boolean;
 }
 
-export default function DraggableResizableTextbox({
+export default function SectionTitleTextbox({
   id = "",
   initialPos = { x: -1, y: -1 },
-  initialSize = { width: 200, height: 50 },
+  initialSize = { width: 350, height: 40 },
   components = [],
-  content = "",
+  content = "Type section title here...",
   updateComponent = () => {},
   isActive = true,
   onMouseDown: onMouseDown = () => {},
   setIsDragging = () => {},
   isPreview = false,
-}: DraggableResizableTextboxProps) {
+}: SectionTitleProps) {
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
+  const [text, setText] = useState(content);
 
-  const handleMouseDown = (e: MouseEvent) => {
+  const handleMouseDown = (e: MouseEvent | React.MouseEvent) => {
     e.stopPropagation();
     onMouseDown();
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    updateComponent(id, position, size, e.target.value);
+  const handleBlur = (e: React.FocusEvent<HTMLHeadingElement, Element>) => {
+    setText(e.currentTarget.innerText);
+    updateComponent(id, position, size, e.currentTarget.innerText);
   };
 
   return isPreview ? (
-    <div
+    <h1
       style={{
         position: "absolute",
         left: position.x,
@@ -62,10 +67,10 @@ export default function DraggableResizableTextbox({
         width: size.width,
         height: size.height,
       }}
-      className="whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg"
+      className="whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-2xl font-bold"
     >
       {content}
-    </div>
+    </h1>
   ) : (
     <Rnd
       size={{ width: size.width, height: size.height }}
@@ -92,26 +97,36 @@ export default function DraggableResizableTextbox({
           newPosition,
         );
       }}
+      enableResizing={{
+        top: false,
+        right: true,
+        bottom: false,
+        left: true,
+        topRight: false,
+        bottomRight: false,
+        bottomLeft: false,
+        topLeft: false,
+      }}
       minWidth={100}
-      minHeight={50}
       bounds="parent"
-      onMouseDown={handleMouseDown}
+      onMouseDown={(e: MouseEvent) => {
+        handleMouseDown(e);
+      }}
       style={{ pointerEvents: "auto" }}
+      dragGrid={[GRID_SIZE, GRID_SIZE]}
+      resizeGrid={[GRID_SIZE, GRID_SIZE]}
     >
-      <div
-        className={`w-full h-full transition-all duration-150 ease-in-out ${
-          isActive
-            ? "outline outline-2 outline-blue-500 bg-gray-100 shadow-md"
-            : "outline outline-2 outline-transparent bg-transparent hover:outline hover:outline-2 hover:outline-gray-300"
-        }`}
-      >
-        <textarea
-          className={`overflow-hidden w-full h-full resize-none border-none outline-none bg-transparent text-lg leading-none`}
-          placeholder="Type here..."
-          defaultValue={content}
-          onChange={handleChange}
-        />
-      </div>
+      <ActiveOutlineContainer isActive={isActive}>
+        <h1
+          contentEditable
+          suppressContentEditableWarning
+          draggable="false"
+          className="overflow-hidden w-full h-full text-black text-2xl font-bold outline-none cursor-text p-0 m-0 leading-none"
+          onBlur={handleBlur}
+        >
+          {text}
+        </h1>
+      </ActiveOutlineContainer>
     </Rnd>
   );
 }
