@@ -135,9 +135,16 @@ export default function Editor() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setEditorHeight(window.innerHeight - 64); // top bar is 64px
+      const defaultHeight = window.innerHeight - 64;
+
+      const lowestY = Math.max(
+        ...components.map((comp) => comp.position.y + comp.size.height),
+        window.innerHeight - 64, // top bar is 64px
+      );
+
+      setEditorHeight(lowestY > defaultHeight ? lowestY + 100 : defaultHeight);
     }
-  }, []);
+  }, [components]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -582,7 +589,6 @@ export default function Editor() {
                 //     ? `absolute inset-0 h-full w-full bg-white bg-[radial-gradient(#d1d5db_1px,transparent_1px)] [background-size:${GRID_SIZE}px_${GRID_SIZE}px] [background-position:-${GRID_SIZE}px_-${GRID_SIZE}px]`
                 //     : "bg-white"
                 // }`}
-                // ? `absolute inset-0 h-full w-full bg-white bg-[linear-gradient(to_right,#d1d5db_1px,transparent_1px) linear-gradient(to_bottom,#d1d5db_1px,transparent_1px)] [background-size:${GRID_SIZE}px_${GRID_SIZE}px] [background-position:-${GRID_SIZE}px_-${GRID_SIZE}px]`
                 className={`relative transition-all ${
                   isGridVisible
                     ? `absolute inset-0 h-full w-full bg-white bg-[linear-gradient(to_right,#e2e5e9_1px,transparent_1px),linear-gradient(to_bottom,#e2e5e9_1px,transparent_1px)] bg-[size:${GRID_SIZE}px_${GRID_SIZE}px]`
