@@ -14,7 +14,7 @@ import {
   VideoIcon,
   AppWindowIcon,
   Rows2Icon,
-  Columns2Icon
+  Columns2Icon,
 } from "lucide-react";
 
 import SidebarItem from "./SidebarItem";
@@ -73,15 +73,15 @@ const sidebarItems = [
     id: 8,
     type: "horizontalLine",
     name: "Horizontal Line",
-    description: "Add a ine to separate sections horizontally.",
-    icon: <Rows2Icon />
+    description: "Add a line to separate sections horizontally.",
+    icon: <Rows2Icon />,
   },
   {
     id: 9,
     type: "verticalLine",
     name: "Vertical Line",
     description: "Add a line to separate sections vertically.",
-    icon: <Columns2Icon />
+    icon: <Columns2Icon />,
   },
   {
     id: 9,
