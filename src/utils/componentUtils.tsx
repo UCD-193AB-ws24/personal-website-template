@@ -1,14 +1,13 @@
-import DraggableResizableTextbox from '@components/editorComponents/DraggableResizableTextbox';
-import SectionTitleTextbox from '@components/editorComponents/SectionTitle';
-import NavigationBar from '@components/editorComponents/NavigationBar';
-import ImageComponent from '@components/editorComponents/ImageComponent';
-import FileComponent from '@components/editorComponents/FileComponent';
-import VideoComponent from '@components/editorComponents/VideoComponent';
-import AcademicEntry from '@components/editorComponents/AcademicEntry';
-import WebPageComponent from '@components/editorComponents/WebPageComponent';
-import WorkEntry from '@components/editorComponents/WorkEntry';
-import HorizontalLine from '@components/editorComponents/HorizontalLine';
-import VerticalLine from '@components/editorComponents/VerticalLine';
+import DraggableResizableTextbox from "@components/editorComponents/DraggableResizableTextbox";
+import SectionTitleTextbox from "@components/editorComponents/SectionTitle";
+import NavigationBar from "@components/editorComponents/NavigationBar";
+import ImageComponent from "@components/editorComponents/ImageComponent";
+import FileComponent from "@components/editorComponents/FileComponent";
+import VideoComponent from "@components/editorComponents/VideoComponent";
+import WebPageComponent from "@components/editorComponents/WebPageComponent";
+import HorizontalLine from "@components/editorComponents/HorizontalLine";
+import VerticalLine from "@components/editorComponents/VerticalLine";
+import IconComponent from "@components/editorComponents/IconComponent";
 
 import { ComponentItem } from '@customTypes/componentTypes';
 
@@ -16,17 +15,16 @@ export const componentMap: Record<
 	string,
 	React.ComponentType<Partial<ComponentItem>>
 > = {
-	textBlock: DraggableResizableTextbox,
-	sectionTitle: SectionTitleTextbox,
-	navBar: NavigationBar,
-	image: ImageComponent,
-	file: FileComponent,
-	video: VideoComponent,
-	academicEntry: AcademicEntry,
-	webPage: WebPageComponent,
-	workEntry: WorkEntry,
-	horizontalLine: HorizontalLine,
-	verticalLine: VerticalLine,
+  textBlock: DraggableResizableTextbox,
+  sectionTitle: SectionTitleTextbox,
+  navBar: NavigationBar,
+  image: ImageComponent,
+  file: FileComponent,
+  video: VideoComponent,
+  webPage: WebPageComponent,
+  horizontalLine: HorizontalLine,
+  verticalLine: VerticalLine,
+  icon: IconComponent
 };
 
 export const componentSizes: Record<string, { width: number; height: number }> =
@@ -42,33 +40,32 @@ export const componentSizes: Record<string, { width: number; height: number }> =
 		workEntry: { width: 750, height: 150 },
 		horizontalLine: { width: 350, height: 2 },
 		verticalLine: { width: 2, height: 350 },
-};
+    	iconComponent: { width: 100, height: 100}
+  };
 
 export const renderOverlayContent = (activeType: string | null) => {
-	switch (activeType) {
-		case 'textBlock':
-			return <DraggableResizableTextbox />;
-		case 'sectionTitle':
-			return <SectionTitleTextbox />;
-		case 'navBar':
-			return <NavigationBar />;
-		case 'image':
-			return <ImageComponent />;
-		case 'file':
-			return <FileComponent />;
-		case 'video':
-			return <VideoComponent />;
-		case 'academicEntry':
-			return <AcademicEntry />;
-		case 'webPage':
-			return <WebPageComponent />;
-		case 'workEntry':
-			return <WorkEntry />;
-		case 'horizontalLine':
-			return <HorizontalLine />;
-		case 'verticalLine':
-			return <VerticalLine />;
-		default:
-			return null;
-	}
+  switch (activeType) {
+    case "textBlock":
+      return <DraggableResizableTextbox />;
+    case "sectionTitle":
+      return <SectionTitleTextbox />;
+    case "navBar":
+      return <NavigationBar />;
+    case "image":
+      return <ImageComponent />;
+    case "file":
+      return <FileComponent />;
+    case "video":
+      return <VideoComponent />;
+    case "webPage":
+      return <WebPageComponent />;
+    case "horizontalLine":
+      return <HorizontalLine />;
+    case "verticalLine":
+      return <VerticalLine />;
+    case "icon":
+      return <IconComponent />
+    default:
+      return null;
+  }
 };

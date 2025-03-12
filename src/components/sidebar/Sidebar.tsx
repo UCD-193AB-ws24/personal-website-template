@@ -15,6 +15,7 @@ import {
   AppWindowIcon,
   Rows2Icon,
   Columns2Icon,
+  Circle
 } from "lucide-react";
 
 import SidebarItem from "./SidebarItem";
@@ -85,20 +86,27 @@ const sidebarItems = [
   },
   {
     id: 10,
+    type: "icon",
+    name: "Icon",
+    description: "Choose from a variety of icons to add.",
+    icon: <Circle />,
+  },
+  {
+    id: 11,
     type: "navButton",
     name: "Navigation Button",
     description: "Add a button to link to other pages or sections.",
     icon: <CircleArrowRightIcon />,
   },
   {
-    id: 11,
+    id: 12,
     type: "aboutMeCard",
     name: "About Me Card",
     description: "Create a quick bio with your photo and contact info.",
     icon: <ContactIcon />,
   },
   {
-    id: 12,
+    id: 13,
     type: "academicEntry",
     name: "Academic Entry",
     description:
@@ -106,14 +114,14 @@ const sidebarItems = [
     icon: <SchoolIcon />,
   },
   {
-    id: 13,
+    id: 14,
     type: "workEntry",
     name: "Work Entry",
     description: "Describe a job role, company, and time period.",
     icon: <BriefcaseIcon />,
   },
   {
-    id: 14,
+    id: 15,
     type: "endoresment",
     name: "Endoresment",
     description: "Add quotes or recommendations from colleagues.",
