@@ -8,6 +8,7 @@ import AcademicEntry from "@components/editorComponents/AcademicEntry";
 import WebPageComponent from "@components/editorComponents/WebPageComponent";
 import HorizontalLine from "@components/editorComponents/HorizontalLine";
 import VerticalLine from "@components/editorComponents/VerticalLine";
+import AboutMeCard from "@components/editorComponents/AboutMeCard";
 
 import { ComponentItem } from "@customTypes/componentTypes";
 
@@ -25,6 +26,7 @@ export const componentMap: Record<
   webPage: WebPageComponent,
   horizontalLine: HorizontalLine,
   verticalLine: VerticalLine,
+  aboutMeCard: AboutMeCard,
 };
 
 export const componentSizes: Record<string, { width: number; height: number }> =
@@ -39,6 +41,7 @@ export const componentSizes: Record<string, { width: number; height: number }> =
     webPage: { width: 800, height: 600 },
     horizontalLine: { width: 800, height: 4 },
     verticalLine: { width: 4, height: 800 },
+    aboutMeCard: { width: 600, height: 70 }
   };
 
 export const renderOverlayContent = (activeType: string | null) => {
@@ -63,6 +66,8 @@ export const renderOverlayContent = (activeType: string | null) => {
       return <HorizontalLine />;
     case "verticalLine":
       return <VerticalLine />;
+    case "aboutMeCard":
+      return <AboutMeCard />
     default:
       return null;
   }
