@@ -15,7 +15,7 @@ export async function GET() {
     if (userDoc.exists) {
       return NextResponse.json<APIResponse<string>>({
         success: true,
-        data: userDoc.data()?.draftMappings,
+        data: userDoc.data()?.draftMappings || [],
       });
     } else {
       throw new Error("User not found");
