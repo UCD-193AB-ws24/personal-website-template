@@ -554,7 +554,7 @@ export default function Editor() {
                 <div className="flex">
                   <button
                     onClick={() => setIsGridVisible((prev) => !prev)}
-                    className="flex items-center gap-2 px-3 py-1 mr-4 border border-gray-400 rounded-md bg-white shadow-md hover:bg-gray-200 transition"
+                    className="text-large font-semibold flex items-center gap-2 px-3 py-1 mr-4 border border-gray-500 hover:bg-gray-500 hover:text-white rounded-md shadow-md transition-all"
                   >
                     <GridIcon size={18} />
                     <span className="text-sm">
