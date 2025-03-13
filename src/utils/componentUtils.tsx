@@ -7,6 +7,8 @@ import VideoComponent from "@components/editorComponents/VideoComponent";
 import AcademicEntry from "@components/editorComponents/AcademicEntry";
 import WebPageComponent from "@components/editorComponents/WebPageComponent";
 import WorkEntry from "@components/editorComponents/WorkEntry";
+import HorizontalLine from "@components/editorComponents/HorizontalLine";
+import VerticalLine from "@components/editorComponents/VerticalLine";
 
 import { ComponentItem } from "@customTypes/componentTypes";
 
@@ -23,6 +25,8 @@ export const componentMap: Record<
   academicEntry: AcademicEntry,
   webPage: WebPageComponent,
   workEntry: WorkEntry,
+  horizontalLine: HorizontalLine,
+  verticalLine: VerticalLine,
 };
 
 export const componentSizes: Record<string, { width: number; height: number }> =
@@ -36,6 +40,8 @@ export const componentSizes: Record<string, { width: number; height: number }> =
     academicEntry: { width: 600, height: 70 },
     webPage: { width: 800, height: 600 },
     workEntry: { width: 750, height: 150 },
+    horizontalLine: { width: 800, height: 4 },
+    verticalLine: { width: 4, height: 800 },
   };
 
 export const renderOverlayContent = (activeType: string | null) => {
@@ -58,6 +64,10 @@ export const renderOverlayContent = (activeType: string | null) => {
       return <WebPageComponent />;
     case "workEntry":
       return <WorkEntry />;
+    case "horizontalLine":
+      return <HorizontalLine />;
+    case "verticalLine":
+      return <VerticalLine />;
     default:
       return null;
   }
