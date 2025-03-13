@@ -392,31 +392,31 @@ export default function Editor() {
 			const editorBounds = over.rect;
 			const draggedRect = active.rect.current.translated as DOMRect;
 
-			const dropX = Math.max(
-				0,
-				Math.min(
-					draggedRect.left - editorBounds.left,
-					editorBounds.width - draggedRect.width
-				)
-			);
-			const dropY = Math.max(
-				0,
-				Math.min(
-					draggedRect.top - editorBounds.top,
-					editorBounds.height - draggedRect.height
-				)
-			);
+      const dropX = Math.max(
+        0,
+        Math.min(
+          draggedRect.left - editorBounds.left,
+          editorBounds.width - draggedRect.width,
+        ),
+      );
+      const dropY = Math.max(
+        0,
+        Math.min(
+          draggedRect.top - editorBounds.top,
+          editorBounds.height - draggedRect.height,
+        ),
+      );
 
-			const newSize = {
-				width: draggedRect.width,
-				height: draggedRect.height,
-			};
-			const newPos = findBestFreeSpot(
-				{ x: dropX, y: dropY },
-				newSize,
-				components,
-				activeComponent.id
-			);
+      const roundedX = Math.round(dropX / GRID_SIZE) * GRID_SIZE;
+      const roundedY = Math.round(dropY / GRID_SIZE) * GRID_SIZE;
+
+      const newSize = { width: draggedRect.width, height: draggedRect.height };
+      const newPos = findBestFreeSpot(
+        { x: roundedX, y: roundedY },
+        newSize,
+        components,
+        activeComponent.id,
+      );
 
 			addComponent(activeComponent.type, newPos, activeComponent.id);
 			setActiveComponent({
@@ -558,37 +558,33 @@ export default function Editor() {
 							)}
 						</Suspense>
 
-						<div className="flex flex-col flex-grow">
-							<div className="fixed top-0 right-0 z-50 bg-gray-100 flex justify-between items-center px-6 py-3 w-[calc(100%-256px)] h-[64px]">
-								<div className="flex items-center gap-10">
-									<Link
-										href="/saveddrafts"
-										className="text-large font-semibold px-4 py-2 rounded-md border border-gray-500 transition-all duration-300 hover:bg-gray-500 hover:text-white shadow-md hover:shadow-lg"
-									>
-										Drafts
-									</Link>
-									<p className="font-bold">{draftName}</p>
-								</div>
-								<div className="flex">
-									<button
-										onClick={() =>
-											setIsGridVisible((prev) => !prev)
-										}
-										className="flex items-center gap-2 px-3 py-1 mr-4 border border-gray-400 rounded-md bg-white shadow-md hover:bg-gray-200 transition"
-									>
-										<GridIcon size={18} />
-										<span className="text-sm">
-											{isGridVisible
-												? 'Grid On'
-												: 'Grid Off'}
-										</span>
-									</button>
-									<button
-										className={`text-large font-semibold px-4 py-2 rounded-md mr-4 border border-blue-500 transition-all duration-300 hover:bg-blue-500 hover:text-white shadow-md hover:shadow-lg`}
-										onClick={() => setIsPreview(!isPreview)}
-									>
-										Preview
-									</button>
+            <div className="flex flex-col flex-grow">
+              <div className="fixed top-0 right-0 z-50 bg-gray-100 flex justify-between items-center px-6 py-3 w-[calc(100%-256px)] h-[64px]">
+                <div className="flex items-center gap-10">
+                  <Link
+                    href="/saveddrafts"
+                    className="text-large font-semibold px-4 py-2 rounded-md border border-gray-500 transition-all duration-300 hover:bg-gray-500 hover:text-white shadow-md hover:shadow-lg"
+                  >
+                    Drafts
+                  </Link>
+                  <p className="font-bold">{draftName}</p>
+                </div>
+                <div className="flex">
+                  <button
+                    onClick={() => setIsGridVisible((prev) => !prev)}
+                    className="text-large font-semibold flex items-center gap-2 px-3 py-1 mr-4 border border-gray-500 hover:bg-gray-500 hover:text-white rounded-md shadow-md transition-all"
+                  >
+                    <GridIcon size={18} />
+                    <span className="text-sm">
+                      {isGridVisible ? "Grid On" : "Grid Off"}
+                    </span>
+                  </button>
+                  <button
+                    className={`text-large font-semibold px-4 py-2 rounded-md mr-4 border border-blue-500 transition-all duration-300 hover:bg-blue-500 hover:text-white shadow-md hover:shadow-lg`}
+                    onClick={() => setIsPreview(!isPreview)}
+                  >
+                    Preview
+                  </button>
 
 									<button
 										className={`text-white text-large font-semibold px-4 py-2 rounded-md bg-blue-500 transition-all duration-300 hover:bg-blue-700 shadow-md hover:shadow-lg`}
