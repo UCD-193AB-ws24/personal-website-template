@@ -391,9 +391,12 @@ export default function Editor() {
         ),
       );
 
+      const roundedX = Math.round(dropX / GRID_SIZE) * GRID_SIZE;
+      const roundedY = Math.round(dropY / GRID_SIZE) * GRID_SIZE;
+
       const newSize = { width: draggedRect.width, height: draggedRect.height };
       const newPos = findBestFreeSpot(
-        { x: dropX, y: dropY },
+        { x: roundedX, y: roundedY },
         newSize,
         components,
         activeComponent.id,
