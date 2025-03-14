@@ -24,7 +24,7 @@ export const componentMap: Record<
   webPage: WebPageComponent,
   horizontalLine: HorizontalLine,
   verticalLine: VerticalLine,
-  icon: IconComponent
+  icon: IconComponent,
 };
 
 export const componentSizes: Record<string, { width: number; height: number }> =
@@ -64,7 +64,7 @@ export const renderOverlayContent = (activeType: string | null) => {
     case "verticalLine":
       return <VerticalLine />;
     case "icon":
-      return <IconComponent />
+      return <IconComponent />;
     default:
       return null;
   }

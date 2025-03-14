@@ -15,7 +15,7 @@ import {
   AppWindowIcon,
   Rows2Icon,
   Columns2Icon,
-  Circle
+  Circle,
 } from "lucide-react";
 
 import SidebarItem from "./SidebarItem";

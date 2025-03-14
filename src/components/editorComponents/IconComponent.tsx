@@ -6,7 +6,11 @@ import * as LucideIcons from "lucide-react";
 
 import ActiveOutlineContainer from "@components/editorComponents/ActiveOutlineContainer";
 
-import type { ComponentItem, Position, Size } from "@customTypes/componentTypes";
+import type {
+  ComponentItem,
+  Position,
+  Size,
+} from "@customTypes/componentTypes";
 
 import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
 import { GRID_SIZE } from "@utils/constants";
@@ -20,7 +24,7 @@ interface IconComponentProps {
     id: string,
     newPos: Position,
     newSize: Size,
-    selectedIcon: string
+    selectedIcon: string,
   ) => void;
   isActive?: boolean;
   onMouseDown?: () => void;
@@ -76,6 +80,7 @@ export default function IconComponent({
         top: true,
         bottom: true,
       }}
+      lockAspectRatio={true}
       minWidth={20}
       minHeight={20}
       bounds="parent"
@@ -84,7 +89,7 @@ export default function IconComponent({
       resizeGrid={[GRID_SIZE, GRID_SIZE]}
     >
       <ActiveOutlineContainer isActive={isActive}>
-        <Icon className="w-full h-full text-gray-700" />
+        <Icon className="w-full h-full text-black" />
       </ActiveOutlineContainer>
     </Rnd>
   );
