@@ -67,12 +67,6 @@ export default function FileComponent({
   // https://stackoverflow.com/questions/58488416/open-base64-encoded-pdf-file-using-javascript-issue-with-file-size-larger-than
   const MAX_FILE_SIZE = 5 * 1024 * 1025; // max 5MB upload for now
 
-  const handleMouseDown = (e: MouseEvent | React.MouseEvent) => {
-    e.stopPropagation();
-    onMouseDown();
-    setIsOverlayActive(false); // Hide overlay when clicked
-  };
-
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const userId = auth.currentUser?.uid;
     if (e.target.files && e.target.files[0]) {
@@ -227,7 +221,7 @@ export default function FileComponent({
             {/* Overlay for enabling drag */}
             {(showOverlay || !isActive) && (
               <div
-                className="w-full h-full flex items-center justify-center absolute inset-0 bg-gray-300 bg-opacity-50 z-10"
+                className="w-full h-full flex items-center justify-center absolute inset-0 bg-gray-100 bg-opacity-15 z-10"
                 onMouseDown={() => setShowOverlay(true)}
               >
                 <div className="absolute w-16 h-16 flex items-center justify-center bg-black bg-opacity-50 rounded-full">
