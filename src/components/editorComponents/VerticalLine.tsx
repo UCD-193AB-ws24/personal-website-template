@@ -89,7 +89,7 @@ export default function VerticalLine({
         right: false,
       }}
       minHeight={50}
-      maxWidth={4}
+      maxWidth={2}
       bounds="parent"
       onMouseDown={(e: MouseEvent) => {
         handleMouseDown(e);

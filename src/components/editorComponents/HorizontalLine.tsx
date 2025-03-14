@@ -90,7 +90,7 @@ export default function HorizontalLine({
         bottom: false,
       }}
       minWidth={50}
-      maxHeight={4}
+      maxHeight={2}
       bounds="parent"
       onMouseDown={(e: MouseEvent) => {
         handleMouseDown(e);
