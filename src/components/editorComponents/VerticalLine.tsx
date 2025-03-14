@@ -28,8 +28,8 @@ interface VerticalLineProps {
 
 export default function VerticalLine({
   id = "",
-  initialPos = { x: 100, y: 0 },
-  initialSize = { width: 2, height: 300 },
+  initialPos = { x: 90, y: -120 },
+  initialSize = { width: 2, height: 350 },
   components = [],
   updateComponent = () => {},
   isActive = true,
@@ -89,7 +89,7 @@ export default function VerticalLine({
         right: false,
       }}
       minHeight={50}
-      maxWidth={4}
+      maxWidth={2}
       bounds="parent"
       onMouseDown={(e: MouseEvent) => {
         handleMouseDown(e);

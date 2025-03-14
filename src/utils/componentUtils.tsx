@@ -40,9 +40,9 @@ export const componentSizes: Record<string, { width: number; height: number }> =
 		academicEntry: { width: 620, height: 70 },
 		webPage: { width: 800, height: 600 },
 		workEntry: { width: 750, height: 150 },
-		horizontalLine: { width: 800, height: 4 },
-		verticalLine: { width: 4, height: 800 },
-	};
+		horizontalLine: { width: 350, height: 2 },
+		verticalLine: { width: 2, height: 350 },
+};
 
 export const renderOverlayContent = (activeType: string | null) => {
 	switch (activeType) {
