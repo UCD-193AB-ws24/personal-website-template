@@ -28,8 +28,8 @@ interface VerticalLineProps {
 
 export default function VerticalLine({
   id = "",
-  initialPos = { x: 90, y: -100 },
-  initialSize = { width: 2, height: 300 },
+  initialPos = { x: 90, y: -120 },
+  initialSize = { width: 2, height: 350 },
   components = [],
   updateComponent = () => {},
   isActive = true,
