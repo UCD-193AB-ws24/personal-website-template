@@ -15,7 +15,7 @@ import {
   AppWindowIcon,
   Rows2Icon,
   Columns2Icon,
-  Circle,
+  StarIcon,
 } from "lucide-react";
 
 import SidebarItem from "./SidebarItem";
@@ -89,7 +89,7 @@ const sidebarItems = [
     type: "icon",
     name: "Icon",
     description: "Choose from a variety of icons to add.",
-    icon: <Circle />,
+    icon: <StarIcon />,
   },
   {
     id: 11,

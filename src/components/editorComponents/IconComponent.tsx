@@ -35,7 +35,7 @@ interface IconComponentProps {
 
 export default function IconComponent({
   id = "",
-  initialPos = { x: 0, y: 0 },
+  initialPos = { x: 75, y: 0 },
   initialSize = { width: 50, height: 50 },
   components = [],
   updateComponent = () => {},
@@ -153,7 +153,7 @@ export default function IconComponent({
             position: "relative",
             top: `${-size.height + 20}px`,
             left: `${size.width + 10}px`,
-            zIndex: 20,
+            zIndex: 1000,
             backgroundColor: "white",
             border: "1px solid #ccc",
             borderRadius: "5px",
@@ -166,13 +166,17 @@ export default function IconComponent({
         >
           {[
             "Star",
-            "Heart",
             "Camera",
             "Check",
             "Home",
             "Search",
             "User",
             "X",
+            "Mail",
+            "Briefcase",
+            "Code",
+            "File",
+            "Globe"
           ].map((iconName) => {
             const IconItem = (LucideIcons as any)[iconName];
             return (
