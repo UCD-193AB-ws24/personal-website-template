@@ -152,7 +152,10 @@ export default function NavigationBar({
 				 * Hack: If the page has a navbar, render a div with the same background color
 				 * behind the navbar so that the navbar appears to take up the entire screen width
 				 */}
-				<div className="fixed h-12 bg-gray-800 w-full top-0 left-0 z-[-100]"></div>
+				<div
+					className="absolute w-[100vw] h-12 bg-gray-800 top-0 left-0 z-[-100]"
+					style={{ transform: 'translate(-8rem, 0)' }}
+				></div>
 				{pages.map((page, index) => {
 					const urlFriendlyPageName = encodeURIComponent(
 						page.pageName.replace(/ /g, '-')
@@ -183,7 +186,10 @@ export default function NavigationBar({
 				 * Hack: If the page has a navbar, render a div with the same background color
 				 * behind the navbar so that the navbar appears to take up the entire screen width
 				 */}
-				<div className="fixed h-12 bg-gray-800 w-full top-0 left-0 z-[-100]"></div>
+				<div
+					className="absolute w-[100vw] h-12 bg-gray-800 top-0 left-0 z-[-100]"
+					style={{ transform: 'translate(-8rem, 0)' }}
+				></div>
 				{pages.map((page, index) => (
 					<div key={index} className="flex items-center space-x-2">
 						<button
