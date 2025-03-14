@@ -72,7 +72,7 @@ export default async function PublishedPage({ params }: PublishedPageProps) {
 	};
 
 	return (
-		<div className="flex flex-col items-center bg-white min-h-screen h-auto">
+		<div className="flex flex-col items-center bg-white min-h-screen h-auto overflow-x-hidden">
 			<FullWindow>{components.map(renderComponent)}</FullWindow>
 		</div>
 	);

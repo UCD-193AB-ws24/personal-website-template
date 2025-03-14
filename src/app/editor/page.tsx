@@ -499,7 +499,7 @@ export default function Editor() {
 	return (
 		<>
 			{isPreview ? (
-				<div className="bg-white">
+				<div className="bg-white overflow-x-hidden">
 					<button
 						className={`text-white text-large font-semibold px-3 py-2 rounded-md mr-1 bg-red-500 transition-all duration-300 hover:bg-red-700 shadow-md hover:shadow-lg fixed top-[10px] right-[0px] z-[1000]`}
 						onClick={() => setIsPreview(!isPreview)}
