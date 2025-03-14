@@ -19,11 +19,7 @@ interface VerticalLineProps {
   initialPos?: Position;
   initialSize?: Size;
   components?: ComponentItem[];
-  updateComponent?: (
-    id: string,
-    newPos: Position,
-    newSize: Size
-  ) => void;
+  updateComponent?: (id: string, newPos: Position, newSize: Size) => void;
   isActive?: boolean;
   onMouseDown?: () => void;
   setIsDragging?: (dragging: boolean) => void;
@@ -32,7 +28,7 @@ interface VerticalLineProps {
 
 export default function VerticalLine({
   id = "",
-  initialPos = { x: 90, y: 0 },
+  initialPos = { x: 90, y: -100 },
   initialSize = { width: 2, height: 300 },
   components = [],
   updateComponent = () => {},
@@ -67,7 +63,13 @@ export default function VerticalLine({
       onDragStart={() => setIsDragging(true)}
       onDragStop={(e, d) => {
         setIsDragging(false);
-        handleDragStop(id, size, components, updateComponent, setPosition)(e, d);
+        handleDragStop(
+          id,
+          size,
+          components,
+          updateComponent,
+          setPosition,
+        )(e, d);
       }}
       onResizeStart={() => setIsDragging(true)}
       onResizeStop={(e, d, ref, delta, newPosition) => {
@@ -77,7 +79,7 @@ export default function VerticalLine({
           d,
           ref,
           delta,
-          newPosition
+          newPosition,
         );
       }}
       enableResizing={{
