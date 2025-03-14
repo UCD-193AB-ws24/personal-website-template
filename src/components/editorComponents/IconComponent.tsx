@@ -24,13 +24,13 @@ interface IconComponentProps {
     id: string,
     newPos: Position,
     newSize: Size,
-    selectedIcon: string,
+    content: string,
   ) => void;
   isActive?: boolean;
   onMouseDown?: () => void;
   setIsDragging?: (dragging: boolean) => void;
   isPreview?: boolean;
-  selectedIcon?: string;
+  content?: string;
 }
 
 export default function IconComponent({
@@ -43,15 +43,24 @@ export default function IconComponent({
   onMouseDown = () => {},
   setIsDragging = () => {},
   isPreview = false,
-  selectedIcon = "Star",
+  content = "Star",
 }: IconComponentProps) {
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
-  const [icon, setIcon] = useState(selectedIcon);
+  const [icon, setIcon] = useState(content);
   const [showDropdown, setShowDropdown] = useState(false);
   const [drag, setDrag] = useState(false);
 
   const Icon = (LucideIcons as any)[icon] || LucideIcons.Star;
+
+  const buttonWidth = 24;
+  const dropdownWidth = 200;
+  const parentPadding = 10;
+  const parentWidth =
+    document.getElementById("editor-drop-zone")?.clientWidth || 1000;
+
+  const isButtonOnLeft =
+    position.x + size.width + buttonWidth + parentPadding > parentWidth;
 
   const handleMouseDown = (e: React.MouseEvent | MouseEvent) => {
     e.stopPropagation();
@@ -61,6 +70,7 @@ export default function IconComponent({
   const handleIconChange = (newIcon: string) => {
     setIcon(newIcon);
     setShowDropdown(false);
+    updateComponent(id, position, size, newIcon);
   };
 
   if (isPreview) {
@@ -123,6 +133,7 @@ export default function IconComponent({
       dragGrid={[GRID_SIZE, GRID_SIZE]}
       resizeGrid={[GRID_SIZE, GRID_SIZE]}
       dragHandleClassName={`icon-${id}`}
+      style={{ pointerEvents: "auto" }}
     >
       <ActiveOutlineContainer isActive={isActive}>
         <Icon className={`w-full h-full text-black icon-${id}`} />
@@ -136,7 +147,7 @@ export default function IconComponent({
           style={{
             position: "relative",
             top: `${-size.height}px`,
-            left: `${size.width}px`,
+            left: isButtonOnLeft ? `-${buttonWidth}px` : `${size.width}px`,
             zIndex: 10,
             pointerEvents: "auto",
             transition: "opacity 0.2s ease-in-out, transform 0.1s",
@@ -148,48 +159,68 @@ export default function IconComponent({
       )}
 
       {!drag && isActive && showDropdown && (
-        <div
-          style={{
-            position: "relative",
-            top: `${-size.height + 20}px`,
-            left: `${size.width + 10}px`,
-            zIndex: 1000,
-            backgroundColor: "white",
-            border: "1px solid #ccc",
-            borderRadius: "5px",
-            padding: "5px",
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            width: "200px",
-            gap: "5px",
-          }}
-        >
-          {[
-            "Star",
-            "Camera",
-            "Check",
-            "Home",
-            "Search",
-            "User",
-            "X",
-            "Mail",
-            "Briefcase",
-            "Code",
-            "File",
-            "Globe"
-          ].map((iconName) => {
-            const IconItem = (LucideIcons as any)[iconName];
-            return (
-              <button
-                key={iconName}
-                onClick={() => handleIconChange(iconName)}
-                className="p-2 border rounded flex items-center justify-center hover:bg-gray-200"
-              >
-                <IconItem className="w-6 h-6 text-black" />
-              </button>
-            );
-          })}
-        </div>
+        <>
+          {/* Overlay to capture clicks and prevent interference */}
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100vw",
+              height: "100vh",
+              zIndex: 100,
+              backgroundColor: "transparent",
+              pointerEvents: "auto",
+            }}
+            onClick={() => setShowDropdown(false)}
+          />
+
+          <div
+            style={{
+              position: "relative",
+              top: `${-size.height + 20}px`,
+              left: isButtonOnLeft
+                ? `-${dropdownWidth + 10}px`
+                : `${size.width + 10}px`,
+              zIndex: 1000,
+              backgroundColor: "white",
+              border: "1px solid #ccc",
+              borderRadius: "5px",
+              padding: "5px",
+              display: "grid",
+              gridTemplateColumns: "repeat(4, 1fr)",
+              width: "200px",
+              gap: "5px",
+              pointerEvents: "auto",
+            }}
+          >
+            {[
+              "Star",
+              "Camera",
+              "Check",
+              "Home",
+              "Search",
+              "User",
+              "X",
+              "Mail",
+              "Briefcase",
+              "Code",
+              "File",
+              "Globe",
+            ].map((iconName) => {
+              const IconItem = (LucideIcons as any)[iconName];
+              return (
+                <button
+                  key={iconName}
+                  onClick={() => handleIconChange(iconName)}
+                  className="p-2 border rounded flex items-center justify-center hover:bg-gray-200"
+                >
+                  <IconItem className="w-6 h-6 text-black" />
+                </button>
+              );
+            })}
+          </div>
+        </>
       )}
     </Rnd>
   );
