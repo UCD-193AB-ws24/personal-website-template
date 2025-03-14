@@ -32,7 +32,7 @@ interface VerticalLineProps {
 
 export default function VerticalLine({
   id = "",
-  initialPos = { x: 100, y: 0 },
+  initialPos = { x: 90, y: 0 },
   initialSize = { width: 2, height: 300 },
   components = [],
   updateComponent = () => {},

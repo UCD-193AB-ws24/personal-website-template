@@ -32,7 +32,7 @@ interface HorizontalLineProps {
 
 export default function HorizontalLine({
   id = "",
-  initialPos = { x: 0, y: 100 },
+  initialPos = { x: 0, y: 40 },
   initialSize = { width: 300, height: 2 },
   components = [],
   updateComponent = () => {},
