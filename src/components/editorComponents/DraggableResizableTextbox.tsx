@@ -65,7 +65,7 @@ export default function DraggableResizableTextbox({
         width: size.width,
         height: size.height,
       }}
-      className="whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg"
+      className="whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg leading-none"
     >
       {content}
     </div>

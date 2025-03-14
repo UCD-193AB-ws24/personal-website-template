@@ -209,6 +209,7 @@ export default function SavedDrafts() {
   };
 
   const handleNameChange = async (newDraftName: string) => {
+    setIsLoading(true);
     if (selectedDraft) {
       // Selected draft is not in the draft mappings, i.e. new draft is being created
       if (
@@ -216,11 +217,13 @@ export default function SavedDrafts() {
         undefined
       ) {
         await createDraft(selectedDraft.id, newDraftName);
+        setIsLoading(false);
         router.push("/editor?draftNumber=" + selectedDraft.id);
       } else {
         handleRenameDraft(selectedDraft.id, selectedDraft.name, newDraftName);
       }
     }
+    setIsLoading(false);
   };
 
   const publishAsTemplate = async (id: number, name: string) => {
@@ -266,14 +269,14 @@ export default function SavedDrafts() {
               setIsModalHidden(false);
               handleNewDraft();
             }}
-            className="bg-[#f08700] hover:bg-[#d67900] transition duration-300 text-white font-bold py-2 px-4 rounded-full border-none text-[#111827]"
+            className="bg-[#f08700] hover:bg-[#d67900] transition duration-300 text-white font-bold py-2 px-4 rounded-md border-none text-[#111827]"
           >
             New Draft
           </button>
 
           <button
             onClick={() => router.push("/templates")}
-            className="bg-[#f08700] hover:bg-[#d67900] transition duration-300 text-white font-bold py-2 px-4 rounded-full border-none text-[#111827]"
+            className="bg-[#f08700] hover:bg-[#d67900] transition duration-300 text-white font-bold py-2 px-4 rounded-md border-none text-[#111827]"
           >
             Select Template
           </button>

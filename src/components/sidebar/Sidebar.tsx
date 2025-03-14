@@ -84,21 +84,21 @@ const sidebarItems = [
     icon: <Columns2Icon />,
   },
   {
-    id: 9,
+    id: 10,
     type: "navButton",
     name: "Navigation Button",
     description: "Add a button to link to other pages or sections.",
     icon: <CircleArrowRightIcon />,
   },
   {
-    id: 10,
+    id: 11,
     type: "aboutMeCard",
     name: "About Me Card",
     description: "Create a quick bio with your photo and contact info.",
     icon: <ContactIcon />,
   },
   {
-    id: 11,
+    id: 12,
     type: "academicEntry",
     name: "Academic Entry",
     description:
@@ -106,14 +106,14 @@ const sidebarItems = [
     icon: <SchoolIcon />,
   },
   {
-    id: 12,
+    id: 13,
     type: "workEntry",
     name: "Work Entry",
     description: "Describe a job role, company, and time period.",
     icon: <BriefcaseIcon />,
   },
   {
-    id: 13,
+    id: 14,
     type: "endoresment",
     name: "Endoresment",
     description: "Add quotes or recommendations from colleagues.",
