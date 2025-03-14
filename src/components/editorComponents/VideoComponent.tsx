@@ -146,7 +146,9 @@ export default function VideoComponent({
     <Rnd
       size={{ width: size.width, height: size.height }}
       position={{ x: position.x, y: position.y }}
+      onDragStart={() => setIsDragging(true)}
       onDrag={(e, d) => {
+        setIsDragging(true);
         setShowOverlay(true);
         if (startPos.current) {
           let clientX: number;
@@ -196,7 +198,6 @@ export default function VideoComponent({
       bounds="parent"
       onMouseDown={(e) => {
         startPos.current = { x: e.clientX, y: e.clientY };
-        console.log("mouse down");
         setShowOverlay(false);
         onMouseDown();
       }}
