@@ -53,15 +53,6 @@ export default function IconComponent({
 
   const Icon = (LucideIcons as any)[icon] || LucideIcons.Star;
 
-  const buttonWidth = 24;
-  const dropdownWidth = 200;
-  const parentPadding = 10;
-  const parentWidth =
-    document.getElementById("editor-drop-zone")?.clientWidth || 1000;
-
-  const isButtonOnLeft =
-    position.x + size.width + buttonWidth + parentPadding > parentWidth;
-
   const handleMouseDown = (e: React.MouseEvent | MouseEvent) => {
     e.stopPropagation();
     onMouseDown();
@@ -88,6 +79,15 @@ export default function IconComponent({
       </div>
     );
   }
+
+  const buttonWidth = 24;
+  const dropdownWidth = 200;
+  const parentPadding = 10;
+  const parentWidth =
+    document.getElementById("editor-drop-zone")?.clientWidth || 1000;
+
+  const isButtonOnLeft =
+    position.x + size.width + buttonWidth + parentPadding > parentWidth;
 
   return (
     <Rnd

@@ -40,7 +40,7 @@ export const componentSizes: Record<string, { width: number; height: number }> =
 		workEntry: { width: 750, height: 150 },
 		horizontalLine: { width: 350, height: 2 },
 		verticalLine: { width: 2, height: 350 },
-    	iconComponent: { width: 100, height: 100}
+    	icon: { width: 100, height: 100}
   };
 
 export const renderOverlayContent = (activeType: string | null) => {
