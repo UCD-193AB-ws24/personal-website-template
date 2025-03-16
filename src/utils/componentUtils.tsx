@@ -1,13 +1,15 @@
-import DraggableResizableTextbox from "@components/editorComponents/DraggableResizableTextbox";
-import SectionTitleTextbox from "@components/editorComponents/SectionTitle";
-import NavigationBar from "@components/editorComponents/NavigationBar";
-import ImageComponent from "@components/editorComponents/ImageComponent";
-import FileComponent from "@components/editorComponents/FileComponent";
-import VideoComponent from "@components/editorComponents/VideoComponent";
-import WebPageComponent from "@components/editorComponents/WebPageComponent";
-import HorizontalLine from "@components/editorComponents/HorizontalLine";
-import VerticalLine from "@components/editorComponents/VerticalLine";
-import IconComponent from "@components/editorComponents/IconComponent";
+import DraggableResizableTextbox from '@components/editorComponents/DraggableResizableTextbox';
+import SectionTitleTextbox from '@components/editorComponents/SectionTitle';
+import NavigationBar from '@components/editorComponents/NavigationBar';
+import ImageComponent from '@components/editorComponents/ImageComponent';
+import FileComponent from '@components/editorComponents/FileComponent';
+import VideoComponent from '@components/editorComponents/VideoComponent';
+import AcademicEntry from '@components/editorComponents/AcademicEntry';
+import WebPageComponent from '@components/editorComponents/WebPageComponent';
+import WorkEntry from '@components/editorComponents/WorkEntry';
+import HorizontalLine from '@components/editorComponents/HorizontalLine';
+import VerticalLine from '@components/editorComponents/VerticalLine';
+import IconComponent from '@components/editorComponents/IconComponent';
 
 import { ComponentItem } from '@customTypes/componentTypes';
 
@@ -21,7 +23,9 @@ export const componentMap: Record<
   image: ImageComponent,
   file: FileComponent,
   video: VideoComponent,
+  academicEntry: AcademicEntry,
   webPage: WebPageComponent,
+  workEntry: WorkEntry,
   horizontalLine: HorizontalLine,
   verticalLine: VerticalLine,
   icon: IconComponent,
@@ -57,8 +61,12 @@ export const renderOverlayContent = (activeType: string | null) => {
       return <FileComponent />;
     case "video":
       return <VideoComponent />;
+    case 'academicEntry':
+      return <AcademicEntry />;
     case "webPage":
       return <WebPageComponent />;
+    case 'workEntry':
+      return <WorkEntry />;
     case "horizontalLine":
       return <HorizontalLine />;
     case "verticalLine":

@@ -38,10 +38,10 @@ export default function IconComponent({
   initialPos = { x: 75, y: 0 },
   initialSize = { width: 50, height: 50 },
   components = [],
-  updateComponent = () => {},
+  updateComponent = () => { },
   isActive = true,
-  onMouseDown = () => {},
-  setIsDragging = () => {},
+  onMouseDown = () => { },
+  setIsDragging = () => { },
   isPreview = false,
   content = "Star",
 }: IconComponentProps) {
@@ -80,74 +80,74 @@ export default function IconComponent({
     );
   }
 
-  const buttonWidth = 24;
   const dropdownWidth = 200;
   const parentPadding = 10;
   const parentWidth =
-    document.getElementById("editor-drop-zone")?.clientWidth || 1000;
+    document.getElementById("editor-drop-zone")?.clientWidth || 500;
 
   const isButtonOnLeft =
-    position.x + size.width + buttonWidth + parentPadding > parentWidth;
+    position.x + size.width + dropdownWidth + parentPadding > parentWidth;
 
   return (
-    <Rnd
-      size={{ width: size.width, height: size.height }}
-      position={{ x: position.x, y: position.y }}
-      onDragStart={() => {
-        setIsDragging(true);
-        setDrag(true);
-      }}
-      onDragStop={(e, d) => {
-        setIsDragging(false);
-        setDrag(false);
-        setShowDropdown(false);
-        handleDragStop(
-          id,
-          size,
-          components,
-          updateComponent,
-          setPosition,
-        )(e, d);
-      }}
-      onResizeStart={() => {
-        setIsDragging(true);
-        setDrag(true);
-      }}
-      onResizeStop={(e, d, ref, delta, newPosition) => {
-        setIsDragging(false);
-        setDrag(false);
-        setShowDropdown(false);
-        handleResizeStop(id, components, updateComponent, setSize, setPosition)(
-          e,
-          d,
-          ref,
-          delta,
-          newPosition,
-        );
-      }}
-      lockAspectRatio={true}
-      minWidth={20}
-      minHeight={20}
-      bounds="parent"
-      onMouseDown={handleMouseDown}
-      dragGrid={[GRID_SIZE, GRID_SIZE]}
-      resizeGrid={[GRID_SIZE, GRID_SIZE]}
-      dragHandleClassName={`icon-${id}`}
-      style={{ pointerEvents: "auto" }}
-    >
-      <ActiveOutlineContainer isActive={isActive}>
-        <Icon className={`w-full h-full text-black icon-${id}`} />
-      </ActiveOutlineContainer>
+    <>
+      <Rnd
+        size={{ width: size.width, height: size.height }}
+        position={{ x: position.x, y: position.y }}
+        onDragStart={() => {
+          setIsDragging(true);
+          setDrag(true);
+        }}
+        onDragStop={(e, d) => {
+          setIsDragging(false);
+          setDrag(false);
+          setShowDropdown(false);
+          handleDragStop(
+            id,
+            size,
+            components,
+            updateComponent,
+            setPosition,
+          )(e, d);
+        }}
+        onResizeStart={() => {
+          setIsDragging(true);
+          setDrag(true);
+        }}
+        onResizeStop={(e, d, ref, delta, newPosition) => {
+          setIsDragging(false);
+          setDrag(false);
+          setShowDropdown(false);
+          handleResizeStop(id, components, updateComponent, setSize, setPosition)(
+            e,
+            d,
+            ref,
+            delta,
+            newPosition,
+          );
+        }}
+        lockAspectRatio={true}
+        minWidth={20}
+        minHeight={20}
+        bounds="parent"
+        onMouseDown={handleMouseDown}
+        dragGrid={[GRID_SIZE, GRID_SIZE]}
+        resizeGrid={[GRID_SIZE, GRID_SIZE]}
+        style={{ pointerEvents: "auto" }}
+      >
+        <ActiveOutlineContainer isActive={isActive}>
+          <Icon className={`w-full h-full text-black`} />
+        </ActiveOutlineContainer>
+      </Rnd>
       {!drag && isActive && (
-        <button
+        <div
           onClick={(e) => {
             e.stopPropagation();
             setShowDropdown((prev) => !prev);
           }}
           style={{
-            position: "relative",
-            top: `${-size.height}px`,
-            left: isButtonOnLeft ? `-${buttonWidth}px` : `${size.width}px`,
+            position: "absolute",
+            top: `${position.y + 10}px`,
+            left: isButtonOnLeft ? `${position.x - 25}px` : `${position.x + size.width}px`,
             zIndex: 10,
             pointerEvents: "auto",
             transition: "opacity 0.2s ease-in-out, transform 0.1s",
@@ -155,33 +155,16 @@ export default function IconComponent({
           className="w-6 h-6 bg-blue-500 text-white rounded shadow-md hover:bg-blue-600 hover:scale-110 flex items-center justify-center z-50"
         >
           <LucideIcons.Pencil className="w-4 h-4 text-white" />
-        </button>
+        </div>
       )}
 
       {!drag && isActive && showDropdown && (
         <>
-          {/* Overlay to capture clicks and prevent interference */}
           <div
             style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100vw",
-              height: "100vh",
-              zIndex: 100,
-              backgroundColor: "transparent",
-              pointerEvents: "auto",
-            }}
-            onClick={() => setShowDropdown(false)}
-          />
-
-          <div
-            style={{
-              position: "relative",
-              top: `${-size.height + 20}px`,
-              left: isButtonOnLeft
-                ? `-${dropdownWidth + 10}px`
-                : `${size.width + 10}px`,
+              position: "absolute",
+              top: `${position.y + 40}px`,
+              left: isButtonOnLeft ? `${position.x - dropdownWidth - parentPadding}px` : `${position.x + size.width + parentPadding}px`,
               zIndex: 1000,
               backgroundColor: "white",
               border: "1px solid #ccc",
@@ -189,7 +172,7 @@ export default function IconComponent({
               padding: "5px",
               display: "grid",
               gridTemplateColumns: "repeat(4, 1fr)",
-              width: "200px",
+              width: `${dropdownWidth}px`,
               gap: "5px",
               pointerEvents: "auto",
             }}
@@ -222,6 +205,6 @@ export default function IconComponent({
           </div>
         </>
       )}
-    </Rnd>
+    </>
   );
 }
