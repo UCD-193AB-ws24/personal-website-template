@@ -45,7 +45,7 @@ interface AboutMeCardProps {
 export default function AboutMeCard({
   id = "",
   initialPos = { x: -1, y: -1 },
-  initialSize = { width: 300, height: 150 },
+  initialSize = { width: 250, height: 250 },
   components = [],
   content = "",
   updateComponent = () => {},
@@ -62,7 +62,7 @@ export default function AboutMeCard({
     contact: "email@email.com | (123)-456-7890",
   });
 
-  const [imageSrc, setImageSrc] = useState("");
+  // const [imageSrc, setImageSrc] = useState("");
   const [loading, setLoading] = useState(!!content);
   const [previewSrc, setPreviewSrc] = useState<string | null>(null);
 
@@ -110,9 +110,13 @@ export default function AboutMeCard({
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       const filePath = `users/${userId}/drafts/${draftNumber}/${id}-${file.name}`;
-      const storageRef = ref(storage, filePath);
-      const uploadTask = uploadBytesResumable(storageRef, file);
 
+      console.log("filePath: ", filePath)
+
+      const storageRef = ref(storage, filePath);
+
+      const uploadTask = uploadBytesResumable(storageRef, file);
+      console.log("fileuploaded: ", filePath)
       const localPreview = URL.createObjectURL(file);
       setPreviewSrc(localPreview);
       setLoading(false);
@@ -138,7 +142,6 @@ export default function AboutMeCard({
         async () => {
           // Get the download URL once uploaded
           const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          setImageSrc(downloadURL);
           setPreviewSrc(null);
 
           if (!sizeSet) {
@@ -150,6 +153,7 @@ export default function AboutMeCard({
             ...prevContent,
             image: downloadURL,
           }));
+          
           updateComponent(
             id,
             position,
@@ -218,8 +222,9 @@ export default function AboutMeCard({
     <Rnd
       size={{ width: size.width, height: size.height }}
       position={{ x: position.x, y: position.y }}
-      onDragStart={() => {
+      onDragStart={(e) => {
         setIsDragging(true);
+        e.preventDefault();
       }}
       onDragStop={(e, d) => {
         setIsDragging(false);
@@ -242,7 +247,7 @@ export default function AboutMeCard({
           newPosition
         );
       }}
-      minHeight={100}
+      minHeight={300}
       minWidth={600}
       bounds="parent"
       onMouseDown={handleMouseDown}
@@ -259,33 +264,35 @@ export default function AboutMeCard({
             <SkeletonLoader width={size.width} height={size.height} />
           )}
 
-          {previewSrc ? (
-            <img
-              src={previewSrc}
-              alt="Uploading Preview"
-              className="min-h-[200px] max-h-[300px] min-w-[300px] max-w-[300px]"
-            />
-          ) : curContent.image != "No Image" ? (
-            <img
-              src={curContent.image}
-              alt="Uploaded"
-              className="min-h-[200px] max-h-[300px] min-w-[300px] max-w-[300px]"
-              onLoad={() => setLoading(false)}
-              onError={() => setLoading(false)}
-              style={{ display: loading ? "none" : "block" }}
-            />
-          ) 
-          : (
-            <label className="min-h-[200px] max-h-[300px] min-w-[300px] max-w-[300px] flex items-center justify-center cursor-pointer bg-gray-200">
-              Click to Upload an Image
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
+          <div className="flex flex-col align-center">
+            {previewSrc ? (
+              <img
+                src={previewSrc}
+                alt="Uploading Preview"
+                className="min-h-[200px] max-h-[300px] min-w-[300px] max-w-[300px]"
               />
-            </label>
-          )}
+            ) : curContent.image != "No Image" ? (
+              <img
+                src={curContent.image}
+                alt="Uploaded"
+                className="min-h-[200px] max-h-[300px] min-w-[300px] max-w-[300px]"
+                onLoad={() => setLoading(false)}
+                onError={() => setLoading(false)}
+                style={{ display: loading ? "none" : "block" }}
+              />
+            ) 
+            : (
+              <label className="min-h-[200px] max-h-[300px] min-w-[300px] max-w-[300px] flex items-center justify-center cursor-pointer bg-gray-200">
+                Click to Upload an Image
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+              </label>
+            )}
+          </div>
 
           <div className="flex flex-col justify-between">
             <p
