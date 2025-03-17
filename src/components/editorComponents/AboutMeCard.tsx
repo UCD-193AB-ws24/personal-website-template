@@ -175,38 +175,41 @@ export default function AboutMeCard({
       className="flex w-full h-full justify-between whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg"
     >
       {loading && <SkeletonLoader width={size.width} height={size.height} />}
-      {previewSrc ? (
-        <img
-          src={previewSrc}
-          alt="Uploading Preview"
-          className="w-full h-full  "
-        />
-      ) : curContent.image != "No Image" ? (
-        <img
-          src={curContent.image}
-          alt="Uploaded"
-          className="w-full h-full"
-          onLoad={() => setLoading(false)}
-          onError={() => setLoading(false)}
-          style={{ display: loading ? "none" : "block" }}
-        />
-      ) : (
-        <div className="w-full h-full flex items-center justify-center bg-gray-200">
-          No Image
-        </div>
-      )}
 
-      <div className="flex flex-col justify-between">
+      <div className="flex flex-col align-center">
+        {previewSrc ? (
+          <img
+            src={previewSrc}
+            alt="Uploading Preview"
+            className="w-full h-full  "
+          />
+        ) : curContent.image != "No Image" ? (
+          <img
+            src={curContent.image}
+            alt="Uploaded"
+            className="w-full h-full"
+            onLoad={() => setLoading(false)}
+            onError={() => setLoading(false)}
+            style={{ display: loading ? "none" : "block" }}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-200">
+            No Image
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-col justify-around">
         <p
           draggable="false"
-          className="overflow-hidden min-w-[300px] max-w-[300px] max-h-[60px] text-black cursor-text p-0 m-0 leading-none outline outline-gray-300 rounded-sm"
+          className="overflow-hidden min-w-[300px] max-w-[300px] max-h-[60px] text-black cursor-text p-0 m-0 leading-none rounded-sm"
         >
           {curContent.bio}
         </p>
 
         <p
           draggable="false"
-          className="overflow-hidden min-w-[300px] max-w-[300px] max-h-[60px] text-black cursor-text p-0 m-0 leading-none outline outline-gray-300 rounded-sm"
+          className="overflow-hidden min-w-[300px] max-w-[300px] max-h-[60px] text-black cursor-text p-0 m-0 leading-none rounded-sm"
         >
           {curContent.contact}
         </p>
