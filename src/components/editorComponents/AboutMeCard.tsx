@@ -67,12 +67,10 @@ export default function AboutMeCard({
 
   const draftNumber = useSearchParams().get("draftNumber");
 
-
   useEffect(() => {
     try {
       const jsonContent = JSON.parse(content);
       setCurContent(jsonContent);
-
     } catch (e) {
       setCurContent({
         image: "No Image",
@@ -149,7 +147,7 @@ export default function AboutMeCard({
             ...prevContent,
             image: downloadURL,
           }));
-          
+
           updateComponent(
             id,
             position,
@@ -181,13 +179,13 @@ export default function AboutMeCard({
         <img
           src={previewSrc}
           alt="Uploading Preview"
-          className="w-full h-full object-cover"
+          className="w-full h-full  "
         />
       ) : curContent.image != "No Image" ? (
         <img
           src={curContent.image}
           alt="Uploaded"
-          className="w-full h-full object-cover"
+          className="w-full h-full"
           onLoad={() => setLoading(false)}
           onError={() => setLoading(false)}
           style={{ display: loading ? "none" : "block" }}
@@ -201,14 +199,14 @@ export default function AboutMeCard({
       <div className="flex flex-col justify-between">
         <p
           draggable="false"
-          className="overflow-hidden min-w-[300px] max-w-[300px] max-h-[30px] text-black text-2xl font-bold cursor-text p-0 m-0 leading-none"
+          className="overflow-hidden min-w-[300px] max-w-[300px] max-h-[60px] text-black cursor-text p-0 m-0 leading-none outline outline-gray-300 rounded-sm"
         >
           {curContent.bio}
         </p>
 
         <p
           draggable="false"
-          className="overflow-hidden min-h-[24px] max-h-[24px] min-w-[300px] max-w-[300px]"
+          className="overflow-hidden min-w-[300px] max-w-[300px] max-h-[60px] text-black cursor-text p-0 m-0 leading-none outline outline-gray-300 rounded-sm"
         >
           {curContent.contact}
         </p>
@@ -243,8 +241,8 @@ export default function AboutMeCard({
           newPosition
         );
       }}
-      minHeight={300}
-      minWidth={600}
+      minHeight={215}
+      minWidth={630}
       bounds="parent"
       onMouseDown={handleMouseDown}
       style={{ pointerEvents: "auto" }}
@@ -265,20 +263,19 @@ export default function AboutMeCard({
               <img
                 src={previewSrc}
                 alt="Uploading Preview"
-                className="min-h-[200px] max-h-[300px] min-w-[300px] max-w-[300px]"
+                className="w-full h-full  "
               />
             ) : curContent.image != "No Image" ? (
               <img
                 src={curContent.image}
                 alt="Uploaded"
-                className="min-h-[200px] max-h-[300px] min-w-[300px] max-w-[300px]"
+                className="w-full h-full"
                 onLoad={() => setLoading(false)}
                 onError={() => setLoading(false)}
                 style={{ display: loading ? "none" : "block" }}
               />
-            ) 
-            : (
-              <label className="min-h-[200px] max-h-[300px] min-w-[300px] max-w-[300px] flex items-center justify-center cursor-pointer bg-gray-200">
+            ) : (
+              <label className="w-full h-full flex items-center justify-center cursor-pointer bg-gray-200">
                 Click to Upload an Image
                 <input
                   type="file"
@@ -290,14 +287,17 @@ export default function AboutMeCard({
             )}
           </div>
 
-          <div className="flex flex-col justify-between">
+          <div className="flex flex-col justify-around">
             <p
               contentEditable
               suppressContentEditableWarning
               draggable="false"
-              className="overflow-hidden min-h-[24px] max-h-[24px] min-w-[300px] max-w-[300px] outline outline-gray-300 rounded-sm"
+              className="overflow-hidden min-w-[300px] max-w-[300px] max-h-[120px] text-black cursor-text p-0 m-0 leading-none outline outline-gray-300 rounded-sm"
               style={{
                 outline: `${!isActive ? "none" : ""}`,
+              }}
+              onMouseDown={(e) => {
+                e.stopPropagation();
               }}
               onBlur={(e) => {
                 setCurContent((prevContent: AboutMeCardContent) => ({
@@ -322,9 +322,12 @@ export default function AboutMeCard({
               contentEditable
               suppressContentEditableWarning
               draggable="false"
-              className="overflow-hidden min-w-[300px] max-w-[300px] resize-none bg-transparent text-lg leading-none outline outline-gray-300 rounded-sm"
+              className="overflow-hidden min-w-[300px] max-w-[300px] max-h-[60px] text-black cursor-text p-0 m-0 leading-none outline outline-gray-300 rounded-sm"
               style={{
                 outline: `${!isActive ? "none" : ""}`,
+              }}
+              onMouseDown={(e) => {
+                e.stopPropagation();
               }}
               onBlur={(e) => {
                 setCurContent((prevContent: AboutMeCardContent) => ({
