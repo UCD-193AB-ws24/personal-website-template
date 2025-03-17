@@ -62,7 +62,6 @@ export default function AboutMeCard({
     contact: "email@email.com | (123)-456-7890",
   });
 
-  // const [imageSrc, setImageSrc] = useState("");
   const [loading, setLoading] = useState(!!content);
   const [previewSrc, setPreviewSrc] = useState<string | null>(null);
 
@@ -111,12 +110,9 @@ export default function AboutMeCard({
       const file = e.target.files[0];
       const filePath = `users/${userId}/drafts/${draftNumber}/${id}-${file.name}`;
 
-      console.log("filePath: ", filePath)
-
       const storageRef = ref(storage, filePath);
 
       const uploadTask = uploadBytesResumable(storageRef, file);
-      console.log("fileuploaded: ", filePath)
       const localPreview = URL.createObjectURL(file);
       setPreviewSrc(localPreview);
       setLoading(false);
