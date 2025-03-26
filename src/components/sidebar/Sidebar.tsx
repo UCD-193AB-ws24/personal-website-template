@@ -132,7 +132,7 @@ const sidebarItems = [
 export default function Sidebar() {
   return (
     <div
-      className={`flex w-64 bg-gray-100 max-h-screen sticky left-0 top-0 transition-width duration-300 z-[1000]`}
+      className={`flex w-64 bg-gray-100 max-h-screen fixed left-0 top-0 transition-width duration-300 z-[1000]`}
     >
       <div className="overflow-y-auto w-64 bg-gray-100 px-4 pt-3 pb-4 border-r h-screen">
         <Link href="/" className="flex items-center gap-x-3 mb-4">
