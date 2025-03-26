@@ -570,7 +570,7 @@ export default function Editor() {
             </Suspense>
 
             <div className="flex flex-col flex-grow">
-              <div className="sticky top-0 left-0 z-50 bg-gray-100 flex justify-between items-center px-6 py-3 h-[64px]">
+              <div className="fixed top-0 left-[256px] w-[calc(100vw-256px)] z-50 bg-gray-100 flex justify-between items-center px-6 py-3 h-[64px]">
                 <div className="flex items-center gap-10">
                   <Link
                     href="/saveddrafts"
@@ -613,6 +613,10 @@ export default function Editor() {
                   backgroundSize: isGridVisible ? "20px 20px" : "auto",
                   minHeight: `${editorHeight}px`,
                   height: "auto",
+                  minWidth: `${editorWidth}px`,
+                  width: "auto",
+                  marginTop: "64px",
+                  marginLeft: "256px"
                 }}
                 // https://ibelick.com/blog/create-grid-and-dot-backgrounds-with-css-tailwind-css
                 className={`relative transition-all ${
