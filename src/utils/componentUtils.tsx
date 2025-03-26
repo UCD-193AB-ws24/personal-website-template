@@ -1,22 +1,22 @@
-import DraggableResizableTextbox from '@components/editorComponents/DraggableResizableTextbox';
-import SectionTitleTextbox from '@components/editorComponents/SectionTitle';
-import NavigationBar from '@components/editorComponents/NavigationBar';
-import ImageComponent from '@components/editorComponents/ImageComponent';
-import FileComponent from '@components/editorComponents/FileComponent';
-import VideoComponent from '@components/editorComponents/VideoComponent';
-import AcademicEntry from '@components/editorComponents/AcademicEntry';
-import WebPageComponent from '@components/editorComponents/WebPageComponent';
-import WorkEntry from '@components/editorComponents/WorkEntry';
-import HorizontalLine from '@components/editorComponents/HorizontalLine';
-import VerticalLine from '@components/editorComponents/VerticalLine';
-import IconComponent from '@components/editorComponents/IconComponent';
+import DraggableResizableTextbox from "@components/editorComponents/DraggableResizableTextbox";
+import SectionTitleTextbox from "@components/editorComponents/SectionTitle";
+import NavigationBar from "@components/editorComponents/NavigationBar";
+import ImageComponent from "@components/editorComponents/ImageComponent";
+import FileComponent from "@components/editorComponents/FileComponent";
+import VideoComponent from "@components/editorComponents/VideoComponent";
+import AcademicEntry from "@components/editorComponents/AcademicEntry";
+import WebPageComponent from "@components/editorComponents/WebPageComponent";
+import WorkEntry from "@components/editorComponents/WorkEntry";
+import HorizontalLine from "@components/editorComponents/HorizontalLine";
+import VerticalLine from "@components/editorComponents/VerticalLine";
+import IconComponent from "@components/editorComponents/IconComponent";
 import AboutMeCard from "@components/editorComponents/AboutMeCard";
 
-import { ComponentItem } from '@customTypes/componentTypes';
+import { ComponentItem } from "@customTypes/componentTypes";
 
 export const componentMap: Record<
-	string,
-	React.ComponentType<Partial<ComponentItem>>
+  string,
+  React.ComponentType<Partial<ComponentItem>>
 > = {
   textBlock: DraggableResizableTextbox,
   sectionTitle: SectionTitleTextbox,
@@ -64,11 +64,11 @@ export const renderOverlayContent = (activeType: string | null) => {
       return <FileComponent />;
     case "video":
       return <VideoComponent />;
-    case 'academicEntry':
+    case "academicEntry":
       return <AcademicEntry />;
     case "webPage":
       return <WebPageComponent />;
-    case 'workEntry':
+    case "workEntry":
       return <WorkEntry />;
     case "horizontalLine":
       return <HorizontalLine />;
