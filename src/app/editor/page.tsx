@@ -18,6 +18,7 @@ import Sidebar from "@components/sidebar/Sidebar";
 import NavigationBar from "@components/editorComponents/NavigationBar";
 import LoadingSpinner from "@components/LoadingSpinner";
 import { toastPublish } from "@components/toasts/PublishToast";
+import FullWindow from "@components/FullWindow";
 
 import type {
   ComponentItem,
@@ -132,6 +133,7 @@ export default function Editor() {
   );
   const [isDragging, setIsDragging] = useState(false);
   const [editorHeight, setEditorHeight] = useState(0);
+  const [editorWidth, setEditorWidth] = useState(0);
   const editorRef = useRef<HTMLDivElement>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -147,14 +149,23 @@ export default function Editor() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const defaultHeight = window.innerHeight - 64;
+      const defaultHeight = window.innerHeight - 64; // top bar is 64px
+      const defaultWidth = window.innerWidth - 256; // sidebar is 256px
 
       const lowestY = Math.max(
         ...components.map((comp) => comp.position.y + comp.size.height),
-        window.innerHeight - 64, // top bar is 64px
+        defaultHeight,
+      );
+
+      const fartestX = Math.max(
+        ...components
+          .filter((comp) => comp.type !== "navBar")
+          .map((comp) => comp.position.x + comp.size.width),
+        defaultWidth,
       );
 
       setEditorHeight(lowestY > defaultHeight ? lowestY : defaultHeight);
+      setEditorWidth(fartestX > defaultWidth ? fartestX : defaultWidth);
     }
   }, [components]);
 
@@ -505,20 +516,16 @@ export default function Editor() {
   return (
     <>
       {isPreview ? (
-        <div className="bg-white overflow-x-hidden">
+        <div className="bg-white min-h-screen min-w-[100vw] h-auto w-max">
           <button
             className={`text-white text-large font-semibold px-3 py-2 rounded-md mr-1 bg-red-500 transition-all duration-300 hover:bg-red-700 shadow-md hover:shadow-lg fixed top-[10px] right-[0px] z-[1000]`}
             onClick={() => setIsPreview(!isPreview)}
           >
             Exit Preview
           </button>
-          <div
-            /* Sidebar is w-64 = 16rem*/
-            className="relative min-h-screen w-[calc(100%-16rem)] mx-auto"
-            style={{ minHeight: `${editorHeight + 64}px` }} // top bar is 64px
-          >
+          <FullWindow width={editorWidth}>
             {components.map(renderComponent)}
-          </div>
+          </FullWindow>
         </div>
       ) : (
         <DndContext
