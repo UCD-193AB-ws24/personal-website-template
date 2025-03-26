@@ -66,16 +66,16 @@ export default function NavigationBar({
   const sidePadding = 128; // 8rem
 
   useEffect(() => {
-      const maxRight = Math.max(
-        ...components
-          .filter((c) => c.type !== "navBar")
-          .map((c) => c.position.x + c.size.width),
-      );
+    const maxRight = Math.max(
+      ...components
+        .filter((c) => c.type !== "navBar")
+        .map((c) => c.position.x + c.size.width),
+    );
 
-      const totalWidth = maxRight + sidePadding * 2;
-      const winWidth = window.innerWidth;
+    const totalWidth = maxRight + sidePadding * 2;
+    const winWidth = window.innerWidth;
 
-      setBackgroundWidth(totalWidth < winWidth ? winWidth : totalWidth);
+    setBackgroundWidth(totalWidth < winWidth ? winWidth : totalWidth);
   }, []);
 
   const handleMouseDown = (e: React.MouseEvent) => {

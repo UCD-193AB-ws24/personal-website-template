@@ -27,7 +27,7 @@ export default function FullWindow({
       style={{
         minHeight: height,
         width: useFullWindowWidth ? windowWidth : `${totalWidth}px`,
-        minWidth: "100vw"
+        minWidth: "100vw",
       }}
     >
       <div
