@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef, Suspense } from "react";
-import Link from "next/link";
 import {
   DndContext,
   DragOverlay,
@@ -10,10 +9,11 @@ import {
   DragMoveEvent,
 } from "@dnd-kit/core";
 import { restrictToWindowEdges } from "@dnd-kit/modifiers";
-import { ArrowUpIcon, Router, XIcon, GridIcon } from "lucide-react";
-import { Flip, toast, ToastContainer } from "react-toastify";
+import { ArrowUpIcon, XIcon } from "lucide-react";
+import { ToastContainer } from "react-toastify";
 
 import EditorDropZone from "@components/editorComponents/EditorDropZone";
+import EditorTopBar from "@components/editorComponents/EditorTopBar";
 import Sidebar from "@components/sidebar/Sidebar";
 import NavigationBar from "@components/editorComponents/NavigationBar";
 import LoadingSpinner from "@components/LoadingSpinner";
@@ -40,12 +40,10 @@ import {
   deletePage,
 } from "@utils/pageManagerUtils";
 import { GRID_SIZE } from "@utils/constants";
-import { APIResponse } from "@customTypes/apiResponse";
 import { useSearchParams } from "next/navigation";
 import { toastSaveSuccess } from "@components/toasts/SaveToast";
 import { saveDraft } from "@lib/requests/saveDrafts";
 import { fetchDraftName } from "@lib/requests/fetchDraftName";
-import SavedDrafts from "../saveddrafts/page";
 import { auth } from "@lib/firebase/firebaseApp";
 import { deleteUnusedDraftFiles } from "@lib/requests/deleteUnusedFiles";
 
@@ -135,6 +133,7 @@ export default function Editor() {
   const [editorHeight, setEditorHeight] = useState(0);
   const [editorWidth, setEditorWidth] = useState(0);
   const editorRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hasLoadedDraftOnce, setHasLoadedDraftOnce] = useState(false);
@@ -148,34 +147,37 @@ export default function Editor() {
   const [draftName, setDraftName] = useState("");
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const defaultHeight = window.innerHeight - 64; // top bar is 64px
-      const defaultWidth = window.innerWidth - 256; // sidebar is 256px
+    const container = scrollContainerRef.current;
+    if (!container) return;
 
-      const lowestY = Math.max(
-        ...components.map((comp) => comp.position.y + comp.size.height),
-        defaultHeight,
-      );
+    const defaultHeight = container.clientHeight;
+    const defaultWidth = container.clientWidth;
 
-      const fartestX = Math.max(
-        ...components
-          .filter((comp) => comp.type !== "navBar")
-          .map((comp) => comp.position.x + comp.size.width),
-        defaultWidth,
-      );
+    const lowestY = Math.max(
+      ...components.map((comp) => comp.position.y + comp.size.height),
+      defaultHeight,
+    );
 
-      setEditorHeight(lowestY > defaultHeight ? lowestY : defaultHeight);
-      setEditorWidth(fartestX > defaultWidth ? fartestX : defaultWidth);
-    }
+    const farthestX = Math.max(
+      ...components
+        .filter((comp) => comp.type !== "navBar")
+        .map((comp) => comp.position.x + comp.size.width),
+      defaultWidth,
+    );
+
+    setEditorHeight(Math.max(lowestY, defaultHeight));
+    setEditorWidth(Math.max(farthestX, defaultWidth));
   }, [components]);
 
   useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
     const handleScroll = () => {
-      if (window.scrollY > 300) setShowScrollTop(true);
-      else setShowScrollTop(false);
+      setShowScrollTop(container?.scrollTop > 300);
     };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    container.addEventListener("scroll", handleScroll);
+    return () => container.removeEventListener("scroll", handleScroll);
   }, []);
 
   const handleSwitchPage = (pageIndex: number) => {
@@ -569,54 +571,32 @@ export default function Editor() {
               )}
             </Suspense>
 
-            <div className="flex flex-col flex-grow">
-              <div className="fixed top-0 left-[256px] w-[calc(100vw-256px)] z-50 bg-gray-100 flex justify-between items-center px-6 py-3 h-[64px]">
-                <div className="flex items-center gap-10">
-                  <Link
-                    href="/saveddrafts"
-                    className="text-large font-semibold px-4 py-2 rounded-md border border-gray-500 transition-all duration-300 hover:bg-gray-500 hover:text-white shadow-md hover:shadow-lg"
-                  >
-                    Drafts
-                  </Link>
-                  <p className="font-bold">{draftName}</p>
-                </div>
-                <div className="flex">
-                  <button
-                    onClick={() => setIsGridVisible((prev) => !prev)}
-                    className="text-large font-semibold flex items-center gap-2 px-3 py-1 mr-4 border border-gray-500 hover:bg-gray-500 hover:text-white rounded-md shadow-md transition-all"
-                  >
-                    <GridIcon size={18} />
-                    <span className="text-sm">
-                      {isGridVisible ? "Grid On" : "Grid Off"}
-                    </span>
-                  </button>
-                  <button
-                    className={`text-large font-semibold px-4 py-2 rounded-md mr-4 border border-blue-500 transition-all duration-300 hover:bg-blue-500 hover:text-white shadow-md hover:shadow-lg`}
-                    onClick={() => setIsPreview(!isPreview)}
-                  >
-                    Preview
-                  </button>
+            <EditorTopBar
+              draftName={draftName}
+              isGridVisible={isGridVisible}
+              setIsGridVisible={setIsGridVisible}
+              isPreview={isPreview}
+              setIsPreview={setIsPreview}
+              handlePublish={handlePublish}
+            />
 
-                  <button
-                    className={`text-white text-large font-semibold px-4 py-2 rounded-md bg-blue-500 transition-all duration-300 hover:bg-blue-700 shadow-md hover:shadow-lg`}
-                    onClick={handlePublish}
-                  >
-                    Publish
-                  </button>
-                </div>
-              </div>
-
+            <div
+              className="overflow-auto"
+              ref={scrollContainerRef}
+              style={{
+                marginTop: "64px",
+                marginLeft: "256px",
+                height: `calc(100vh - 64px)`, // full height minus top bar
+                width: `calc(100vw - 256px)`, // full width minus sidebar
+              }}
+            >
               <EditorDropZone
                 ref={editorRef}
                 onClick={handleBackgroundClick}
                 style={{
                   backgroundSize: isGridVisible ? "20px 20px" : "auto",
                   minHeight: `${editorHeight}px`,
-                  height: "auto",
                   minWidth: `${editorWidth}px`,
-                  width: "auto",
-                  marginTop: "64px",
-                  marginLeft: "256px"
                 }}
                 // https://ibelick.com/blog/create-grid-and-dot-backgrounds-with-css-tailwind-css
                 className={`relative transition-all ${
@@ -665,7 +645,12 @@ export default function Editor() {
           </div>
           {showScrollTop && (
             <button
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              onClick={() =>
+                scrollContainerRef.current?.scrollTo({
+                  top: 0,
+                  behavior: "smooth",
+                })
+              }
               className="fixed bottom-20 right-5 p-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-700 transition"
             >
               <ArrowUpIcon size={24} />
