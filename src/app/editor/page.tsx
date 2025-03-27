@@ -422,13 +422,14 @@ export default function Editor() {
         ),
       );
 
-      const roundedX = Math.round(dropX / GRID_SIZE) * GRID_SIZE;
+      let roundedX = Math.round(dropX / GRID_SIZE) * GRID_SIZE;
       const roundedY = Math.round(dropY / GRID_SIZE) * GRID_SIZE;
 
       const newSize = componentSizes[activeComponent.type] || {
         width: draggedRect.width,
         height: draggedRect.height,
       };
+      if (activeComponent.type === "projectCard") roundedX = 0;
       const newPos = findBestFreeSpot(
         { x: roundedX, y: roundedY },
         newSize,
@@ -628,7 +629,7 @@ export default function Editor() {
                             ? `${activeComponent.position.y + activeComponent.size.height + 15}px`
                             : `${activeComponent.position.y - 25}px`,
                         left:
-                          activeComponent.type === "navBar"
+                          activeComponent.type === "navBar" || activeComponent.type === "projectCard"
                             ? "50px"
                             : `${activeComponent.position.x + activeComponent.size.width - 20}px`,
                         zIndex: 10,
