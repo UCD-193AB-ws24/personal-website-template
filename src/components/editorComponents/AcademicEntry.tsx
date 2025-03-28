@@ -62,7 +62,7 @@ export default function AcademicEntry({
 		try {
 			const jsonContent = JSON.parse(content);
 			setCurContent(jsonContent);
-		} catch (e) {
+		} catch {
 			setCurContent({
 				schoolName: 'School',
 				subtext: 'Degree',
