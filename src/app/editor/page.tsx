@@ -10,8 +10,8 @@ import {
 	DragMoveEvent,
 } from '@dnd-kit/core';
 import { restrictToWindowEdges } from '@dnd-kit/modifiers';
-import { ArrowUpIcon, Router, XIcon, GridIcon } from 'lucide-react';
-import { Flip, toast, ToastContainer } from 'react-toastify';
+import { ArrowUpIcon, XIcon, GridIcon } from 'lucide-react';
+import { ToastContainer } from 'react-toastify';
 
 import EditorDropZone from '@components/editorComponents/EditorDropZone';
 import Sidebar from '@components/sidebar/Sidebar';
@@ -39,12 +39,10 @@ import {
 	deletePage,
 } from '@utils/pageManagerUtils';
 import { GRID_SIZE } from '@utils/constants';
-import { APIResponse } from '@customTypes/apiResponse';
 import { useSearchParams } from 'next/navigation';
 import { toastSaveSuccess } from '@components/toasts/SaveToast';
 import { saveDraft } from '@lib/requests/saveDrafts';
 import { fetchDraftName } from '@lib/requests/fetchDraftName';
-import SavedDrafts from '../saveddrafts/page';
 import { auth } from '@lib/firebase/firebaseApp';
 import { deleteUnusedDraftFiles } from '@lib/requests/deleteUnusedFiles';
 
@@ -113,7 +111,16 @@ function DraftLoader({
 			setIsLoading(false);
 			setHasLoadedDraftOnce(true);
 		}
-	}, [draftNumber]);
+	}, [
+          draftNumber,
+          setDraftNumber,
+	  setDraftName,
+	  setPages,
+	  setActivePageId,
+	  setComponents,
+	  setIsLoading,
+	  setHasLoadedDraftOnce
+        ]);
 
 	return null;
 }
@@ -134,7 +141,6 @@ export default function Editor() {
 	const [activePageIndex, setActivePageIndex] = useState<number | null>(null);
 	const [isGridVisible, setIsGridVisible] = useState(false);
 
-	const [username, setUsername] = useState('');
 	const [draftName, setDraftName] = useState('');
 
 	useEffect(() => {
@@ -494,6 +500,7 @@ export default function Editor() {
 		) {
 			addComponent('navBar', { x: 0, y: 0 }, `navBar-${Date.now()}`);
 		}
+           // eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [pages, components]);
 
 	return (
