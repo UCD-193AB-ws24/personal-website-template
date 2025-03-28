@@ -64,7 +64,7 @@ export default function WorkEntry({
     try {
       const jsonContent = JSON.parse(content);
       setCurContent(jsonContent);
-    } catch (e) {
+    } catch {
       setCurContent({
         company: "Company",
         jobTitle: "Job Title",
