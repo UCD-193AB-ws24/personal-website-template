@@ -147,7 +147,7 @@ export default function VideoComponent({
       size={{ width: size.width, height: size.height }}
       position={{ x: position.x, y: position.y }}
       onDragStart={() => setIsDragging(true)}
-      onDrag={(e, d) => {
+      onDrag={(e, _d) => {
         setIsDragging(true);
         setShowOverlay(true);
         if (startPos.current) {
@@ -215,6 +215,7 @@ export default function VideoComponent({
                 onMouseDown={() => setShowOverlay(true)}
               >
                 {thumbnail && (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={thumbnail}
                     alt=""
