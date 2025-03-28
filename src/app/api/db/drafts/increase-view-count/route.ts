@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUser, db } from "@lib/firebase/firebaseAdmin";
+import { db } from "@lib/firebase/firebaseAdmin";
 import { APIResponse } from "@customTypes/apiResponse";
 import { FieldValue } from "firebase-admin/firestore";
 
