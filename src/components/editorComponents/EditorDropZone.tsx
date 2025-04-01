@@ -31,6 +31,7 @@ function EditorDropZone(
       className={`overflow-hidden w-full relative transition-all duration-300 ${
         isOver ? "bg-gray-100" : "bg-white"
       } ${className}`}
+      id="editor-drop-zone"
       style={style}
     >
       {children}

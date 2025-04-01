@@ -28,8 +28,8 @@ interface HorizontalLineProps {
 
 export default function HorizontalLine({
   id = "",
-  initialPos = { x: 0, y: 100 },
-  initialSize = { width: 300, height: 2 },
+  initialPos = { x: -90, y: 40 },
+  initialSize = { width: 350, height: 2 },
   components = [],
   updateComponent = () => {},
   isActive = true,
@@ -90,7 +90,7 @@ export default function HorizontalLine({
         bottom: false,
       }}
       minWidth={50}
-      maxHeight={4}
+      maxHeight={2}
       bounds="parent"
       onMouseDown={(e: MouseEvent) => {
         handleMouseDown(e);

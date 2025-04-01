@@ -209,6 +209,7 @@ export default function SavedDrafts() {
   };
 
   const handleNameChange = async (newDraftName: string) => {
+    setIsLoading(true);
     if (selectedDraft) {
       // Selected draft is not in the draft mappings, i.e. new draft is being created
       if (
@@ -216,11 +217,13 @@ export default function SavedDrafts() {
         undefined
       ) {
         await createDraft(selectedDraft.id, newDraftName);
+        setIsLoading(false);
         router.push("/editor?draftNumber=" + selectedDraft.id);
       } else {
         handleRenameDraft(selectedDraft.id, selectedDraft.name, newDraftName);
       }
     }
+    setIsLoading(false);
   };
 
   const publishAsTemplate = async (id: number, name: string) => {

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Rnd } from "react-rnd";
 import { MoveIcon } from "lucide-react";
 import { toast, Flip } from "react-toastify";
@@ -53,20 +53,19 @@ export default function FileComponent({
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
   const [pdfSrc, setPdfSrc] = useState(content || "");
-  const [isOverlayActive, setIsOverlayActive] = useState(true);
   const [loading, setLoading] = useState(!!content);
   const [previewSrc, setPreviewSrc] = useState<string | null>(null);
+  const [showOverlay, setShowOverlay] = useState(false);
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+
+  // Track the initial mouse position for threshold logic
+  const startPos = useRef<{ x: number; y: number } | null>(null);
+  const dragThreshold = 10; // Minimum movement (px) before dragging starts
 
   const draftNumber = useSearchParams().get("draftNumber");
 
   // https://stackoverflow.com/questions/58488416/open-base64-encoded-pdf-file-using-javascript-issue-with-file-size-larger-than
   const MAX_FILE_SIZE = 5 * 1024 * 1025; // max 5MB upload for now
-
-  const handleMouseDown = (e: MouseEvent | React.MouseEvent) => {
-    e.stopPropagation();
-    onMouseDown();
-    setIsOverlayActive(false); // Hide overlay when clicked
-  };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const userId = auth.currentUser?.uid;
@@ -160,6 +159,30 @@ export default function FileComponent({
       size={{ width: size.width, height: size.height }}
       position={{ x: position.x, y: position.y }}
       onDragStart={() => setIsDragging(true)}
+      onDrag={(e, d) => {
+        setIsDragging(true);
+        setShowOverlay(true);
+        if (startPos.current) {
+          let clientX: number;
+          let clientY: number;
+          if ("clientX" in e) {
+            clientX = e.clientX;
+            clientY = e.clientY;
+          } else if ("touches" in e && e.touches.length > 0) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+          } else {
+            return;
+          }
+
+          const dx = Math.abs(clientX - startPos.current.x);
+          const dy = Math.abs(clientY - startPos.current.y);
+
+          if (dx > dragThreshold || dy > dragThreshold) {
+            setIsDragging(true);
+          }
+        }
+      }}
       onDragStop={(e, d) => {
         setIsDragging(false);
         handleDragStop(
@@ -182,9 +205,12 @@ export default function FileComponent({
         );
       }}
       bounds="parent"
-      onMouseDown={handleMouseDown}
+      onMouseDown={(e) => {
+        startPos.current = { x: e.clientX, y: e.clientY };
+        setShowOverlay(false);
+        onMouseDown();
+      }}
       style={{ pointerEvents: "auto" }}
-      dragHandleClassName={`${id}-drag-handle`}
       dragGrid={[GRID_SIZE, GRID_SIZE]}
       resizeGrid={[GRID_SIZE, GRID_SIZE]}
     >
@@ -192,12 +218,16 @@ export default function FileComponent({
         {loading && <SkeletonLoader width={size.width} height={size.height} />}
         {previewSrc ? (
           <div className="relative w-full h-full">
-            {/* Transparent Overlay to Capture Clicks */}
-            {isOverlayActive && (
+            {/* Overlay for enabling drag */}
+            {(showOverlay || !isActive) && (
               <div
-                className="absolute inset-0 bg-transparent z-10 cursor-pointer"
-                onMouseDown={handleMouseDown}
-              />
+                className="w-full h-full flex items-center justify-center absolute inset-0 bg-gray-100 bg-opacity-15 z-10"
+                onMouseDown={() => setShowOverlay(true)}
+              >
+                <div className="absolute w-16 h-16 flex items-center justify-center bg-black bg-opacity-50 rounded-full">
+                  <MoveIcon size={48} className="text-white" />
+                </div>
+              </div>
             )}
 
             {/* PDF Viewer */}
@@ -205,18 +235,24 @@ export default function FileComponent({
               id={`pdf-iframe-${id}`}
               src={previewSrc}
               className="w-full h-full border-none"
-              style={{ pointerEvents: "auto" }}
-              onMouseLeave={() => setIsOverlayActive(true)} // Re-enable overlay when leaving iframe
+              style={{
+                pointerEvents: showOverlay ? "none" : "auto", // Allow interaction after dragging
+              }}
+              onMouseEnter={() => setShowOverlay(false)} // Remove overlay when interacting with iframe
             />
           </div>
         ) : pdfSrc ? (
           <div className="relative w-full h-full">
-            {/* Transparent Overlay to Capture Clicks */}
-            {isOverlayActive && (
+            {/* Overlay for enabling drag */}
+            {(showOverlay || !isActive) && !loading && (
               <div
-                className="absolute inset-0 bg-transparent z-10 cursor-pointer"
-                onMouseDown={handleMouseDown}
-              />
+                className="w-full h-full flex items-center justify-center absolute inset-0 bg-gray-100 bg-opacity-15 z-10"
+                onMouseDown={() => setShowOverlay(true)}
+              >
+                <div className="absolute w-16 h-16 flex items-center justify-center bg-black bg-opacity-50 rounded-full">
+                  <MoveIcon size={48} className="text-white" />
+                </div>
+              </div>
             )}
 
             {/* PDF Viewer */}
@@ -224,13 +260,13 @@ export default function FileComponent({
               id={`pdf-iframe-${id}`}
               src={pdfSrc}
               className="w-full h-full border-none"
-              onMouseLeave={() => setIsOverlayActive(true)} // Re-enable overlay when leaving iframe
-              onLoad={() => setLoading(false)}
-              onError={() => setLoading(false)}
               style={{
-                pointerEvents: "auto",
+                pointerEvents: showOverlay ? "none" : "auto", // Allow interaction after dragging
                 display: loading ? "none" : "block",
               }}
+              onMouseEnter={() => setShowOverlay(false)} // Remove overlay when interacting with iframe
+              onLoad={() => setLoading(false)}
+              onError={() => setLoading(false)}
             />
           </div>
         ) : (
@@ -245,14 +281,6 @@ export default function FileComponent({
           </label>
         )}
       </ActiveOutlineContainer>
-
-      {isActive && (
-        <div
-          className={`${id}-drag-handle absolute top-10 right-[-30px] w-6 h-6 bg-gray-300 rounded-md cursor-move flex items-center justify-center z-10`}
-        >
-          <MoveIcon />
-        </div>
-      )}
     </Rnd>
   );
 }
