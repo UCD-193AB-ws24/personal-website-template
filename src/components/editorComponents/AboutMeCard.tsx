@@ -81,6 +81,7 @@ export default function AboutMeCard({
   }, []);
 
   const handleMouseDown = (e: MouseEvent) => {
+    console.log("parent")
     e.stopPropagation();
     onMouseDown();
   };
@@ -181,10 +182,12 @@ export default function AboutMeCard({
           <img
             src={previewSrc}
             alt="Uploading Preview"
-            className="w-full h-full  "
+            className="w-full h-full"
+            draggable="false"
           />
         ) : curContent.image != "No Image" ? (
           <img
+            draggable="false"
             src={curContent.image}
             alt="Uploaded"
             className="w-full h-full"
@@ -219,9 +222,8 @@ export default function AboutMeCard({
     <Rnd
       size={{ width: size.width, height: size.height }}
       position={{ x: position.x, y: position.y }}
-      onDragStart={(e) => {
+      onDragStart={() => {
         setIsDragging(true);
-        e.preventDefault();
       }}
       onDragStop={(e, d) => {
         setIsDragging(false);
@@ -266,10 +268,12 @@ export default function AboutMeCard({
               <img
                 src={previewSrc}
                 alt="Uploading Preview"
-                className="w-full h-full  "
+                className="w-full h-full"
+                draggable="false"
               />
             ) : curContent.image != "No Image" ? (
               <img
+                draggable="false"
                 src={curContent.image}
                 alt="Uploaded"
                 className="w-full h-full"
@@ -299,9 +303,6 @@ export default function AboutMeCard({
               style={{
                 outline: `${!isActive ? "none" : ""}`,
               }}
-              onMouseDown={(e) => {
-                e.stopPropagation();
-              }}
               onBlur={(e) => {
                 setCurContent((prevContent: AboutMeCardContent) => ({
                   ...prevContent,
@@ -328,9 +329,6 @@ export default function AboutMeCard({
               className="overflow-hidden min-w-[300px] max-w-[300px] max-h-[60px] text-black cursor-text p-0 m-0 leading-none outline outline-gray-300 rounded-sm"
               style={{
                 outline: `${!isActive ? "none" : ""}`,
-              }}
-              onMouseDown={(e) => {
-                e.stopPropagation();
               }}
               onBlur={(e) => {
                 setCurContent((prevContent: AboutMeCardContent) => ({
