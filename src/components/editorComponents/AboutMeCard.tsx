@@ -81,7 +81,6 @@ export default function AboutMeCard({
   }, []);
 
   const handleMouseDown = (e: MouseEvent) => {
-    console.log("parent")
     e.stopPropagation();
     onMouseDown();
   };
