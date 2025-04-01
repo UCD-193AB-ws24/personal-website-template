@@ -10,6 +10,7 @@ import WorkEntry from '@components/editorComponents/WorkEntry';
 import HorizontalLine from '@components/editorComponents/HorizontalLine';
 import VerticalLine from '@components/editorComponents/VerticalLine';
 import IconComponent from '@components/editorComponents/IconComponent';
+import AboutMeCard from "@components/editorComponents/AboutMeCard";
 
 import { ComponentItem } from '@customTypes/componentTypes';
 
@@ -28,6 +29,7 @@ export const componentMap: Record<
   workEntry: WorkEntry,
   horizontalLine: HorizontalLine,
   verticalLine: VerticalLine,
+  aboutMeCard: AboutMeCard,
   icon: IconComponent,
 };
 
@@ -44,7 +46,8 @@ export const componentSizes: Record<string, { width: number; height: number }> =
 		workEntry: { width: 750, height: 150 },
 		horizontalLine: { width: 350, height: 2 },
 		verticalLine: { width: 2, height: 350 },
-    	icon: { width: 100, height: 100}
+    icon: { width: 100, height: 100},
+    aboutMeCard: { width: 600, height: 70 }
   };
 
 export const renderOverlayContent = (activeType: string | null) => {
@@ -71,6 +74,8 @@ export const renderOverlayContent = (activeType: string | null) => {
       return <HorizontalLine />;
     case "verticalLine":
       return <VerticalLine />;
+    case "aboutMeCard":
+      return <AboutMeCard />
     case "icon":
       return <IconComponent />;
     default:
