@@ -3,7 +3,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@lib/firebase/firebaseApp";
 import { signUserOut } from "@lib/firebase/auth";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { APIResponse } from "@customTypes/apiResponse";
 import Navbar from "@components/Navbar";
 import LoadingSpinner from "@components/LoadingSpinner";
@@ -43,7 +43,7 @@ export default function SavedDrafts() {
     }
   };
   
-  const getUsername = async () => {
+  const getUsername = useCallback(async () => {
     const name = await fetchUsername();
     if (name === null) {
       setUsername("Unknown");
@@ -51,7 +51,7 @@ export default function SavedDrafts() {
     } else {
       setUsername(name);
     }
-  };
+  }, [router]);
   
   const getDraftMappings = () => {
     setIsLoading(true);
@@ -230,7 +230,7 @@ useEffect(() => {
     getDraftMappings();
     getPublishedDraftNumber();
   }
-}, [user]);
+}, [user, getUsername]);
 
 return (
   <div>
