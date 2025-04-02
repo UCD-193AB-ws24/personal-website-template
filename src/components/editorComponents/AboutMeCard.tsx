@@ -71,14 +71,15 @@ export default function AboutMeCard({
     try {
       const jsonContent = JSON.parse(content);
       setCurContent(jsonContent);
-    } catch (e) {
+    } catch (error) {
+      console.error("Error logging out:", error);
       setCurContent({
         image: "No Image",
         bio: "Enter Bio here",
         contact: "email@email.com | (123)-456-7890",
       });
     }
-  }, []);
+  }, [content]);
 
   const handleMouseDown = (e: MouseEvent) => {
     e.stopPropagation();
