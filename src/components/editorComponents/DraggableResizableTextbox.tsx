@@ -13,6 +13,11 @@ import type {
 
 import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
 import { GRID_SIZE } from "@utils/constants";
+import RichTextbox from "@components/RichText/RichTextbox";
+import ToolbarPlugin from '@components/RichText/Plugins/RichTextToolbar';
+import {LexicalComposer} from '@lexical/react/LexicalComposer';
+import { RichTextInitialConfig, BlankRichTextEditorState } from "@components/RichText/RichTextSettings";
+
 
 interface DraggableResizableTextboxProps {
   id?: string;
@@ -37,7 +42,7 @@ export default function DraggableResizableTextbox({
   initialPos = { x: -1, y: -1 },
   initialSize = { width: 200, height: 50 },
   components = [],
-  content = "",
+  content = BlankRichTextEditorState,
   updateComponent = () => {},
   isActive = true,
   onMouseDown: onMouseDown = () => {},
@@ -46,18 +51,20 @@ export default function DraggableResizableTextbox({
 }: DraggableResizableTextboxProps) {
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
+  const [textboxState, setTextboxState] = useState(content);
 
   const handleMouseDown = (e: MouseEvent) => {
     e.stopPropagation();
     onMouseDown();
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    updateComponent(id, position, size, e.target.value);
-  };
 
-  return isPreview ? (
-    <div
+  const updateTextboxState = (newState: string) => {
+    setTextboxState(newState);
+    updateComponent(id, position, size, newState);
+  }
+
+  return isPreview ? (<div
       style={{
         position: "absolute",
         left: position.x,
@@ -67,50 +74,49 @@ export default function DraggableResizableTextbox({
       }}
       className="whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg leading-none"
     >
-      {content}
-    </div>
-  ) : (
-    <Rnd
-      size={{ width: size.width, height: size.height }}
-      position={{ x: position.x, y: position.y }}
-      onDragStart={() => setIsDragging(true)}
-      onDragStop={(e, d) => {
-        setIsDragging(false);
-        handleDragStop(
-          id,
-          size,
-          components,
-          updateComponent,
-          setPosition,
-        )(e, d);
-      }}
-      onResizeStart={() => setIsDragging(true)}
-      onResizeStop={(e, d, ref, delta, newPosition) => {
-        setIsDragging(false);
-        handleResizeStop(id, components, updateComponent, setSize, setPosition)(
-          e,
-          d,
-          ref,
-          delta,
-          newPosition,
-        );
-      }}
-      minWidth={100}
-      minHeight={50}
-      bounds="parent"
-      onMouseDown={handleMouseDown}
-      style={{ pointerEvents: "auto" }}
-      dragGrid={[GRID_SIZE, GRID_SIZE]}
-      resizeGrid={[GRID_SIZE, GRID_SIZE]}
-    >
-      <ActiveOutlineContainer isActive={isActive}>
-        <textarea
-          className={`overflow-hidden w-full h-full resize-none border-none outline-none bg-transparent text-lg leading-none`}
-          placeholder="Type here..."
-          defaultValue={content}
-          onChange={handleChange}
-        />
-      </ActiveOutlineContainer>
-    </Rnd>
-  );
+      <LexicalComposer initialConfig={RichTextInitialConfig}>
+        <RichTextbox isPreview={isPreview} textboxState={textboxState} updateTextboxState={updateTextboxState} />
+      </LexicalComposer>
+    </div>) : (
+    <LexicalComposer initialConfig={RichTextInitialConfig}>
+      { isActive && <ToolbarPlugin /> }
+      <Rnd
+        size={{ width: size.width, height: size.height }}
+        position={{ x: position.x, y: position.y }}
+        onDragStart={() => setIsDragging(true)}
+        onDragStop={(e, d) => {
+          setIsDragging(false);
+          handleDragStop(
+            id,
+            size,
+            components,
+            updateComponent,
+            setPosition,
+          )(e, d);
+        }}
+        onResizeStart={() => setIsDragging(true)}
+        onResizeStop={(e, d, ref, delta, newPosition) => {
+          setIsDragging(false);
+          handleResizeStop(id, components, updateComponent, setSize, setPosition)(
+            e,
+            d,
+            ref,
+            delta,
+            newPosition,
+          );
+        }}
+        minWidth={100}
+        minHeight={50}
+        bounds="parent"
+        onMouseDown={handleMouseDown}
+        style={{ pointerEvents: "auto" }}
+        dragGrid={[GRID_SIZE, GRID_SIZE]}
+        resizeGrid={[GRID_SIZE, GRID_SIZE]}
+      >
+        <ActiveOutlineContainer isActive={isActive}>
+          <RichTextbox isPreview={isPreview} textboxState={textboxState} updateTextboxState={updateTextboxState} isActive={isActive} />
+        </ActiveOutlineContainer>
+      </Rnd>
+    </LexicalComposer>
+  )
 }
