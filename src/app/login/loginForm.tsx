@@ -32,6 +32,7 @@ export default function LogInForm() {
     const isOk = await signInWithGoogle();
     if (isOk) {
       router.push("/profile");
+      setSuccess(true);
       return;
     }
   };

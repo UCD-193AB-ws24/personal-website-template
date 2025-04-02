@@ -28,7 +28,6 @@ export default function SavedDrafts() {
     id: number;
     name: string;
   }>();
-  const [newDraftName, setNewDraftName] = useState("");
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [publishedDraftNumber, setPublishedDraftNumber] = useState(0);
@@ -39,9 +38,6 @@ export default function SavedDrafts() {
       getDraftMappings();
       getPublishedDraftNumber();
     }
-    // else {
-    //   router.push("/")
-    // }
   }, [user]);
 
   const handleSignOut = async () => {
@@ -204,7 +200,6 @@ export default function SavedDrafts() {
       setIsLoading(false);
     }
     setIsModalHidden(true);
-    setNewDraftName("");
     setSelectedDraft(undefined);
   };
 
