@@ -72,7 +72,7 @@ export default function WorkEntry({
         details: "Details",
       });
     }
-  }, []);
+  }, [content]);
 
   const handleMouseDown = (e: MouseEvent) => {
     e.stopPropagation();

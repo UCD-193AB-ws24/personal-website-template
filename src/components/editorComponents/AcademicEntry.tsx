@@ -69,7 +69,7 @@ export default function AcademicEntry({
 				duration: 'Jan 20XX - Dec 20XX',
 			});
 		}
-	}, []);
+	}, [content]);
 
 	const handleMouseDown = (e: MouseEvent) => {
 		e.stopPropagation();
