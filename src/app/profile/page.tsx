@@ -5,7 +5,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@lib/firebase/firebaseApp";
 import { signUserOut } from "@lib/firebase/auth";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { APIResponse } from "@customTypes/apiResponse";
 import { fetchUsername } from "@lib/requests/fetchUsername";
 import LoadingSpinner from "@components/LoadingSpinner";
@@ -24,14 +24,7 @@ export default function Profile() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    if (user) {
-      getUsername();
-      getPublishedDraftNumber();
-      getDraftMappings();
-    }
-  }, [user]);
-
+  
   const handleSignOut = async () => {
     try {
       await signUserOut();
@@ -41,8 +34,8 @@ export default function Profile() {
       console.error("Error logging out:", error);
     }
   };
-
-  const getUsername = async () => {
+  
+  const getUsername = useCallback(async () => {
     const name = await fetchUsername();
     if (name === null) {
       setUsername("Unknown");
@@ -50,8 +43,8 @@ export default function Profile() {
     } else {
       setUsername(name);
     }
-  };
-
+  }, [router]);
+  
   const getDraftMappings = () => {
     setIsLoading(true);
     fetch("/api/user/get-drafts", {
@@ -59,21 +52,21 @@ export default function Profile() {
         "Content-Type": "application/json",
       },
     })
-      .then((res) => res.json())
-      .then((res) => {
-        if (res.success) {
-          setDraftMappings(res.data);
-          setIsLoading(false);
-        } else {
-          throw new Error(res.error);
-        }
-      })
-      .catch((error) => {
-        console.log(error.message);
+    .then((res) => res.json())
+    .then((res) => {
+      if (res.success) {
+        setDraftMappings(res.data);
         setIsLoading(false);
-      });
+      } else {
+        throw new Error(res.error);
+      }
+    })
+    .catch((error) => {
+      console.log(error.message);
+      setIsLoading(false);
+    });
   };
-
+  
   const handleOpenWebsite = async () => {
     try {
       window.open(`/pages/${username}`, "_blank");
@@ -81,20 +74,14 @@ export default function Profile() {
       console.log("Error opening website:", error.message);
     }
   };
-
-  const getPublishedDraftNumber = async () => {
-    const pubDraftNum = await fetchPublishedDraftNumber();
-    getViews(pubDraftNum);
-    setPublishedDraftNumber(pubDraftNum);
-  };
-
-  const getViews = async (publishedDraftNumber: number) => {
+  
+  const getViews = useCallback(async(publishedDraftNumber: number) => {
     if (publishedDraftNumber === 0) {
       return;
     }
-
+    
     setIsLoading(true);
-
+    
     try {
       const response = await fetch(
         `/api/user/get-published-views?publishedDraftNumber=${publishedDraftNumber}`,
@@ -104,16 +91,16 @@ export default function Profile() {
           },
         },
       );
-
+      
       const resBody = (await response.json()) as APIResponse<string>;
-
+      
       if (response.ok && resBody.success) {
         console.log("views: ", resBody.data);
-
+        
         if (resBody.data !== undefined) {
           setViews(resBody.data);
         }
-
+        
         setIsLoading(false);
       } else {
         throw new Error("views could not be returned");
@@ -123,24 +110,38 @@ export default function Profile() {
       setIsLoading(false);
       console.log(error.message);
     }
-  };
+  }, []);
+
+  const getPublishedDraftNumber = useCallback(async () => {
+    const pubDraftNum = await fetchPublishedDraftNumber();
+    getViews(pubDraftNum);
+    setPublishedDraftNumber(pubDraftNum);
+  }, [getViews]);
+  
+  useEffect(() => {
+    if (user) {
+      getUsername();
+      getPublishedDraftNumber();
+      getDraftMappings();
+    }
+  }, [user, getUsername, getPublishedDraftNumber]);
 
   return (
     <div>
       <header>
         {user ? (
           <Navbar
-            user={true}
-            username={username}
-            onSignOut={handleSignOut}
-            navLinks={[
-              { label: "Home", href: "/" },
-              { label: "Drafts", href: "/saveddrafts" },
-            ]}
+          user={true}
+          username={username}
+          onSignOut={handleSignOut}
+          navLinks={[
+            { label: "Home", href: "/" },
+            { label: "Drafts", href: "/saveddrafts" },
+          ]}
           />
         ) : (
           <Navbar
-            user={false}
+          user={false}
             navLinks={[
               { label: "Log In", href: "/login" },
               { label: "Sign Up", href: "/signup" },
