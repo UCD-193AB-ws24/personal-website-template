@@ -3,7 +3,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@lib/firebase/firebaseApp";
 import { signUserOut } from "@lib/firebase/auth";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { TemplateMapping } from "@customTypes/apiResponse";
 import Navbar from "@components/Navbar";
 import LoadingSpinner from "@components/LoadingSpinner";
@@ -28,16 +28,6 @@ export default function Templates() {
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateMapping>();
   const router = useRouter();
 
-  useEffect(() => {
-    if (user) {
-      getUsername();
-      getTemplates();
-    }
-    // else {
-    //   router.push("/")
-    // }
-  }, [user]);
-
   const handleSignOut = async () => {
     try {
       await signUserOut();
@@ -48,7 +38,7 @@ export default function Templates() {
     }
   };
 
-  const getUsername = async () => {
+  const getUsername = useCallback(async () => {
     const name = await fetchUsername();
     if (name === null) {
       setUsername("Unknown");
@@ -56,7 +46,7 @@ export default function Templates() {
     } else {
       setUsername(name);
     }
-  };
+  }, [router]);
 
   const getTemplates = async () => {
     setIsLoading(true);
@@ -124,6 +114,13 @@ export default function Templates() {
 
     setIsLoading(false);
   };
+
+  useEffect(() => {
+    if (user) {
+      getUsername();
+      getTemplates();
+    }
+  }, [user, getUsername]);
 
   return (
     <div>
