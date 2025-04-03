@@ -68,7 +68,7 @@ export default function NavigationBar({
   useEffect(() => {
     const maxRight = Math.max(
       ...components
-        .filter((c) => c.type !== "navBar")
+        .filter((c) => c.type !== "navBar" && c.type !== "projectCard")
         .map((c) => c.position.x + c.size.width),
     );
 

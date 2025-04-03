@@ -87,13 +87,17 @@ export default async function PublishedPage({ params }: PublishedPageProps) {
 
   const maxRight = Math.max(
     ...components
-      .filter((c) => c.type !== "navBar")
+      .filter((c) => c.type !== "navBar" && c.type !== "projectCard")
       .map((c) => c.position.x + c.size.width),
+  );
+
+  const lowestY = Math.max(
+    ...components.map((comp) => comp.position.y + comp.size.height),
   );
 
   return (
     <div className="flex justify-center bg-white min-h-screen min-w-[100vw] h-auto w-max">
-      <FullWindow width={maxRight}>
+      <FullWindow width={maxRight} lowestY={lowestY}>
         {components.map(renderComponent)}
       </FullWindow>
     </div>
