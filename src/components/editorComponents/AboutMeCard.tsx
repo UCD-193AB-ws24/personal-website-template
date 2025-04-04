@@ -7,7 +7,6 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useSearchParams } from "next/navigation";
 
 import ActiveOutlineContainer from "@components/editorComponents/ActiveOutlineContainer";
-import SkeletonLoader from "@components/editorComponents/SkeletonLoader";
 
 import type {
   ComponentItem,
@@ -176,7 +175,6 @@ export default function AboutMeCard({
       }}
       className="flex w-full h-full justify-between whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg"
     >
-      {loading && <SkeletonLoader width={size.width} height={size.height} />}
 
       <div className="flex flex-col align-center">
         {previewSrc ? (
@@ -260,9 +258,6 @@ export default function AboutMeCard({
           className="flex w-full h-full justify-between whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg"
           style={{ padding: `${GRID_SIZE}px` }}
         >
-          {loading && (
-            <SkeletonLoader width={size.width} height={size.height} />
-          )}
 
           <div className="flex flex-col align-center">
             {previewSrc ? (
