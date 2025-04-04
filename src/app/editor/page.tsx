@@ -120,7 +120,6 @@ function DraftLoader({
 	  setIsLoading,
 	  setHasLoadedDraftOnce
         ]);
-
   return null;
 }
 

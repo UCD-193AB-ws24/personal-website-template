@@ -6,11 +6,11 @@ import { storage } from "@lib/firebase/firebaseApp";
 const fetchStoredAndReferencedFiles = async (
   userId: string,
   draftNumber: string,
-  pages: any[],
+  pages: any[]
 ) => {
   const draftStorageRef = ref(
     storage,
-    `users/${userId}/drafts/${draftNumber}/`,
+    `users/${userId}/drafts/${draftNumber}/`
   );
 
   const storedFiles = await listAll(draftStorageRef);
@@ -41,8 +41,8 @@ const fetchStoredAndReferencedFiles = async (
           );
 
           return storagePath;
-        }),
-    ),
+        })
+    )
   );
 
   return { storedImagePaths, activeImagePaths };
@@ -51,7 +51,7 @@ const fetchStoredAndReferencedFiles = async (
 export const deleteUnusedDraftFiles = async (
   userId: string,
   draftNumber: string,
-  updatedPages: any[],
+  updatedPages: any[]
 ) => {
   try {
     const { storedImagePaths, activeImagePaths } =
@@ -59,7 +59,7 @@ export const deleteUnusedDraftFiles = async (
 
     // Find images that are stored but NOT referenced in components
     const unusedImages = storedImagePaths.filter(
-      (path) => !activeImagePaths.has(path),
+      (path) => !activeImagePaths.has(path)
     );
 
     if (unusedImages.length === 0) return;
@@ -69,9 +69,9 @@ export const deleteUnusedDraftFiles = async (
       unusedImages.map(async (path) => {
         const imageRef = ref(storage, path);
         await deleteObject(imageRef).catch((error) =>
-          console.error("Error deleting image:", error),
+          console.error("Error deleting image:", error)
         );
-      }),
+      })
     );
   } catch (error) {
     console.error("Failed to delete unused draft images:", error);
