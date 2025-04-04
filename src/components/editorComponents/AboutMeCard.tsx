@@ -7,7 +7,6 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useSearchParams } from "next/navigation";
 
 import ActiveOutlineContainer from "@components/editorComponents/ActiveOutlineContainer";
-import SkeletonLoader from "@components/editorComponents/SkeletonLoader";
 
 import type {
   ComponentItem,
@@ -72,8 +71,7 @@ export default function AboutMeCard({
     try {
       const jsonContent = JSON.parse(content);
       setCurContent(jsonContent);
-    } catch (error) {
-      console.error("Error logging out:", error);
+    } catch {
       setCurContent({
         image: "No Image",
         bio: "Enter Bio here",
@@ -138,17 +136,18 @@ export default function AboutMeCard({
         async () => {
           // Get the download URL once uploaded
           const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+
+          setCurContent((prevContent: AboutMeCardContent) => ({
+            ...prevContent,
+            image: downloadURL,
+          }));
+
           setPreviewSrc(null);
 
           if (!sizeSet) {
             const { width, height } = await resizeImage(downloadURL);
             setSize({ width, height });
           }
-
-          setCurContent((prevContent: AboutMeCardContent) => ({
-            ...prevContent,
-            image: downloadURL,
-          }));
 
           updateComponent(
             id,
@@ -176,7 +175,6 @@ export default function AboutMeCard({
       }}
       className="flex w-full h-full justify-between whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg"
     >
-      {loading && <SkeletonLoader width={size.width} height={size.height} />}
 
       <div className="flex flex-col align-center">
         {previewSrc ? (
@@ -260,9 +258,6 @@ export default function AboutMeCard({
           className="flex w-full h-full justify-between whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg"
           style={{ padding: `${GRID_SIZE}px` }}
         >
-          {loading && (
-            <SkeletonLoader width={size.width} height={size.height} />
-          )}
 
           <div className="flex flex-col align-center">
             {previewSrc ? (
