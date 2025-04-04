@@ -58,18 +58,18 @@ export default function AcademicEntry({
     duration: "Jan 20XX - Dec 20XX",
   });
 
-  useEffect(() => {
-    try {
-      const jsonContent = JSON.parse(content);
-      setCurContent(jsonContent);
-    } catch (e) {
-      setCurContent({
-        schoolName: "School",
-        subtext: "Degree",
-        duration: "Jan 20XX - Dec 20XX",
-      });
-    }
-  }, []);
+	useEffect(() => {
+		try {
+			const jsonContent = JSON.parse(content);
+			setCurContent(jsonContent);
+		} catch {
+			setCurContent({
+				schoolName: 'School',
+				subtext: 'Degree',
+				duration: 'Jan 20XX - Dec 20XX',
+			});
+		}
+	}, [content]);
 
   const handleMouseDown = (e: MouseEvent) => {
     e.stopPropagation();

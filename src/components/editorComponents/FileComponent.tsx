@@ -56,7 +56,6 @@ export default function FileComponent({
   const [loading, setLoading] = useState(!!content);
   const [previewSrc, setPreviewSrc] = useState<string | null>(null);
   const [showOverlay, setShowOverlay] = useState(false);
-  const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   // Track the initial mouse position for threshold logic
   const startPos = useRef<{ x: number; y: number } | null>(null);
@@ -141,7 +140,7 @@ export default function FileComponent({
       size={{ width: size.width, height: size.height }}
       position={{ x: position.x, y: position.y }}
       onDragStart={() => setIsDragging(true)}
-      onDrag={(e, d) => {
+      onDrag={(e, _d) => {
         setIsDragging(true);
         setShowOverlay(true);
         if (startPos.current) {

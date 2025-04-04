@@ -50,7 +50,6 @@ export default function WebPageComponent({
   const [size, setSize] = useState(initialSize);
   const [webpageSrc, setWebPageSrc] = useState(content || "");
   const [showOverlay, setShowOverlay] = useState(false);
-  const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   // Track the initial mouse position for threshold logic
   const startPos = useRef<{ x: number; y: number } | null>(null);
@@ -113,7 +112,7 @@ export default function WebPageComponent({
       size={{ width: size.width, height: size.height }}
       position={{ x: position.x, y: position.y }}
       onDragStart={() => setIsDragging(true)}
-      onDrag={(e, d) => {
+      onDrag={(e, _d) => {
         setIsDragging(true);
         setShowOverlay(true);
         if (startPos.current) {

@@ -64,7 +64,7 @@ export default function WorkEntry({
     try {
       const jsonContent = JSON.parse(content);
       setCurContent(jsonContent);
-    } catch (e) {
+    } catch {
       setCurContent({
         company: "Company",
         jobTitle: "Job Title",
@@ -72,7 +72,7 @@ export default function WorkEntry({
         details: "Details",
       });
     }
-  }, []);
+  }, [content]);
 
   const handleMouseDown = (e: MouseEvent) => {
     e.stopPropagation();

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from 'next/image';
 import { useState } from "react";
 import { signInWithGoogle, signUpWithEmail } from "@lib/firebase/auth";
 import { useRouter } from "next/navigation";
@@ -102,10 +103,12 @@ export default function SignUpForm() {
             onClick={handleSignInWithGoogle}
             className="flex items-center w-full max-w-xs px-4 py-3 bg-white border border-gray-300 rounded-md shadow-md transition duration-300 hover:bg-gray-100 focus:outline-none"
           >
-            <img
-              src="googlelogo.png"
+            <Image
+              src="/googlelogo.png"
               alt="Google logo"
-              className="w-6 h-6 mr-3"
+              width={24}
+              height={24}
+              className="mr-3"
             />
             <span className="text-gray-700 font-medium">
               Continue with Google
