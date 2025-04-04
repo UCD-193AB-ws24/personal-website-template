@@ -3,10 +3,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Rnd } from "react-rnd";
 import { PlayIcon } from "lucide-react";
-import { toast, Flip } from "react-toastify";
 
 import ActiveOutlineContainer from "@components/editorComponents/ActiveOutlineContainer";
-import ErrorToast, { toastError } from "@components/toasts/ErrorToast";
+import { toastError } from "@components/toasts/ErrorToast";
 
 import type {
   ComponentItem,

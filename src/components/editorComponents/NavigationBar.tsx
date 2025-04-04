@@ -5,7 +5,6 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { PlusIcon } from "lucide-react";
-import { toast, Flip } from "react-toastify";
 import {
   DndContext,
   closestCenter,
@@ -19,7 +18,7 @@ import {
   restrictToParentElement,
 } from "@dnd-kit/modifiers";
 
-import ErrorToast, { toastError } from '@components/toasts/ErrorToast';
+import { toastError } from '@components/toasts/ErrorToast';
 import SortablePageItem from '@components/SortablePageItem';
 
 import type { ComponentItem } from "@customTypes/componentTypes";
