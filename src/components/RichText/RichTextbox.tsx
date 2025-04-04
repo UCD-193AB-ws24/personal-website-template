@@ -1,4 +1,4 @@
-import {EditorState} from 'lexical';
+import {$createParagraphNode, $createTextNode, $getRoot, EditorState} from 'lexical';
 import {useEffect} from 'react';
 
 import {RichTextPlugin} from '@lexical/react/LexicalRichTextPlugin';
@@ -31,8 +31,23 @@ export default function RichTextbox({ isPreview, textboxState, updateTextboxStat
       editor.setEditable(false);
     }
 
-    const editorState = editor.parseEditorState(textboxState)
-    editor.setEditorState(editorState);
+    try {
+      const editorState = editor.parseEditorState(textboxState)
+      editor.setEditorState(editorState);
+    } catch (error: any) {
+      console.log("Error:", error.message)
+
+      // Fallback: set the content to be the textboxState
+      editor.update(() => {
+        const root = $getRoot();
+        root.clear();
+
+        const paragraph = $createParagraphNode();
+        const text = $createTextNode(textboxState);
+        paragraph.append(text)
+        root.append(paragraph);
+      })
+    }
   }, [editor, isPreview, textboxState])
 
   const onChangeHandler = (editorState: EditorState, _editor: LexicalEditor, _tags: Set<string>) => {
