@@ -5,7 +5,6 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { PlusIcon } from "lucide-react";
-import { toast, Flip } from "react-toastify";
 import {
   DndContext,
   closestCenter,
@@ -19,8 +18,8 @@ import {
   restrictToParentElement,
 } from "@dnd-kit/modifiers";
 
-import ErrorToast from "@components/toasts/ErrorToast";
-import SortablePageItem from "@components/SortablePageItem";
+import { toastError } from '@components/toasts/ErrorToast';
+import SortablePageItem from '@components/SortablePageItem';
 
 import type { ComponentItem } from "@customTypes/componentTypes";
 
@@ -92,36 +91,21 @@ export default function NavigationBar({
     setEditedName(e.target.value);
   };
 
-  const handleEditSubmit = (index: number) => {
-    if (!editedName.trim()) {
-      setEditedName(pages[index].pageName); // Revert to existing name if new name is empty string
-    } else {
-      const isDuplicate = pages.some(
-        (page, i) => i !== index && page.pageName === editedName.trim(),
-      );
-      if (isDuplicate) {
-        toast(
-          (props) => (
-            <ErrorToast {...props} message="Page name must be unique!" />
-          ),
-          {
-            position: "top-right",
-            autoClose: false,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: false,
-            progress: undefined,
-            theme: "light",
-            transition: Flip,
-          },
-        );
-        return;
-      }
-      updatePageName(index, editedName.trim());
-    }
-    setEditingIndex(null);
-  };
+	const handleEditSubmit = (index: number) => {
+		if (!editedName.trim()) {
+			setEditedName(pages[index].pageName); // Revert to existing name if new name is empty string
+		} else {
+			const isDuplicate = pages.some(
+				(page, i) => i !== index && page.pageName === editedName.trim()
+			);
+			if (isDuplicate) {
+				toastError("Page name must be unique!");
+				return;
+			}
+			updatePageName(index, editedName.trim());
+		}
+		setEditingIndex(null);
+	};
 
   const sensors = useSensors(
     useSensor(PointerSensor, {

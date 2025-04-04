@@ -120,6 +120,7 @@ function DraftLoader({
 	  setIsLoading,
 	  setHasLoadedDraftOnce
         ]);
+
   return null;
 }
 
@@ -141,8 +142,7 @@ export default function Editor() {
   const [pages, setPages] = useState<Page[]>([]);
   const [activePageIndex, setActivePageIndex] = useState<number | null>(null);
   const [isGridVisible, setIsGridVisible] = useState(false);
-
-  const [draftName, setDraftName] = useState("");
+	const [draftName, setDraftName] = useState('');
 
   useEffect(() => {
     const container = scrollContainerRef.current;
