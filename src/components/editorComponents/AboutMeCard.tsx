@@ -72,8 +72,7 @@ export default function AboutMeCard({
     try {
       const jsonContent = JSON.parse(content);
       setCurContent(jsonContent);
-    } catch (error) {
-      console.error("Error logging out:", error);
+    } catch {
       setCurContent({
         image: "No Image",
         bio: "Enter Bio here",
@@ -138,17 +137,18 @@ export default function AboutMeCard({
         async () => {
           // Get the download URL once uploaded
           const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+
+          setCurContent((prevContent: AboutMeCardContent) => ({
+            ...prevContent,
+            image: downloadURL,
+          }));
+
           setPreviewSrc(null);
 
           if (!sizeSet) {
             const { width, height } = await resizeImage(downloadURL);
             setSize({ width, height });
           }
-
-          setCurContent((prevContent: AboutMeCardContent) => ({
-            ...prevContent,
-            image: downloadURL,
-          }));
 
           updateComponent(
             id,
