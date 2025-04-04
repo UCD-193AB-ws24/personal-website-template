@@ -3,10 +3,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Rnd } from "react-rnd";
 import { PlayIcon } from "lucide-react";
-import { toast, Flip } from "react-toastify";
 
 import ActiveOutlineContainer from "@components/editorComponents/ActiveOutlineContainer";
-import ErrorToast from "@components/toasts/ErrorToast";
+import { toastError } from "@components/toasts/ErrorToast";
 
 import type {
   ComponentItem,
@@ -97,25 +96,7 @@ export default function VideoComponent({
       setVideoSrc(embedUrl);
       updateComponent(id, position, size, embedUrl);
     } else {
-      toast(
-        (props) => (
-          <ErrorToast
-            {...props}
-            message="Invalid YouTube video URL. Please enter a valid URL."
-          />
-        ),
-        {
-          position: "top-right",
-          autoClose: false,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: false,
-          progress: undefined,
-          theme: "light",
-          transition: Flip,
-        },
-      );
+      toastError("Invalid YouTube video URL. Please enter a valid URL.");
     }
   };
 

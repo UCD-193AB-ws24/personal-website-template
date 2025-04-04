@@ -1,6 +1,6 @@
 import { toast, ToastContentProps, Flip } from "react-toastify";
 
-export function toastSuccess(subtext: string) {
+export function toastSuccess(message: string) {
   toast(SuccessToast, {
     position: "top-right",
     autoClose: 2500,
@@ -11,12 +11,12 @@ export function toastSuccess(subtext: string) {
     progress: undefined,
     theme: "light",
     transition: Flip,
-    data: { subtext },
+    data: { message },
   });
 }
 
 interface SuccessToastProps {
-  data: { subtext: string };
+  data: { message: string };
 }
 
 export default function SuccessToast({
@@ -27,7 +27,7 @@ export default function SuccessToast({
     <div className="grid grid-cols-[1fr_1px_80px] w-full">
       <div className="flex flex-col p-4">
         <h3 className="font-semibold text-lg text-green-500">Success!</h3>
-        <p className="text-sm">{data.subtext}</p>
+        <p className="text-sm">{data.message}</p>
       </div>
       <div className="bg-zinc-900/20 h-full" />
       <div className="flex flex-col justify-center items-center">
