@@ -21,10 +21,9 @@ interface RichTextboxProps {
   isPreview: boolean;
   textboxState: string;
   updateTextboxState: (val: string) => void;
-  isActive?: boolean;
 }
 
-export default function RichTextbox({ isPreview, textboxState, updateTextboxState, isActive=false }: RichTextboxProps) {
+export default function RichTextbox({ isPreview, textboxState, updateTextboxState }: RichTextboxProps) {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
@@ -34,7 +33,7 @@ export default function RichTextbox({ isPreview, textboxState, updateTextboxStat
 
     const editorState = editor.parseEditorState(textboxState)
     editor.setEditorState(editorState);
-  }, [])
+  }, [editor, isPreview, textboxState])
 
   const onChangeHandler = (editorState: EditorState, _editor: LexicalEditor, _tags: Set<string>) => {
     updateTextboxState(JSON.stringify(editorState.toJSON()));

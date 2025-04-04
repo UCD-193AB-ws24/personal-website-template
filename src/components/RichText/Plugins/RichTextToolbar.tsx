@@ -1,7 +1,7 @@
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {$getNearestNodeOfType, mergeRegister} from '@lexical/utils';
+import {mergeRegister} from '@lexical/utils';
 import {INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND} from '@lexical/list';
-import {$isLinkNode, TOGGLE_LINK_COMMAND} from '@lexical/link'
+import {TOGGLE_LINK_COMMAND} from '@lexical/link'
 import {
   $getSelection,
   $isRangeSelection,
@@ -50,7 +50,7 @@ export default function RichTextToolbarPlugin() {
         toastError("Selected text must include one of the following protocols: http, https, mailto, sms, tel.");
         return "";
       }
-    } catch (error: any) {
+    } catch {
       toastError("Selected text is not a valid URL. Ensure that a protocol is provided. Example: https://example.com");
       return "";
     }

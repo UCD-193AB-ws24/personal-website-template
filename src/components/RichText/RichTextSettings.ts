@@ -1,7 +1,7 @@
 import { EditorThemeClasses } from "lexical";
 import { ParagraphNode, TextNode } from "lexical";
 import { ListItemNode, ListNode } from '@lexical/list';
-import { AutoLinkNode, LinkNode } from '@lexical/link';
+import { LinkNode } from '@lexical/link';
 
 export const RichTextTheme: EditorThemeClasses =  {
 	code: 'editor-code',

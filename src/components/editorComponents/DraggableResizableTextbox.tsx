@@ -114,7 +114,7 @@ export default function DraggableResizableTextbox({
         resizeGrid={[GRID_SIZE, GRID_SIZE]}
       >
         <ActiveOutlineContainer isActive={isActive}>
-          <RichTextbox isPreview={isPreview} textboxState={textboxState} updateTextboxState={updateTextboxState} isActive={isActive} />
+          <RichTextbox isPreview={isPreview} textboxState={textboxState} updateTextboxState={updateTextboxState} />
         </ActiveOutlineContainer>
       </Rnd>
     </LexicalComposer>
