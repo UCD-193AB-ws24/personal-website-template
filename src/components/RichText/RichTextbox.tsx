@@ -25,6 +25,7 @@ interface RichTextboxProps {
 
 export default function RichTextbox({ isPreview, textboxState, updateTextboxState, isActive=false }: RichTextboxProps) {
   const [editor] = useLexicalComposerContext();
+  const debug = false;
 
   useEffect(() => {
     if (isPreview) {
@@ -55,7 +56,7 @@ export default function RichTextbox({ isPreview, textboxState, updateTextboxStat
         <OnChangePlugin onChange={onChangeHandler} />
         <ListPlugin />
         <HistoryPlugin />
-        { isActive && <TreeViewPlugin /> }
+        { isActive && debug && <TreeViewPlugin /> }
         <TabIndentationPlugin />
       </div>
     </div>
