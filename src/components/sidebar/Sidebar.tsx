@@ -16,6 +16,7 @@ import {
   Rows2Icon,
   Columns2Icon,
   StarIcon,
+  PresentationIcon,
 } from "lucide-react";
 
 import SidebarItem from "./SidebarItem";
@@ -122,6 +123,13 @@ const sidebarItems = [
   },
   {
     id: 15,
+    type: "projectCard",
+    name: "Project Card",
+    description: "Describe project(s) you worked on.",
+    icon: <PresentationIcon />,
+  },
+  {
+    id: 16,
     type: "endoresment",
     name: "Endoresment",
     description: "Add quotes or recommendations from colleagues.",
@@ -132,7 +140,7 @@ const sidebarItems = [
 export default function Sidebar() {
   return (
     <div
-      className={`flex w-64 bg-gray-100 max-h-screen sticky top-0 transition-width duration-300`}
+      className={`flex w-64 bg-gray-100 max-h-screen fixed left-0 top-0 transition-width duration-300 z-[1000]`}
     >
       <div className="overflow-y-auto w-64 bg-gray-100 px-4 pt-3 pb-4 border-r h-screen">
         <Link href="/" className="flex items-center gap-x-3 mb-4">

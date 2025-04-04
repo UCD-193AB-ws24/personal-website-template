@@ -4,7 +4,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@lib/firebase/firebaseApp";
 import { signUserOut } from "@lib/firebase/auth";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { APIResponse } from "@customTypes/apiResponse";
 import { fetchUsername } from "@lib/requests/fetchUsername";
 import LoadingSpinner from "@components/LoadingSpinner";
@@ -26,13 +26,6 @@ export default function SetupDraft() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    if (user) {
-      getUsername();
-      getDraftMappings();
-    }
-  }, [user]);
-
   const handleSignOut = async () => {
     try {
       await signUserOut();
@@ -43,7 +36,7 @@ export default function SetupDraft() {
     }
   };
 
-  const getUsername = async () => {
+  const getUsername = useCallback(async () => {
     const name = await fetchUsername();
     if (name === null) {
       setUsername("Unknown");
@@ -51,7 +44,7 @@ export default function SetupDraft() {
     } else {
       setUsername(name);
     }
-  };
+  }, [router]);
 
   const getDraftMappings = () => {
     setIsLoading(true);
@@ -139,6 +132,13 @@ export default function SetupDraft() {
     }
     setIsLoading(false);
   };
+
+  useEffect(() => {
+    if (user) {
+      getUsername();
+      getDraftMappings();
+    }
+  }, [user, getUsername]);
 
   return (
     <div>

@@ -3,11 +3,10 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@lib/firebase/firebaseApp";
 import { signUserOut } from "@lib/firebase/auth";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { APIResponse, TemplateMapping } from "@customTypes/apiResponse";
+import { useCallback, useEffect, useState } from "react";
+import { TemplateMapping } from "@customTypes/apiResponse";
 import Navbar from "@components/Navbar";
 import LoadingSpinner from "@components/LoadingSpinner";
-import DraftItem from "@components/DraftItem";
 import { fetchUsername } from "@lib/requests/fetchUsername";
 import { fetchTemplateMappings } from "@lib/requests/fetchTemplateMappings";
 import TemplateItem from "@components/TemplateItem";
@@ -22,23 +21,12 @@ export default function Templates() {
   const [user] = useAuthState(auth);
   const [username, setUsername] = useState("");
   const [isModalHidden, setIsModalHidden] = useState(true);
-  const [newDraftName, setNewDraftName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [templateMappings, setTemplateMappings] = useState<TemplateMapping[]>(
     [],
   );
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateMapping>();
   const router = useRouter();
-
-  useEffect(() => {
-    if (user) {
-      getUsername();
-      getTemplates();
-    }
-    // else {
-    //   router.push("/")
-    // }
-  }, [user]);
 
   const handleSignOut = async () => {
     try {
@@ -50,7 +38,7 @@ export default function Templates() {
     }
   };
 
-  const getUsername = async () => {
+  const getUsername = useCallback(async () => {
     const name = await fetchUsername();
     if (name === null) {
       setUsername("Unknown");
@@ -58,7 +46,7 @@ export default function Templates() {
     } else {
       setUsername(name);
     }
-  };
+  }, [router]);
 
   const getTemplates = async () => {
     setIsLoading(true);
@@ -126,6 +114,13 @@ export default function Templates() {
 
     setIsLoading(false);
   };
+
+  useEffect(() => {
+    if (user) {
+      getUsername();
+      getTemplates();
+    }
+  }, [user, getUsername]);
 
   return (
     <div>

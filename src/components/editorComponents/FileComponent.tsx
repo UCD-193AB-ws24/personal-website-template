@@ -3,12 +3,11 @@
 import React, { useState, useRef } from "react";
 import { Rnd } from "react-rnd";
 import { MoveIcon } from "lucide-react";
-import { toast, Flip } from "react-toastify";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useSearchParams } from "next/navigation";
 
 import ActiveOutlineContainer from "@components/editorComponents/ActiveOutlineContainer";
-import ErrorToast from "@components/toasts/ErrorToast";
+import { toastError } from "@components/toasts/ErrorToast";
 import SkeletonLoader from "@components/editorComponents/SkeletonLoader";
 
 import type {
@@ -56,7 +55,6 @@ export default function FileComponent({
   const [loading, setLoading] = useState(!!content);
   const [previewSrc, setPreviewSrc] = useState<string | null>(null);
   const [showOverlay, setShowOverlay] = useState(false);
-  const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   // Track the initial mouse position for threshold logic
   const startPos = useRef<{ x: number; y: number } | null>(null);
@@ -72,25 +70,7 @@ export default function FileComponent({
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       if (file.size > MAX_FILE_SIZE) {
-        toast(
-          (props) => (
-            <ErrorToast
-              {...props}
-              message="File size exceeds the 5MB limit. Please upload a smaller file."
-            />
-          ),
-          {
-            position: "top-right",
-            autoClose: false,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: false,
-            progress: undefined,
-            theme: "light",
-            transition: Flip,
-          },
-        );
+        toastError("File size exceeds the 5MB limit. Please upload a smaller file.");
         return;
       }
       const filePath = `users/${userId}/drafts/${draftNumber}/${id}-${file.name}`;
@@ -159,7 +139,7 @@ export default function FileComponent({
       size={{ width: size.width, height: size.height }}
       position={{ x: position.x, y: position.y }}
       onDragStart={() => setIsDragging(true)}
-      onDrag={(e, d) => {
+      onDrag={(e, _d) => {
         setIsDragging(true);
         setShowOverlay(true);
         if (startPos.current) {

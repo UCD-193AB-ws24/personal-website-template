@@ -38,10 +38,10 @@ export default function IconComponent({
   initialPos = { x: 75, y: 0 },
   initialSize = { width: 50, height: 50 },
   components = [],
-  updateComponent = () => { },
+  updateComponent = () => {},
   isActive = true,
-  onMouseDown = () => { },
-  setIsDragging = () => { },
+  onMouseDown = () => {},
+  setIsDragging = () => {},
   isPreview = false,
   content = "Star",
 }: IconComponentProps) {
@@ -117,13 +117,13 @@ export default function IconComponent({
           setIsDragging(false);
           setDrag(false);
           setShowDropdown(false);
-          handleResizeStop(id, components, updateComponent, setSize, setPosition)(
-            e,
-            d,
-            ref,
-            delta,
-            newPosition,
-          );
+          handleResizeStop(
+            id,
+            components,
+            updateComponent,
+            setSize,
+            setPosition,
+          )(e, d, ref, delta, newPosition);
         }}
         lockAspectRatio={true}
         minWidth={20}
@@ -147,7 +147,9 @@ export default function IconComponent({
           style={{
             position: "absolute",
             top: `${position.y + 10}px`,
-            left: isButtonOnLeft ? `${position.x - 25}px` : `${position.x + size.width}px`,
+            left: isButtonOnLeft
+              ? `${position.x - 25}px`
+              : `${position.x + size.width}px`,
             zIndex: 10,
             pointerEvents: "auto",
             transition: "opacity 0.2s ease-in-out, transform 0.1s",
@@ -164,7 +166,9 @@ export default function IconComponent({
             style={{
               position: "absolute",
               top: `${position.y + 40}px`,
-              left: isButtonOnLeft ? `${position.x - dropdownWidth - parentPadding}px` : `${position.x + size.width + parentPadding}px`,
+              left: isButtonOnLeft
+                ? `${position.x - dropdownWidth - parentPadding}px`
+                : `${position.x + size.width + parentPadding}px`,
               zIndex: 1000,
               backgroundColor: "white",
               border: "1px solid #ccc",

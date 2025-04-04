@@ -3,10 +3,9 @@
 import React, { useState, useRef } from "react";
 import { Rnd } from "react-rnd";
 import { MoveIcon } from "lucide-react";
-import { toast, Flip } from "react-toastify";
 
 import ActiveOutlineContainer from "@components/editorComponents/ActiveOutlineContainer";
-import ErrorToast from "@components/toasts/ErrorToast";
+import { toastError } from "@components/toasts/ErrorToast";
 
 import type {
   ComponentItem,
@@ -50,7 +49,6 @@ export default function WebPageComponent({
   const [size, setSize] = useState(initialSize);
   const [webpageSrc, setWebPageSrc] = useState(content || "");
   const [showOverlay, setShowOverlay] = useState(false);
-  const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   // Track the initial mouse position for threshold logic
   const startPos = useRef<{ x: number; y: number } | null>(null);
@@ -80,25 +78,7 @@ export default function WebPageComponent({
       setWebPageSrc(url);
       updateComponent(id, position, size, url);
     } else {
-      toast(
-        (props) => (
-          <ErrorToast
-            {...props}
-            message="Invalid URL. Please enter a valid URL."
-          />
-        ),
-        {
-          position: "top-right",
-          autoClose: false,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: false,
-          progress: undefined,
-          theme: "light",
-          transition: Flip,
-        },
-      );
+      toastError("Invalid URL. Please enter a valid URL.");
     }
   };
 
@@ -131,7 +111,7 @@ export default function WebPageComponent({
       size={{ width: size.width, height: size.height }}
       position={{ x: position.x, y: position.y }}
       onDragStart={() => setIsDragging(true)}
-      onDrag={(e, d) => {
+      onDrag={(e, _d) => {
         setIsDragging(true);
         setShowOverlay(true);
         if (startPos.current) {

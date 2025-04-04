@@ -24,19 +24,20 @@ const fetchStoredAndReferencedFiles = async (
             (comp.type === "image" ||
               comp.type === "file" ||
               comp.type === "aboutMeCard") &&
-            comp.content
+            comp.content,
         )
         .map((comp: any) => {
-          const content = comp.type === "aboutMeCard"
-            ? JSON.parse(comp.content).image
-            : comp.content;
+          const content =
+            comp.type === "aboutMeCard"
+              ? JSON.parse(comp.content).image
+              : comp.content;
 
           const url = new URL(content);
           const storagePath = decodeURIComponent(
             url.pathname.replace(
               `/v0/b/${storage.app.options.storageBucket}/o/`,
-              ""
-            )
+              "",
+            ),
           );
 
           return storagePath;
