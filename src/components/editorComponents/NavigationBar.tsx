@@ -76,7 +76,7 @@ export default function NavigationBar({
     const winWidth = window.innerWidth;
 
     setBackgroundWidth(totalWidth < winWidth ? winWidth : totalWidth);
-  }, []);
+  }, [components]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();

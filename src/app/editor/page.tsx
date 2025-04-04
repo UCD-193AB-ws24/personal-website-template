@@ -98,19 +98,28 @@ function DraftLoader({
             setComponents([]);
           }
 
-          setIsLoading(false);
-          setHasLoadedDraftOnce(true);
-        })
-        .catch((error) => {
-          console.error("Error fetching draft:", error);
-          setIsLoading(false);
-          setHasLoadedDraftOnce(true);
-        });
-    } else {
-      setIsLoading(false);
-      setHasLoadedDraftOnce(true);
-    }
-  }, [draftNumber]);
+					setIsLoading(false);
+					setHasLoadedDraftOnce(true);
+				})
+				.catch((error) => {
+					console.error('Error fetching draft:', error);
+					setIsLoading(false);
+					setHasLoadedDraftOnce(true);
+				});
+		} else {
+			setIsLoading(false);
+			setHasLoadedDraftOnce(true);
+		}
+	}, [
+          draftNumber,
+          setDraftNumber,
+	  setDraftName,
+	  setPages,
+	  setActivePageId,
+	  setComponents,
+	  setIsLoading,
+	  setHasLoadedDraftOnce
+        ]);
 
   return null;
 }
@@ -134,8 +143,7 @@ export default function Editor() {
   const [activePageIndex, setActivePageIndex] = useState<number | null>(null);
   const [isGridVisible, setIsGridVisible] = useState(false);
 
-  const [username, setUsername] = useState("");
-  const [draftName, setDraftName] = useState("");
+	const [draftName, setDraftName] = useState('');
 
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -493,17 +501,18 @@ export default function Editor() {
     ) : null;
   };
 
-  {
-    /* Make Navigation Bar always present when more than one page exists */
-  }
-  useEffect(() => {
-    if (
-      pages.length > 1 &&
-      !components.some((comp) => comp.type === "navBar")
-    ) {
-      addComponent("navBar", { x: 0, y: 0 }, `navBar-${Date.now()}`);
-    }
-  }, [pages, components]);
+	{
+		/* Make Navigation Bar always present when more than one page exists */
+	}
+	useEffect(() => {
+		if (
+			pages.length > 1 &&
+			!components.some((comp) => comp.type === 'navBar')
+		) {
+			addComponent('navBar', { x: 0, y: 0 }, `navBar-${Date.now()}`);
+		}
+           // eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [pages, components]);
 
   return (
     <>

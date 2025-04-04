@@ -3,7 +3,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@lib/firebase/firebaseApp";
 import { signUserOut } from "@lib/firebase/auth";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { APIResponse } from "@customTypes/apiResponse";
 import Navbar from "@components/Navbar";
 import LoadingSpinner from "@components/LoadingSpinner";
@@ -28,22 +28,11 @@ export default function SavedDrafts() {
     id: number;
     name: string;
   }>();
-  const [newDraftName, setNewDraftName] = useState("");
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [publishedDraftNumber, setPublishedDraftNumber] = useState(0);
 
-  useEffect(() => {
-    if (user) {
-      getUsername();
-      getDraftMappings();
-      getPublishedDraftNumber();
-    }
-    // else {
-    //   router.push("/")
-    // }
-  }, [user]);
-
+  
   const handleSignOut = async () => {
     try {
       await signUserOut();
@@ -53,8 +42,8 @@ export default function SavedDrafts() {
       console.error("Error logging out:", error);
     }
   };
-
-  const getUsername = async () => {
+  
+  const getUsername = useCallback(async () => {
     const name = await fetchUsername();
     if (name === null) {
       setUsername("Unknown");
@@ -62,8 +51,8 @@ export default function SavedDrafts() {
     } else {
       setUsername(name);
     }
-  };
-
+  }, [router]);
+  
   const getDraftMappings = () => {
     setIsLoading(true);
     fetch("/api/user/get-drafts", {
@@ -71,30 +60,30 @@ export default function SavedDrafts() {
         "Content-Type": "application/json",
       },
     })
-      .then((res) => res.json())
-      .then((res) => {
-        if (res.success) {
-          setDraftMappings(res.data);
-          setIsLoading(false);
-        } else {
-          throw new Error(res.error);
-        }
-      })
-      .catch((error) => {
-        console.log(error.message);
+    .then((res) => res.json())
+    .then((res) => {
+      if (res.success) {
+        setDraftMappings(res.data);
         setIsLoading(false);
-      });
+      } else {
+        throw new Error(res.error);
+      }
+    })
+    .catch((error) => {
+      console.log(error.message);
+      setIsLoading(false);
+    });
   };
-
+  
   const getPublishedDraftNumber = async () => {
     setIsLoading(true);
-
+    
     const pubDraftNum = await fetchPublishedDraftNumber();
     setPublishedDraftNumber(pubDraftNum);
-
+    
     setIsLoading(false);
   };
-
+  
   const unpublish = () => {
     setIsLoading(true);
     fetch("/api/user/unpublish-draft", {
@@ -117,32 +106,32 @@ export default function SavedDrafts() {
         console.log(error.message);
         setIsLoading(false);
       });
-  };
-
-  const loadEditor = async (draftNumber: string) => {
-    router.push("/editor?draftNumber=" + draftNumber);
-  };
-
-  const handleNewDraft = async () => {
-    const timestamp = Date.now();
-    setSelectedDraft({ id: timestamp, name: "Untitled Draft" });
-  };
-
-  const handleDeleteDraft = async (draftNumber: number, draftName: string) => {
-    setIsLoading(true);
-    try {
-      const res = await fetch("/api/user/delete-draft", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+    };
+    
+    const loadEditor = async (draftNumber: string) => {
+      router.push("/editor?draftNumber=" + draftNumber);
+    };
+    
+    const handleNewDraft = async () => {
+      const timestamp = Date.now();
+      setSelectedDraft({ id: timestamp, name: "Untitled Draft" });
+    };
+    
+    const handleDeleteDraft = async (draftNumber: number, draftName: string) => {
+      setIsLoading(true);
+      try {
+        const res = await fetch("/api/user/delete-draft", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
         },
         body: JSON.stringify({
           draftObj: { id: draftNumber, name: draftName },
         }),
       });
-
+      
       const resBody = (await res.json()) as APIResponse<string>;
-
+      
       if (res.ok && resBody.success) {
         // Delete the Firebase Storage directory since draft is
         // now successfully deleted
@@ -152,110 +141,117 @@ export default function SavedDrafts() {
         }
         setDraftMappings((original) =>
           original.filter((d) => d.id !== draftNumber),
-        );
-        toastSuccess("Successfully deleted your draft.");
-      } else if (!resBody.success) {
-        throw new Error(resBody.error);
-      }
-      setIsLoading(false);
-    } catch (error: any) {
-      console.log("Error creating new draft:", error.message);
-      setIsLoading(false);
+      );
+      toastSuccess("Successfully deleted your draft.");
+    } else if (!resBody.success) {
+      throw new Error(resBody.error);
     }
-  };
+    setIsLoading(false);
+  } catch (error: any) {
+    console.log("Error creating new draft:", error.message);
+    setIsLoading(false);
+  }
+};
 
-  const handleRenameDraft = async (
-    draftNumber: number,
-    oldName: string,
-    newName: string,
-  ) => {
-    setIsLoading(true);
-    try {
-      const res = await fetch("/api/user/rename-draft", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          number: draftNumber,
-          oldName: oldName,
-          newName: newName,
+const handleRenameDraft = async (
+  draftNumber: number,
+  oldName: string,
+  newName: string,
+) => {
+  setIsLoading(true);
+  try {
+    const res = await fetch("/api/user/rename-draft", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        number: draftNumber,
+        oldName: oldName,
+        newName: newName,
+      }),
+    });
+    
+    const resBody = (await res.json()) as APIResponse<string>;
+    
+    if (res.ok && resBody.success) {
+      setDraftMappings((original) =>
+        original.map((d) => {
+          if (d.id === draftNumber) {
+            d.name = newName;
+          }
+          return d;
         }),
-      });
-
-      const resBody = (await res.json()) as APIResponse<string>;
-
-      if (res.ok && resBody.success) {
-        setDraftMappings((original) =>
-          original.map((d) => {
-            if (d.id === draftNumber) {
-              d.name = newName;
-            }
-            return d;
-          }),
-        );
-        toastSuccess("Successfully renamed your draft.");
-      } else if (!resBody.success) {
-        throw new Error(resBody.error);
-      }
-      setIsLoading(false);
-    } catch (error: any) {
-      console.log("Error creating new draft:", error.message);
-      setIsLoading(false);
-    }
-    setIsModalHidden(true);
-    setNewDraftName("");
-    setSelectedDraft(undefined);
-  };
-
-  const handleNameChange = async (newDraftName: string) => {
-    setIsLoading(true);
-    if (selectedDraft) {
-      // Selected draft is not in the draft mappings, i.e. new draft is being created
-      if (
-        draftMappings.find((mapping) => mapping.id === selectedDraft.id) ===
-        undefined
-      ) {
-        await createDraft(selectedDraft.id, newDraftName);
-        setIsLoading(false);
-        router.push("/editor?draftNumber=" + selectedDraft.id);
-      } else {
-        handleRenameDraft(selectedDraft.id, selectedDraft.name, newDraftName);
-      }
+      );
+      toastSuccess("Successfully renamed your draft.");
+    } else if (!resBody.success) {
+      throw new Error(resBody.error);
     }
     setIsLoading(false);
-  };
-
-  const publishAsTemplate = async (id: number, name: string) => {
-    setIsLoading(true);
-
-    const result = await createTemplate(id, name);
-    if (result) {
-      toastSuccess("Successfully published draft as a template.");
-    }
+  } catch (error: any) {
+    console.log("Error creating new draft:", error.message);
     setIsLoading(false);
-  };
+  }
+  setIsModalHidden(true);
+  setSelectedDraft(undefined);
+};
 
-  return (
-    <div>
+const handleNameChange = async (newDraftName: string) => {
+  setIsLoading(true);
+  if (selectedDraft) {
+    // Selected draft is not in the draft mappings, i.e. new draft is being created
+    if (
+      draftMappings.find((mapping) => mapping.id === selectedDraft.id) ===
+      undefined
+    ) {
+      await createDraft(selectedDraft.id, newDraftName);
+      setIsLoading(false);
+      router.push("/editor?draftNumber=" + selectedDraft.id);
+    } else {
+      handleRenameDraft(selectedDraft.id, selectedDraft.name, newDraftName);
+    }
+  }
+  setIsLoading(false);
+};
+
+const publishAsTemplate = async (id: number, name: string) => {
+  setIsLoading(true);
+  
+  const result = await createTemplate(id, name);
+  if (result) {
+    toastSuccess("Successfully published draft as a template.");
+  }
+  setIsLoading(false);
+};
+
+useEffect(() => {
+  if (user) {
+    getUsername();
+    getDraftMappings();
+    getPublishedDraftNumber();
+  }
+}, [user, getUsername]);
+
+return (
+  <div>
       <header>
         {user ? (
           <Navbar
-            user={true}
-            username={username}
-            onSignOut={handleSignOut}
-            navLinks={[
-              { label: "Home", href: "/" },
-              { label: "Profile", href: "/profile" },
-            ]}
+          user={true}
+          username={username}
+          onSignOut={handleSignOut}
+          navLinks={[
+            { label: "Home", href: "/" },
+            { label: "Profile", href: "/profile" },
+          ]}
           />
         ) : (
           <Navbar
-            user={false}
-            navLinks={[
-              { label: "Log In", href: "/login" },
-              { label: "Sign Up", href: "/signup" },
-            ]}
+          user={false}
+          navLinks={[
+            { label: "Log In", href: "/login" },
+            { label: "Sign Up", href: "/signup" },
+          ]}
           />
         )}
       </header>

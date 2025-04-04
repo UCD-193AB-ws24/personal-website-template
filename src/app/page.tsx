@@ -12,13 +12,13 @@ import Navbar from "@components/Navbar";
 export default function Home() {
   const [user] = useAuthState(auth);
   const [username, setUsername] = useState("");
-  const [publishedDraftNumber, setPublishedDraftNumber] = useState("");
   const router = useRouter();
 
   useEffect(() => {
     if (user) {
       getUsername();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const handleSignOut = async () => {
