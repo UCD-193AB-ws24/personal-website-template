@@ -16,6 +16,7 @@ import {
   Rows2Icon,
   Columns2Icon,
   StarIcon,
+  PresentationIcon,
 } from "lucide-react";
 
 import SidebarItem from "./SidebarItem";
@@ -122,6 +123,13 @@ const sidebarItems = [
   },
   {
     id: 15,
+    type: "projectCard",
+    name: "Project Card",
+    description: "Describe project(s) you worked on.",
+    icon: <PresentationIcon />,
+  },
+  {
+    id: 16,
     type: "endoresment",
     name: "Endoresment",
     description: "Add quotes or recommendations from colleagues.",

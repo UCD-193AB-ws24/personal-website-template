@@ -5,9 +5,11 @@ import { ReactNode, useState, useEffect } from "react";
 export default function FullWindow({
   children,
   width,
+  lowestY,
 }: {
   children: ReactNode;
   width: number;
+  lowestY: number;
 }) {
   const [height, setHeight] = useState(0);
   const [windowWidth, setWindowWidth] = useState(0);
@@ -20,6 +22,10 @@ export default function FullWindow({
   const sidePadding = 128; // 8rem
   const totalWidth = width + sidePadding * 2;
   const useFullWindowWidth = totalWidth < windowWidth;
+
+  useEffect(() => {
+    setHeight((prev) => Math.max(prev, lowestY + 50));
+  }, [lowestY]);
 
   return (
     <div

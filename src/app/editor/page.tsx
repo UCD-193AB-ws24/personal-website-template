@@ -142,7 +142,6 @@ export default function Editor() {
   const [pages, setPages] = useState<Page[]>([]);
   const [activePageIndex, setActivePageIndex] = useState<number | null>(null);
   const [isGridVisible, setIsGridVisible] = useState(false);
-
 	const [draftName, setDraftName] = useState('');
 
   useEffect(() => {
@@ -159,12 +158,12 @@ export default function Editor() {
 
     const farthestX = Math.max(
       ...components
-        .filter((comp) => comp.type !== "navBar")
+        .filter((comp) => comp.type !== "navBar" && comp.type !== "projectCard")
         .map((comp) => comp.position.x + comp.size.width),
       defaultWidth,
     );
 
-    setEditorHeight(Math.max(lowestY, defaultHeight));
+    setEditorHeight(Math.max(lowestY + 50, defaultHeight));
     setEditorWidth(Math.max(farthestX, defaultWidth));
   }, [components]);
 
@@ -421,13 +420,15 @@ export default function Editor() {
         ),
       );
 
-      const roundedX = Math.round(dropX / GRID_SIZE) * GRID_SIZE;
+      let roundedX = Math.round(dropX / GRID_SIZE) * GRID_SIZE;
       const roundedY = Math.round(dropY / GRID_SIZE) * GRID_SIZE;
+      if (activeComponent.type === "projectCard") roundedX = 0;
 
       const newSize = componentSizes[activeComponent.type] || {
         width: draggedRect.width,
         height: draggedRect.height,
       };
+
       const newPos = findBestFreeSpot(
         { x: roundedX, y: roundedY },
         newSize,
@@ -524,7 +525,7 @@ export default function Editor() {
           >
             Exit Preview
           </button>
-          <FullWindow width={editorWidth}>
+          <FullWindow width={editorWidth} lowestY={editorHeight - 50}>
             {components.map(renderComponent)}
           </FullWindow>
         </div>
@@ -627,7 +628,8 @@ export default function Editor() {
                             ? `${activeComponent.position.y + activeComponent.size.height + 15}px`
                             : `${activeComponent.position.y - 25}px`,
                         left:
-                          activeComponent.type === "navBar"
+                          activeComponent.type === "navBar" ||
+                          activeComponent.type === "projectCard"
                             ? "50px"
                             : `${activeComponent.position.x + activeComponent.size.width - 20}px`,
                         zIndex: 10,
