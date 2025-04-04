@@ -2,15 +2,15 @@
 
 import { useState, useEffect, useRef, Suspense } from "react";
 import {
-	DndContext,
-	DragOverlay,
-	DragStartEvent,
-	DragEndEvent,
-	DragMoveEvent,
-} from '@dnd-kit/core';
-import { restrictToWindowEdges } from '@dnd-kit/modifiers';
-import { ArrowUpIcon, XIcon, GridIcon } from 'lucide-react';
-import { ToastContainer } from 'react-toastify';
+  DndContext,
+  DragOverlay,
+  DragStartEvent,
+  DragEndEvent,
+  DragMoveEvent,
+} from "@dnd-kit/core";
+import { restrictToWindowEdges } from "@dnd-kit/modifiers";
+import { ArrowUpIcon, XIcon } from "lucide-react";
+import { ToastContainer } from "react-toastify";
 
 import EditorDropZone from "@components/editorComponents/EditorDropZone";
 import EditorTopBar from "@components/editorComponents/EditorTopBar";
@@ -34,18 +34,18 @@ import {
   renderOverlayContent,
 } from "@utils/componentUtils";
 import {
-	switchPage,
-	updatePageName,
-	addPage,
-	deletePage,
-} from '@utils/pageManagerUtils';
-import { GRID_SIZE } from '@utils/constants';
-import { useSearchParams } from 'next/navigation';
-import { toastSaveSuccess } from '@components/toasts/SaveToast';
-import { saveDraft } from '@lib/requests/saveDrafts';
-import { fetchDraftName } from '@lib/requests/fetchDraftName';
-import { auth } from '@lib/firebase/firebaseApp';
-import { deleteUnusedDraftFiles } from '@lib/requests/deleteUnusedFiles';
+  switchPage,
+  updatePageName,
+  addPage,
+  deletePage,
+} from "@utils/pageManagerUtils";
+import { GRID_SIZE } from "@utils/constants";
+import { useSearchParams } from "next/navigation";
+import { toastSaveSuccess } from "@components/toasts/SaveToast";
+import { saveDraft } from "@lib/requests/saveDrafts";
+import { fetchDraftName } from "@lib/requests/fetchDraftName";
+import { auth } from "@lib/firebase/firebaseApp";
+import { deleteUnusedDraftFiles } from "@lib/requests/deleteUnusedFiles";
 
 interface DraftLoaderProps {
   setPages: any;
