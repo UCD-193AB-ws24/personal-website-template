@@ -142,7 +142,6 @@ export default function Editor() {
   const [activePageIndex, setActivePageIndex] = useState<number | null>(null);
   const [isGridVisible, setIsGridVisible] = useState(false);
 
-  const [username, setUsername] = useState("");
   const [draftName, setDraftName] = useState("");
 
   useEffect(() => {

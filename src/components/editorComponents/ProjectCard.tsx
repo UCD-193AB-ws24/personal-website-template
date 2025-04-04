@@ -63,10 +63,10 @@ export default function ProjectCard({
       if (Array.isArray(jsonContent)) {
         setCards(jsonContent);
       }
-    } catch (e) {
+    } catch {
       setCards([]);
     }
-  }, []);
+  }, [content]);
 
   useEffect(() => {
     if (!containerRef.current) return;
