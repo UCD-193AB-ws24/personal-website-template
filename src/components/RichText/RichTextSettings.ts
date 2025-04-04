@@ -1,6 +1,7 @@
 import { EditorThemeClasses } from "lexical";
 import { ParagraphNode, TextNode } from "lexical";
 import { ListItemNode, ListNode } from '@lexical/list';
+import { AutoLinkNode, LinkNode } from '@lexical/link';
 
 export const RichTextTheme: EditorThemeClasses =  {
 	code: 'editor-code',
@@ -49,7 +50,7 @@ export const RichTextTheme: EditorThemeClasses =  {
 
 export const RichTextInitialConfig = {
 	namespace: "RichTextbox",
-	nodes: [ParagraphNode, TextNode, ListNode, ListItemNode],
+	nodes: [ParagraphNode, TextNode, ListNode, ListItemNode, LinkNode],
 	onError(error: Error) {
 		throw error;
 	},

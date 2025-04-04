@@ -7,13 +7,14 @@ import {HistoryPlugin} from '@lexical/react/LexicalHistoryPlugin';
 import {LexicalErrorBoundary} from '@lexical/react/LexicalErrorBoundary';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin';
+import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
+import {ClickableLinkPlugin} from '@lexical/react/LexicalClickableLinkPlugin';
 import {
   LexicalEditor,
 } from 'lexical';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import "./RichText.css";
-import TreeViewPlugin from '@components/RichText/Plugins/RichTextTreeView';
 
 
 interface RichTextboxProps {
@@ -25,7 +26,6 @@ interface RichTextboxProps {
 
 export default function RichTextbox({ isPreview, textboxState, updateTextboxState, isActive=false }: RichTextboxProps) {
   const [editor] = useLexicalComposerContext();
-  const debug = false;
 
   useEffect(() => {
     if (isPreview) {
@@ -41,7 +41,7 @@ export default function RichTextbox({ isPreview, textboxState, updateTextboxStat
   }
 
   return (
-    <div className="rounded-[2px] relative text-left h-full whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg leading-none">
+    <div className="rounded-[2px] relative text-left h-full whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg leading-none bg-white">
       <div className="bg-white relative h-full">
         <RichTextPlugin
           contentEditable={
@@ -55,8 +55,9 @@ export default function RichTextbox({ isPreview, textboxState, updateTextboxStat
         />
         <OnChangePlugin onChange={onChangeHandler} />
         <ListPlugin />
+        <ClickableLinkPlugin />
+        <LinkPlugin />
         <HistoryPlugin />
-        { isActive && debug && <TreeViewPlugin /> }
         <TabIndentationPlugin />
       </div>
     </div>

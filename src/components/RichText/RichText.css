@@ -36,6 +36,11 @@
 .RichTextbox-link {
   color: rgb(33, 111, 219);
   text-decoration: none;
+  cursor: pointer;
+}
+.RichTextbox-link:hover {
+  text-decoration: underline;
+  color: rgb(33, 111, 219);
 }
 
 .tree-view-output {

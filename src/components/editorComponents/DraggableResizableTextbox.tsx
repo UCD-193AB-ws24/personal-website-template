@@ -14,7 +14,7 @@ import type {
 import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
 import { GRID_SIZE } from "@utils/constants";
 import RichTextbox from "@components/RichText/RichTextbox";
-import ToolbarPlugin from '@components/RichText/Plugins/RichTextToolbar';
+import RichTextToolbarPlugin from '@components/RichText/Plugins/RichTextToolbar';
 import {LexicalComposer} from '@lexical/react/LexicalComposer';
 import { RichTextInitialConfig, BlankRichTextEditorState } from "@components/RichText/RichTextSettings";
 
@@ -79,7 +79,7 @@ export default function DraggableResizableTextbox({
       </LexicalComposer>
     </div>) : (
     <LexicalComposer initialConfig={RichTextInitialConfig}>
-      { isActive && <ToolbarPlugin /> }
+      { isActive && <RichTextToolbarPlugin /> }
       <Rnd
         size={{ width: size.width, height: size.height }}
         position={{ x: position.x, y: position.y }}

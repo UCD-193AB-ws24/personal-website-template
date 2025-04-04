@@ -19,7 +19,7 @@ import {
 	restrictToParentElement,
 } from '@dnd-kit/modifiers';
 
-import ErrorToast from '@components/toasts/ErrorToast';
+import ErrorToast, { toastError } from '@components/toasts/ErrorToast';
 import SortablePageItem from '@components/SortablePageItem';
 
 import type { ComponentItem } from '@customTypes/componentTypes';
@@ -86,25 +86,7 @@ export default function NavigationBar({
 				(page, i) => i !== index && page.pageName === editedName.trim()
 			);
 			if (isDuplicate) {
-				toast(
-					(props) => (
-						<ErrorToast
-							{...props}
-							message="Page name must be unique!"
-						/>
-					),
-					{
-						position: 'top-right',
-						autoClose: false,
-						hideProgressBar: true,
-						closeOnClick: true,
-						pauseOnHover: true,
-						draggable: false,
-						progress: undefined,
-						theme: 'light',
-						transition: Flip,
-					}
-				);
+				toastError("Page name must be unique!");
 				return;
 			}
 			updatePageName(index, editedName.trim());
