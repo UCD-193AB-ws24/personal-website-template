@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {$createParagraphNode, $createTextNode, $getRoot, EditorState} from 'lexical';
 import {useEffect} from 'react';
 
@@ -27,6 +28,7 @@ export default function RichTextbox({ isPreview, textboxState, updateTextboxStat
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
+    console.log("useeffect")
     if (isPreview) {
       editor.setEditable(false);
     }
@@ -48,7 +50,7 @@ export default function RichTextbox({ isPreview, textboxState, updateTextboxStat
         root.append(paragraph);
       })
     }
-  }, [editor, isPreview, textboxState])
+  }, [])
 
   const onChangeHandler = (editorState: EditorState, _editor: LexicalEditor, _tags: Set<string>) => {
     updateTextboxState(JSON.stringify(editorState.toJSON()));
