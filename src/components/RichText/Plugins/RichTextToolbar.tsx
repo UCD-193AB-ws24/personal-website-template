@@ -122,7 +122,7 @@ export default function RichTextToolbarPlugin() {
       }
     }
 
-  }, []);
+  }, [fontSize]);
 
   useEffect(() => {
     return mergeRegister(
