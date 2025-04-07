@@ -5,24 +5,31 @@ import {TOGGLE_LINK_COMMAND} from '@lexical/link'
 import {
   $getSelection,
   $isRangeSelection,
+  $isTextNode,
   CAN_REDO_COMMAND,
   CAN_UNDO_COMMAND,
+  createCommand,
   FORMAT_ELEMENT_COMMAND,
   FORMAT_TEXT_COMMAND,
+  LexicalCommand,
   REDO_COMMAND,
   SELECTION_CHANGE_COMMAND,
   UNDO_COMMAND,
 } from 'lexical';
 import {useCallback, useEffect, useRef, useState} from 'react';
-import { Undo, Redo, Bold, Italic, Underline, Strikethrough, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, LucideLink} from 'lucide-react';
+import { Plus, Minus, Undo, Redo, Bold, Italic, Underline, Strikethrough, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, LucideLink} from 'lucide-react';
+// ^^ need a plus and minus for increase decrease font
 import { toastError } from '@components/toasts/ErrorToast';
 
 
+const fontSizes = ['12px', '16px', '18px', '20px', '24px', '30px', '36px', '42px', '48px', '60px', '72px']
 const LowPriority = 1;
 
 function Divider() {
   return <div className="divider" />;
 }
+
+const SET_FONT_SIZE_COMMAND: LexicalCommand<string> = createCommand();
 
 export default function RichTextToolbarPlugin() {
   const [editor] = useLexicalComposerContext();
@@ -33,6 +40,8 @@ export default function RichTextToolbarPlugin() {
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
   const [isStrikethrough, setIsStrikethrough] = useState(false);
+  // add const for setting font size (set a default size too)
+  const [fontSize, setFontSize] = useState('16px');
 
   // Adapted from https://github.com/facebook/lexical/blob/83205d80a072e76bc56effd78113a0ee99c5306f/packages/lexical-playground/src/utils/url.ts#L1
   const isValidURL = (url: string): string => {
@@ -71,12 +80,48 @@ export default function RichTextToolbarPlugin() {
   const $updateToolbar = useCallback(() => {
     const selection = $getSelection();
     if ($isRangeSelection(selection)) {
+
+      console.log("hello");
+
       // Update text format
       setIsBold(selection.hasFormat('bold'));
       setIsItalic(selection.hasFormat('italic'));
       setIsUnderline(selection.hasFormat('underline'));
       setIsStrikethrough(selection.hasFormat('strikethrough'));
+
+      // Update font size
+      const nodes = selection.getNodes();
+      let fontSizeFound: string | null = null;
+      let hasMixedFontSizes = false;
+  
+      for (const node of nodes) {
+        if ($isTextNode(node)) {
+          console.log("is text node");
+
+          const style = node.getStyle();
+          const match = style?.match(/font-size:\s*([^\s;]+)/);
+          const currentFontSize = match?.[1] || null;
+
+          console.log("node: ", node);
+          console.log("match: " + match);
+          console.log("cur size: " + currentFontSize);
+
+          if (fontSizeFound === null) {
+            fontSizeFound = currentFontSize;
+          } else if (fontSizeFound !== currentFontSize) {
+            hasMixedFontSizes = true;
+            break;
+          }
+        }
+      }
+  
+      if (hasMixedFontSizes) {
+        setFontSize('   ');
+      } else {
+        setFontSize(fontSizeFound || fontSize);
+      }
     }
+
   }, []);
 
   useEffect(() => {
@@ -110,6 +155,24 @@ export default function RichTextToolbarPlugin() {
         },
         LowPriority,
       ),
+      // BUG: it's modifying text that wasn't selected...
+      editor.registerCommand(
+        SET_FONT_SIZE_COMMAND,
+        (size: string) => {
+          editor.update(() => {
+            const selection = $getSelection();
+            if ($isRangeSelection(selection)) {
+              selection.getNodes().forEach(node => {
+                if ($isTextNode(node)) {
+                  node.setStyle('font-size: ' + size);
+                }
+              });
+            }
+          });
+          return true;
+        },
+        LowPriority,
+      ),
     );
   }, [editor, $updateToolbar]);
 
@@ -133,6 +196,44 @@ export default function RichTextToolbarPlugin() {
         aria-label="Redo">
         <Redo className="format redo" />
       </button>
+      <Divider />
+
+      <div className="flex justify-evenly items-center">
+
+        {/* Add functionality for increase decrease font size*/}
+
+        {/* Decrease button */}
+        {/* Disable if size is less than [x size] */}
+        <button
+          disabled={fontSizes.indexOf(fontSize) === 0}
+          onClick={() => {
+            console.log("decreasing font size to " + fontSizes[fontSizes.indexOf(fontSize) - 1]);
+            setFontSize(fontSizes[fontSizes.indexOf(fontSize) - 1]);
+            console.log("new size: " + fontSize);
+            editor.dispatchCommand(SET_FONT_SIZE_COMMAND, fontSizes[fontSizes.indexOf(fontSize) - 1]);
+          }}
+        >
+          <Minus className="format"/>
+        </button>
+
+        {/* Font Size Label */}
+        <h1>{ fontSize }</h1>
+
+        {/* Increase button */}
+        {/* Disable if size is more than [y size] */}
+        <button
+          disabled={fontSizes.indexOf(fontSize) === (fontSizes.length - 1)}
+          onClick={() => {
+            console.log("increasing font size to " + fontSizes[fontSizes.indexOf(fontSize) + 1]);
+            setFontSize(fontSizes[fontSizes.indexOf(fontSize) + 1]);
+            console.log("new size: " + fontSize);
+            editor.dispatchCommand(SET_FONT_SIZE_COMMAND, fontSizes[fontSizes.indexOf(fontSize) + 1]);
+          }}
+        >
+          <Plus className="format"/>
+        </button>
+      </div>
+
       <Divider />
       <button
         onClick={() => {
