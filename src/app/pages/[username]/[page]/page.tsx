@@ -78,14 +78,18 @@ export default async function PublishedPage({ params }: PublishedPageProps) {
       .map((c) => c.position.x + c.size.width),
   );
 
+  const lowestY = Math.max(
+    ...components.map((comp) => comp.position.y + comp.size.height),
+  );
+
   return (
     <>
       {/* Full-screen background to cover the body::before */}
       <div className="fixed inset-0 z-0 bg-white" />
 
       <div className="min-h-screen w-screen overflow-auto">
-        <div className="flex justify-center bg-white min-h-screen h-auto w-max">
-          <FullWindow width={maxRight} >
+        <div className="bg-white h-screen w-screen overflow-auto">
+          <FullWindow width={maxRight} lowestY={lowestY}>
             {components.map(renderComponent)}
           </FullWindow>
         </div>
