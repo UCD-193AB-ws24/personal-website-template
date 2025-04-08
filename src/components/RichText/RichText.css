@@ -62,7 +62,6 @@
 .RichTextbox-paragraph {
   margin: 0;
   margin-bottom: 8px;
-  position: relative;
 }
 
 .RichTextbox-paragraph:last-child {
