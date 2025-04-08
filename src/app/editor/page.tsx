@@ -153,14 +153,12 @@ export default function Editor() {
 
     const lowestY = Math.max(
       ...components.map((comp) => comp.position.y + comp.size.height),
-      defaultHeight,
     );
 
     const farthestX = Math.max(
       ...components
         .filter((comp) => comp.type !== "navBar" && comp.type !== "projectCard")
         .map((comp) => comp.position.x + comp.size.width),
-      defaultWidth,
     );
 
     setEditorHeight(Math.max(lowestY + 50, defaultHeight));
