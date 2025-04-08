@@ -96,10 +96,15 @@ export default async function PublishedPage({ params }: PublishedPageProps) {
   );
 
   return (
-    <div className="flex justify-center bg-white min-h-screen min-w-[100vw] h-auto w-max">
-      <FullWindow width={maxRight} lowestY={lowestY}>
-        {components.map(renderComponent)}
-      </FullWindow>
-    </div>
+    <>
+      {/* Full-screen background to cover the body::before */}
+      <div className="fixed inset-0 z-0 bg-white" />
+
+      <div className="flex justify-center bg-white min-h-screen min-w-[100vw] h-auto w-max">
+        <FullWindow width={maxRight} lowestY={lowestY}>
+          {components.map(renderComponent)}
+        </FullWindow>
+      </div>
+    </>
   );
 }

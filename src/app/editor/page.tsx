@@ -515,6 +515,9 @@ export default function Editor() {
 
   return (
     <>
+      {/* Full-screen white background to cover the body::before */}
+      <div className="fixed inset-0 z-0 bg-white" />
+
       {isPreview ? (
         <div className="bg-white min-h-screen min-w-[100vw] h-auto w-max">
           <button
