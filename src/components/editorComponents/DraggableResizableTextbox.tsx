@@ -116,7 +116,6 @@ export default function DraggableResizableTextbox({
       >
         <ActiveOutlineContainer isActive={isActive}>
           <RichTextbox isPreview={isPreview} textboxState={textboxState} updateTextboxState={updateTextboxState} />
-          <RichTextTreeViewPlugin />
         </ActiveOutlineContainer>
       </Rnd>
     </LexicalComposer>

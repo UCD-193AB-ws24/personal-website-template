@@ -7,9 +7,10 @@ import {
   $isRangeSelection,
   EditorState,
   KEY_ESCAPE_COMMAND,
+  NodeKey,
 } from "lexical";
 import { $findMatchingParent, mergeRegister } from "@lexical/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { $createLinkNode, $isLinkNode } from "@lexical/link";
 
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
@@ -26,6 +27,9 @@ import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import "./RichText.css";
 import { getSelectedNode } from "./utils/getSelectedNode";
 import { Position } from "@customTypes/componentTypes";
+import { Text, Search } from "lucide-react";
+import isValidURL from "@components/RichText/utils/isValidURL";
+
 
 const LowPriority = 1;
 
@@ -41,6 +45,7 @@ export default function RichTextbox({
   updateTextboxState,
 }: RichTextboxProps) {
   const [editor] = useLexicalComposerContext();
+  const linkEditorRef = useRef<HTMLDivElement | null>(null);
   const [isLinkEditorVisible, setIsLinkEditorVisible] = useState(false);
   const [linkEditorPosition, setLinkEditorPosition] = useState<Position>({
     x: 0,
@@ -48,6 +53,29 @@ export default function RichTextbox({
   });
   const [linkEditorTextField, setLinkEditorTextField] = useState("");
   const [linkEditorURLField, setLinkEditorURLField] = useState("");
+  const [lastActiveLinkNodeKey, setLastActiveLinkNodeKey] = useState<NodeKey>("")
+  const [escapePressed, setEscapePressed] = useState(false);
+
+  // Using refs inside the useEffect's dependency list since using state variables
+  // in the dependency list causes the lexical editor to defocus on change
+  const lastActiveLinkNodeKeyRef = useRef(lastActiveLinkNodeKey);
+  const escapePressedRef = useRef(escapePressed);
+
+  // Update refs whenever their corresponding state variable updates
+  useEffect(() => {
+    lastActiveLinkNodeKeyRef.current = lastActiveLinkNodeKey
+  }, [lastActiveLinkNodeKey])
+
+  useEffect(() => {
+    escapePressedRef.current = escapePressed
+  }, [escapePressed])
+
+  const handleBlur = (e: FocusEvent) => {
+    if (linkEditorRef.current && e.relatedTarget instanceof Node && linkEditorRef.current.contains(e.relatedTarget)) {
+      return;
+    }
+    setIsLinkEditorVisible(false);
+  }
 
   useEffect(() => {
     if (isPreview) {
@@ -88,15 +116,27 @@ export default function RichTextbox({
                 });
               }
 
-              setIsLinkEditorVisible(true);
-              setLinkEditorTextField(node.getTextContent());
-              setLinkEditorURLField(linkParent.getURL());
+              // If the user clicks escape while editing a link, we want
+              // to hide the link editor until the user clicks on another node
+              // and then clicks back on the link
+              if (!escapePressedRef.current || (escapePressedRef.current && linkParent.getKey() !== lastActiveLinkNodeKeyRef.current)) {
+                setIsLinkEditorVisible(true);
+                setLinkEditorTextField(node.getTextContent());
+                setLinkEditorURLField(linkParent.getURL());
+                setLastActiveLinkNodeKey(linkParent.getKey());
+                setEscapePressed(false);
+              }
             } else {
               setLinkEditorPosition({ x: 0, y: 0 });
               setIsLinkEditorVisible(false);
               setLinkEditorTextField("");
               setLinkEditorURLField("");
+              setLastActiveLinkNodeKey("");
+              setEscapePressed(true);
             }
+          } else {
+            // Reset escape pressed if the cursor isn't over a link node
+            setEscapePressed(false);
           }
         });
       }),
@@ -108,12 +148,20 @@ export default function RichTextbox({
           setIsLinkEditorVisible(false);
           setLinkEditorTextField("");
           setLinkEditorURLField("");
+          setEscapePressed(true);
+
+          // Return true stops propagation to other command handlers
           return true;
         },
         LowPriority,
       ),
+      editor.registerRootListener((rootElement, prevRootElement) => {
+        // Hide link editor when editor isn't in focus
+        rootElement?.addEventListener('blur', handleBlur)
+        prevRootElement?.removeEventListener('blur', handleBlur)
+      })
     );
-  }, []);
+  }, [editor, lastActiveLinkNodeKeyRef, escapePressedRef]);
 
   const onChangeHandler = (
     editorState: EditorState,
@@ -148,28 +196,42 @@ export default function RichTextbox({
         <TabIndentationPlugin />
 
         <div
+          ref={linkEditorRef}
           hidden={!isLinkEditorVisible}
-          className="absolute z-[10000]"
-          style={{ left: linkEditorPosition.x, top: linkEditorPosition.y }}
+          className="absolute z-[10000] gap-[4px] p-2 bg-white shadow-[0px_0px_37px_-14px_rgba(0,_0,_0,_1)] rounded-md"
+          style={{ display: `${isLinkEditorVisible ? "flex" : "none" }`, left: linkEditorPosition.x, top: linkEditorPosition.y }}
         >
-          <input
-            type="text"
-            placeholder="Text"
-            value={linkEditorTextField}
-            onChange={(e) => {
-              setLinkEditorTextField(e.target.value);
-            }}
-          />
-          <input
-            type="url"
-            placeholder="URL"
-            value={linkEditorURLField}
-            onChange={(e) => {
-              setLinkEditorURLField(e.target.value);
-            }}
-          />
+          <div className="flex justify-center items-center gap-[4px] p-1 border rounded-md focus-within:border-blue-500">
+            <Text size={16} />
+            <input
+              className="text-sm focus:outline-none"
+              type="text"
+              placeholder="Text"
+              value={linkEditorTextField}
+              onChange={(e) => {
+                setLinkEditorTextField(e.target.value);
+              }}
+            />
+          </div>
+          <div className="flex justify-center items-center gap-[4px] p-1 border rounded-md focus-within:border-blue-500">
+            <Search size={16} />
+            <input
+              className="text-sm focus:outline-none"
+              type="url"
+              placeholder="URL"
+              value={linkEditorURLField}
+              onChange={(e) => {
+                setLinkEditorURLField(e.target.value);
+              }}
+            />
+          </div>
           <button
+            className="text-sm text-blue-500 font-bold ml-[16px]"
             onClick={() => {
+              if (!isValidURL(linkEditorURLField)) {
+                return;
+              }
+
               editor.update(() => {
                 const selection = $getSelection();
                 if ($isRangeSelection(selection)) {
