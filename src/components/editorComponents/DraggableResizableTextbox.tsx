@@ -17,7 +17,6 @@ import RichTextbox from "@components/RichText/RichTextbox";
 import RichTextToolbarPlugin from '@components/RichText/Plugins/RichTextToolbar';
 import {LexicalComposer} from '@lexical/react/LexicalComposer';
 import { RichTextInitialConfig, BlankRichTextEditorState } from "@components/RichText/RichTextSettings";
-import RichTextTreeViewPlugin from "@components/RichText/Plugins/RichTextTreeView";
 
 
 interface DraggableResizableTextboxProps {
