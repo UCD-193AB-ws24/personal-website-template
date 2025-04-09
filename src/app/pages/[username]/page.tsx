@@ -100,7 +100,7 @@ export default async function PublishedPage({ params }: PublishedPageProps) {
       {/* Full-screen background to cover the body::before */}
       <div className="fixed inset-0 z-0 bg-white" />
 
-      <div className="bg-white h-screen w-screen overflow-auto">
+      <div className="absolute h-screen w-screen overflow-auto">
         <FullWindow width={maxRight} lowestY={lowestY}>
           {components.map(renderComponent)}
         </FullWindow>
