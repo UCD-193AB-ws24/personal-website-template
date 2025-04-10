@@ -1,3 +1,5 @@
+"use client";
+
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
   $createParagraphNode,
@@ -5,6 +7,7 @@ import {
   $getRoot,
   $getSelection,
   $isRangeSelection,
+  CLICK_COMMAND,
   EditorState,
   KEY_ESCAPE_COMMAND,
   NodeKey,
@@ -20,7 +23,6 @@ import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { TabIndentationPlugin } from "@lexical/react/LexicalTabIndentationPlugin";
 import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
-import { ClickableLinkPlugin } from "@lexical/react/LexicalClickableLinkPlugin";
 import { LexicalEditor } from "lexical";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
@@ -29,6 +31,11 @@ import { getSelectedNode } from "./utils/getSelectedNode";
 import { Position } from "@customTypes/componentTypes";
 import { Text, Search } from "lucide-react";
 import isValidURL from "@components/RichText/utils/isValidURL";
+import { useEditorContext } from "../../contexts/EditorContext";
+import { useRouter } from "next/navigation";
+import { fetchUsername } from "@lib/requests/fetchUsername";
+import { usePublishContext } from "@contexts/PublishContext";
+import { usePagesContext } from "@contexts/PagesContext";
 
 
 const LowPriority = 1;
@@ -44,8 +51,22 @@ export default function RichTextbox({
   textboxState,
   updateTextboxState,
 }: RichTextboxProps) {
+  const editorContext = useEditorContext();
+  const pagesContext = usePagesContext();
+
+  const publishContext = usePublishContext();
+  const router = useRouter();
+
+  const [username, setUsername] = useState("");
+
   const [editor] = useLexicalComposerContext();
   const linkEditorRef = useRef<HTMLDivElement | null>(null);
+
+  // Should find a better solution than having a hard-coded width
+  // Using linkEditorRef.current.clientWidth doesn't work since hiding
+  // the link editor causes the width to be 0
+  const linkEditorWidth = 430;
+
   const [isLinkEditorVisible, setIsLinkEditorVisible] = useState(false);
   const [linkEditorPosition, setLinkEditorPosition] = useState<Position>({
     x: 0,
@@ -56,10 +77,25 @@ export default function RichTextbox({
   const [lastActiveLinkNodeKey, setLastActiveLinkNodeKey] = useState<NodeKey>("")
   const [escapePressed, setEscapePressed] = useState(false);
 
+  useEffect(() => {
+    getUsername();
+  }, [])
+
+  const getUsername = async () => {
+    const name = await fetchUsername();
+    if (name === null) {
+      setUsername("Unknown");
+      router.push("/setusername");
+    } else {
+      setUsername(name);
+    }
+  };
+
   // Using refs inside the useEffect's dependency list since using state variables
   // in the dependency list causes the lexical editor to defocus on change
   const lastActiveLinkNodeKeyRef = useRef(lastActiveLinkNodeKey);
   const escapePressedRef = useRef(escapePressed);
+  const usernameRef = useRef(username);
 
   // Update refs whenever their corresponding state variable updates
   useEffect(() => {
@@ -69,6 +105,10 @@ export default function RichTextbox({
   useEffect(() => {
     escapePressedRef.current = escapePressed
   }, [escapePressed])
+
+  useEffect(() => {
+    usernameRef.current = username
+  }, [username])
 
   const handleBlur = (e: FocusEvent) => {
     if (linkEditorRef.current && e.relatedTarget instanceof Node && linkEditorRef.current.contains(e.relatedTarget)) {
@@ -103,17 +143,32 @@ export default function RichTextbox({
     return mergeRegister(
       editor.registerUpdateListener(({ editorState }) => {
         editorState.read(() => {
+          if (isPreview) {
+            return;
+          }
+
           const selection = $getSelection();
           if ($isRangeSelection(selection)) {
             const node = getSelectedNode(selection);
             const linkParent = $findMatchingParent(node, $isLinkNode);
             if (linkParent) {
               const element = editor.getElementByKey(node.getKey());
-              if (element) {
-                setLinkEditorPosition({
-                  x: element.offsetLeft,
-                  y: element.offsetTop + element.offsetHeight,
-                });
+              const dropzone = document.getElementById("editor-drop-zone");
+
+              if (element && dropzone) {
+                const elementRect = element.getBoundingClientRect();
+                const dropzoneRect = dropzone.getBoundingClientRect();
+                if (elementRect.left + linkEditorWidth > dropzoneRect.right) {
+                  setLinkEditorPosition({
+                    x: dropzoneRect.right - (elementRect.left + linkEditorWidth),
+                    y: element.offsetTop + element.offsetHeight + 4,
+                  });
+                } else {
+                  setLinkEditorPosition({
+                    x: element.offsetLeft,
+                    y: element.offsetTop + element.offsetHeight + 4,
+                  });
+                }
               }
 
               // If the user clicks escape while editing a link, we want
@@ -159,9 +214,54 @@ export default function RichTextbox({
         // Hide link editor when editor isn't in focus
         rootElement?.addEventListener('blur', handleBlur)
         prevRootElement?.removeEventListener('blur', handleBlur)
-      })
+      }),
+      // Custom handler for clicking relative links
+      editor.registerCommand(
+        CLICK_COMMAND,
+        (payload) => {
+          const target = payload.target as HTMLElement;
+
+          // Check that the user clicked a link
+          if (target.parentElement?.tagName === "A") {
+            // Get the link node to get the URL
+            const selection = $getSelection();
+            if ($isRangeSelection(selection)) {
+              const node = getSelectedNode(selection);
+              const linkParent = $findMatchingParent(node, $isLinkNode);
+
+              if (linkParent) {
+                payload.preventDefault();
+                const linkParentURL = linkParent.getURL();
+                const pageIdx = getPageIdx(linkParentURL);
+
+                if (pageIdx !== -1) {
+                  // Handle relative links
+                  if (publishContext.isPublish) {
+                    // Redirect to the linked page
+                    const urlFriendlyPageName = encodeURIComponent(
+                      linkParentURL.replace(/ /g, "-"),
+                    );
+                    router.push(`/pages/${usernameRef.current}/${urlFriendlyPageName}`)
+                    return true;
+                  } else {
+                    // Handle relative links using handleSwitchPage function
+                    editorContext!.handleSwitchPage(pageIdx);
+                    return true;
+                  }
+                } else {
+                  // Handle outside links
+                  window.open(linkParentURL, "_blank")?.focus();
+                  return true;
+                }
+              }
+            }
+          }
+          return false;
+        },
+        LowPriority
+      )
     );
-  }, [editor, lastActiveLinkNodeKeyRef, escapePressedRef]);
+  }, [editor, lastActiveLinkNodeKeyRef, escapePressedRef, usernameRef]);
 
   const onChangeHandler = (
     editorState: EditorState,
@@ -171,8 +271,18 @@ export default function RichTextbox({
     updateTextboxState(JSON.stringify(editorState.toJSON()));
   };
 
+  const getPageIdx = (name: string): number => {
+    for (let i = 0; i < pagesContext.pages.length; i++) {
+      if (pagesContext.pages[i].pageName === name) {
+        return i;
+      }
+    }
+
+    return -1;
+  }
+
   return (
-    <div className="rounded-[2px] text-left h-full whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg leading-none bg-white">
+    <div className="relative rounded-[2px] text-left h-full whitespace-pre-wrap bg-transparent resize-none text-lg leading-none bg-white">
       <div className="bg-white h-full">
         <RichTextPlugin
           contentEditable={
@@ -190,14 +300,12 @@ export default function RichTextbox({
         />
         <OnChangePlugin onChange={onChangeHandler} />
         <ListPlugin />
-        <ClickableLinkPlugin />
         <LinkPlugin />
         <HistoryPlugin />
         <TabIndentationPlugin />
 
         <div
           ref={linkEditorRef}
-          hidden={!isLinkEditorVisible}
           className="absolute z-[10000] gap-[4px] p-2 bg-white shadow-[0px_0px_37px_-14px_rgba(0,_0,_0,_1)] rounded-md"
           style={{ display: `${isLinkEditorVisible ? "flex" : "none" }`, left: linkEditorPosition.x, top: linkEditorPosition.y }}
         >
@@ -228,26 +336,24 @@ export default function RichTextbox({
           <button
             className="text-sm text-blue-500 font-bold ml-[16px]"
             onClick={() => {
-              if (!isValidURL(linkEditorURLField)) {
-                return;
-              }
+              if (getPageIdx(linkEditorURLField) !== -1 || isValidURL(linkEditorURLField)) {
+                editor.update(() => {
+                  const selection = $getSelection();
+                  if ($isRangeSelection(selection)) {
+                    const node = getSelectedNode(selection);
+                    const linkParent = $findMatchingParent(node, $isLinkNode);
 
-              editor.update(() => {
-                const selection = $getSelection();
-                if ($isRangeSelection(selection)) {
-                  const node = getSelectedNode(selection);
-                  const linkParent = $findMatchingParent(node, $isLinkNode);
+                    if (linkParent) {
+                      // Replace the old link with a new link node containing the entered fields
+                      const newLink = $createLinkNode(linkEditorURLField);
+                      newLink.append($createTextNode(linkEditorTextField));
 
-                  if (linkParent) {
-                    // Replace the old link with a new link node containing the entered fields
-                    const newLink = $createLinkNode(linkEditorURLField);
-                    newLink.append($createTextNode(linkEditorTextField));
-
-                    linkParent.replace(newLink);
-                    newLink.select();
+                      linkParent.replace(newLink);
+                      newLink.select();
+                    }
                   }
-                }
-              });
+                });
+              }
             }}
           >
             Apply

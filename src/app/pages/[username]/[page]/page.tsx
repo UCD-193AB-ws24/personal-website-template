@@ -4,6 +4,8 @@ import NavigationBar from "@components/editorComponents/NavigationBar";
 import Custom404 from "@components/Custom404";
 
 import { componentMap } from "@utils/componentUtils";
+import PublishContextProvider from "@contexts/PublishContext";
+import PagesContextProvider from "@contexts/PagesContext";
 
 interface PublishedPageProps {
   params: Promise<{ username: string; page: string }>;
@@ -83,10 +85,14 @@ export default async function PublishedPage({ params }: PublishedPageProps) {
   );
 
   return (
-    <div className="flex justify-center bg-white min-h-screen h-auto w-max">
-      <FullWindow width={maxRight} lowestY={lowestY}>
-        {components.map(renderComponent)}
-      </FullWindow>
-    </div>
+    <PublishContextProvider isPublish={true}>
+      <PagesContextProvider pages={pages}>
+        <div className="flex justify-center bg-white min-h-screen h-auto w-max">
+          <FullWindow width={maxRight} lowestY={lowestY}>
+            {components.map(renderComponent)}
+          </FullWindow>
+        </div>
+      </PagesContextProvider>
+    </PublishContextProvider>
   );
 }
