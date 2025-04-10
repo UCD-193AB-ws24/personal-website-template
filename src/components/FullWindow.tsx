@@ -32,7 +32,7 @@ export default function FullWindow({
 
   return (
     <div
-      className={"relative bg-white"}
+      className={"flex flex-row relative bg-white"}
       style={{
         minWidth: useFullWindowWidth ? windowWidth : `${totalWidth}px`,
         minHeight: height,
