@@ -35,9 +35,9 @@ export default function SidebarItem({
       {...listeners}
       {...attributes}
       style={style}
-      className="flex items-start gap-3 p-3 border border-gray-300 rounded-md bg-white shadow-sm hover:shadow-md hover:bg-gray-50 transition-all cursor-grab active:cursor-grabbing"
+      className="flex items-start gap-3 px-3 py-4 bg-white hover:bg-blue-100 rounded-lg hover:shadow-md hover:scale-[1.02] transform transition-all cursor-grab active:cursor-grabbing hover:border hover:border-gray-300"
     >
-      <div className="mr-3 text-blue-500">{icon}</div>
+      <div className="text-blue-500">{icon}</div>
       <div>
         <h3 className="font-semibold text-sm">{name}</h3>
         <p className="text-xs text-gray-600">{description}</p>
