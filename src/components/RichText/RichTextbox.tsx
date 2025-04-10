@@ -44,12 +44,14 @@ interface RichTextboxProps {
   isPreview: boolean;
   textboxState: string;
   updateTextboxState: (val: string) => void;
+  isActive?: boolean;
 }
 
 export default function RichTextbox({
   isPreview,
   textboxState,
   updateTextboxState,
+  isActive = false
 }: RichTextboxProps) {
   const editorContext = useEditorContext();
   const pagesContext = usePagesContext();
@@ -96,6 +98,7 @@ export default function RichTextbox({
   const lastActiveLinkNodeKeyRef = useRef(lastActiveLinkNodeKey);
   const escapePressedRef = useRef(escapePressed);
   const usernameRef = useRef(username);
+  const isActiveRef = useRef(isActive);
 
   // Update refs whenever their corresponding state variable updates
   useEffect(() => {
@@ -110,12 +113,12 @@ export default function RichTextbox({
     usernameRef.current = username
   }, [username])
 
-  const handleBlur = (e: FocusEvent) => {
-    if (linkEditorRef.current && e.relatedTarget instanceof Node && linkEditorRef.current.contains(e.relatedTarget)) {
-      return;
+  useEffect(() => {
+    isActiveRef.current = isActive;
+    if (!isActive) {
+      setIsLinkEditorVisible(false);
     }
-    setIsLinkEditorVisible(false);
-  }
+  }, [isActive])
 
   useEffect(() => {
     if (isPreview) {
@@ -210,11 +213,6 @@ export default function RichTextbox({
         },
         LowPriority,
       ),
-      editor.registerRootListener((rootElement, prevRootElement) => {
-        // Hide link editor when editor isn't in focus
-        rootElement?.addEventListener('blur', handleBlur)
-        prevRootElement?.removeEventListener('blur', handleBlur)
-      }),
       // Custom handler for clicking relative links
       editor.registerCommand(
         CLICK_COMMAND,
