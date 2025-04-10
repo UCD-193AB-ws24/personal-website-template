@@ -27,7 +27,7 @@ export default function AccordionItem({
           open ? "max-h-[1000px]" : "max-h-0"
         }`}
       >
-        <div className="p-3 pb-3 bg-blue-50">{children}</div>
+        <div className="p-3 pb-3 bg-gray-100">{children}</div>
       </div>
     </div>
   );
