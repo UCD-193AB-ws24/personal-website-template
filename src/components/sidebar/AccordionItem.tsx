@@ -11,8 +11,8 @@ export default function AccordionItem({
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="bg-white">
-      <div className="border border-gray-300 hover:bg-gray-50">
+    <>
+      <div className="bg-white border border-gray-300 hover:bg-gray-50 rounded-lg">
         <button
           onClick={() => setOpen(!open)}
           className="w-full flex justify-between items-center p-3 text-left font-medium"
@@ -29,6 +29,6 @@ export default function AccordionItem({
       >
         <div className="p-3 pb-3 bg-gray-100">{children}</div>
       </div>
-    </div>
+    </>
   );
 }
