@@ -46,6 +46,8 @@ import { saveDraft } from "@lib/requests/saveDrafts";
 import { fetchDraftName } from "@lib/requests/fetchDraftName";
 import { auth } from "@lib/firebase/firebaseApp";
 import { deleteUnusedDraftFiles } from "@lib/requests/deleteUnusedFiles";
+import EditorContextProvider from "@contexts/EditorContext";
+import PagesContextProvider from "@contexts/PagesContext";
 
 interface DraftLoaderProps {
   setPages: any;
@@ -98,28 +100,28 @@ function DraftLoader({
             setComponents([]);
           }
 
-					setIsLoading(false);
-					setHasLoadedDraftOnce(true);
-				})
-				.catch((error) => {
-					console.error('Error fetching draft:', error);
-					setIsLoading(false);
-					setHasLoadedDraftOnce(true);
-				});
-		} else {
-			setIsLoading(false);
-			setHasLoadedDraftOnce(true);
-		}
-	}, [
-          draftNumber,
-          setDraftNumber,
-	  setDraftName,
-	  setPages,
-	  setActivePageId,
-	  setComponents,
-	  setIsLoading,
-	  setHasLoadedDraftOnce
-        ]);
+          setIsLoading(false);
+          setHasLoadedDraftOnce(true);
+        })
+        .catch((error) => {
+          console.error("Error fetching draft:", error);
+          setIsLoading(false);
+          setHasLoadedDraftOnce(true);
+        });
+    } else {
+      setIsLoading(false);
+      setHasLoadedDraftOnce(true);
+    }
+  }, [
+    draftNumber,
+    setDraftNumber,
+    setDraftName,
+    setPages,
+    setActivePageId,
+    setComponents,
+    setIsLoading,
+    setHasLoadedDraftOnce,
+  ]);
 
   return null;
 }
@@ -142,7 +144,7 @@ export default function Editor() {
   const [pages, setPages] = useState<Page[]>([]);
   const [activePageIndex, setActivePageIndex] = useState<number | null>(null);
   const [isGridVisible, setIsGridVisible] = useState(false);
-	const [draftName, setDraftName] = useState('');
+  const [draftName, setDraftName] = useState("");
 
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -176,18 +178,24 @@ export default function Editor() {
     return () => container.removeEventListener("scroll", handleScroll);
   }, []);
 
+
+  const componentsRef = useRef(components);
+  useEffect(() => {
+    componentsRef.current = components
+  }, [components]);
+
   const handleSwitchPage = (pageIndex: number) => {
     switchPage(
       pageIndex,
       activePageIndex,
       pages,
       setPages,
-      components,
+      componentsRef.current,
       setComponents,
       setActiveComponent,
       setActivePageIndex,
     );
-  };
+  }
 
   const handleUpdatePageName = (pageIndex: number, newName: string) => {
     updatePageName(pageIndex, newName, setPages);
@@ -354,7 +362,7 @@ export default function Editor() {
       setComponents((prev) =>
         prev.map((comp) =>
           comp.id === id ? { ...comp, position, size, content } : comp,
-        ),
+        )
       );
     } else {
       setComponents((prev) =>
@@ -500,18 +508,18 @@ export default function Editor() {
     ) : null;
   };
 
-	{
-		/* Make Navigation Bar always present when more than one page exists */
-	}
-	useEffect(() => {
-		if (
-			pages.length > 1 &&
-			!components.some((comp) => comp.type === 'navBar')
-		) {
-			addComponent('navBar', { x: 0, y: 0 }, `navBar-${Date.now()}`);
-		}
-           // eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [pages, components]);
+  {
+    /* Make Navigation Bar always present when more than one page exists */
+  }
+  useEffect(() => {
+    if (
+      pages.length > 1 &&
+      !components.some((comp) => comp.type === "navBar")
+    ) {
+      addComponent("navBar", { x: 0, y: 0 }, `navBar-${Date.now()}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pages, components]);
 
   return (
     <>
@@ -519,149 +527,159 @@ export default function Editor() {
       <div className="fixed inset-0 z-0 bg-white" />
 
       {isPreview ? (
-        <div className="bg-white min-h-screen min-w-[100vw] h-auto w-max">
-          <button
-            className={`text-white text-large font-semibold px-3 py-2 rounded-md mr-1 bg-red-500 transition-all duration-300 hover:bg-red-700 shadow-md hover:shadow-lg fixed top-[10px] right-[0px] z-[1000]`}
-            onClick={() => setIsPreview(!isPreview)}
-          >
-            Exit Preview
-          </button>
-          <FullWindow width={editorWidth} lowestY={editorHeight - 50}>
-            {components.map(renderComponent)}
-          </FullWindow>
-        </div>
-      ) : (
-        <DndContext
-          modifiers={[restrictToWindowEdges]}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-          onDragMove={handleDragMove}
-        >
-          <div
-            className={`flex ${isPreview ? "justify-center items-center h-screen bg-gray-200" : ""} text-black relative bg-white`}
-          >
-            <Sidebar />
-
-            <button
-              className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-md"
-              style={{
-                position: "fixed",
-                bottom: "20px",
-                right: "20px",
-                zIndex: "10",
-              }}
-              onClick={handleSaveDraft}
-            >
-              Save
-            </button>
-
-            <LoadingSpinner show={isLoading} />
-            <ToastContainer />
-
-            <Suspense fallback={<LoadingSpinner show={true} />}>
-              {!hasLoadedDraftOnce && (
-                <DraftLoader
-                  setPages={setPages}
-                  setActivePageId={setActivePageIndex}
-                  setDraftNumber={setDraftNumber}
-                  setComponents={setComponents}
-                  setIsLoading={setIsLoading}
-                  setHasLoadedDraftOnce={setHasLoadedDraftOnce}
-                  setDraftName={setDraftName}
-                />
-              )}
-            </Suspense>
-
-            <EditorTopBar
-              draftName={draftName}
-              isGridVisible={isGridVisible}
-              setIsGridVisible={setIsGridVisible}
-              isPreview={isPreview}
-              setIsPreview={setIsPreview}
-              handlePublish={handlePublish}
-            />
-
-            <div
-              className="overflow-auto"
-              ref={scrollContainerRef}
-              style={{
-                marginTop: "64px",
-                marginLeft: "256px",
-                height: `calc(100vh - 64px)`, // full height minus top bar
-                width: `calc(100vw - 256px)`, // full width minus sidebar
-              }}
-            >
-              <EditorDropZone
-                ref={editorRef}
-                onClick={handleBackgroundClick}
-                style={{
-                  backgroundSize: isGridVisible ? "20px 20px" : "auto",
-                  minHeight: `${editorHeight}px`,
-                  minWidth: `${editorWidth}px`,
-                }}
-                // https://ibelick.com/blog/create-grid-and-dot-backgrounds-with-css-tailwind-css
-                className={`relative transition-all ${
-                  isGridVisible
-                    ? `absolute inset-0 h-full w-full bg-white bg-[linear-gradient(to_right,#e2e5e9_1px,transparent_1px),linear-gradient(to_bottom,#e2e5e9_1px,transparent_1px)] bg-[size:${GRID_SIZE}px_${GRID_SIZE}px]`
-                    : "bg-white"
-                }`}
+        <PagesContextProvider pages={pages}>
+          <EditorContextProvider handleSwitchPage={handleSwitchPage}>
+            <div className="bg-white min-h-screen min-w-[100vw] h-auto w-max">
+              <button
+                className={`text-white text-large font-semibold px-3 py-2 rounded-md mr-1 bg-red-500 transition-all duration-300 hover:bg-red-700 shadow-md hover:shadow-lg fixed top-[10px] right-[0px] z-[1000]`}
+                onClick={() => setIsPreview(!isPreview)}
               >
-                {!isLoading && components.length === 0 && pages.length < 2 ? (
-                  <h1 className="text-2xl font-bold mb-4 text-gray-400 text-center mt-20">
-                    Drag components here to start building your site!
-                  </h1>
-                ) : (
-                  components.map(renderComponent)
-                )}
-
-                {activeComponent &&
-                  !isDragging &&
-                  (activeComponent.type !== "navBar" || pages.length === 1) && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeComponent(activeComponent.id);
-                      }}
-                      style={{
-                        position: "absolute",
-                        top:
-                          activeComponent.position.y < 40
-                            ? `${activeComponent.position.y + activeComponent.size.height + 15}px`
-                            : `${activeComponent.position.y - 25}px`,
-                        left:
-                          activeComponent.type === "navBar" ||
-                          activeComponent.type === "projectCard"
-                            ? "50px"
-                            : `${activeComponent.position.x + activeComponent.size.width - 20}px`,
-                        zIndex: 10,
-                        pointerEvents: "auto",
-                        transition: "opacity 0.2s ease-in-out, transform 0.1s",
-                      }}
-                      className="w-6 h-6 bg-red-500 text-white rounded shadow-md hover:bg-red-600 hover:scale-110 flex items-center justify-center z-50"
-                    >
-                      <XIcon size={32} />
-                    </button>
-                  )}
-              </EditorDropZone>
+                Exit Preview
+              </button>
+              <FullWindow width={editorWidth} lowestY={editorHeight - 50}>
+                {components.map(renderComponent)}
+              </FullWindow>
             </div>
-          </div>
-          {showScrollTop && (
-            <button
-              onClick={() =>
-                scrollContainerRef.current?.scrollTo({
-                  top: 0,
-                  behavior: "smooth",
-                })
-              }
-              className="fixed bottom-20 right-5 p-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-700 transition"
+          </EditorContextProvider>
+        </PagesContextProvider>
+      ) : (
+        <PagesContextProvider pages={pages}>
+          <EditorContextProvider handleSwitchPage={handleSwitchPage}>
+            <DndContext
+              modifiers={[restrictToWindowEdges]}
+              onDragStart={handleDragStart}
+              onDragEnd={handleDragEnd}
+              onDragMove={handleDragMove}
             >
-              <ArrowUpIcon size={24} />
-            </button>
-          )}
-          <DragOverlay>
-            {renderOverlayContent(activeComponent?.type || null)}
-          </DragOverlay>
-        </DndContext>
+              <div
+                className={`flex ${isPreview ? "justify-center items-center h-screen bg-gray-200" : ""} text-black relative bg-white`}
+              >
+                <Sidebar />
+
+                <button
+                  className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-md"
+                  style={{
+                    position: "fixed",
+                    bottom: "20px",
+                    right: "20px",
+                    zIndex: "10",
+                  }}
+                  onClick={handleSaveDraft}
+                >
+                  Save
+                </button>
+
+                <LoadingSpinner show={isLoading} />
+                <ToastContainer />
+
+                <Suspense fallback={<LoadingSpinner show={true} />}>
+                  {!hasLoadedDraftOnce && (
+                    <DraftLoader
+                      setPages={setPages}
+                      setActivePageId={setActivePageIndex}
+                      setDraftNumber={setDraftNumber}
+                      setComponents={setComponents}
+                      setIsLoading={setIsLoading}
+                      setHasLoadedDraftOnce={setHasLoadedDraftOnce}
+                      setDraftName={setDraftName}
+                    />
+                  )}
+                </Suspense>
+
+                <EditorTopBar
+                  draftName={draftName}
+                  isGridVisible={isGridVisible}
+                  setIsGridVisible={setIsGridVisible}
+                  isPreview={isPreview}
+                  setIsPreview={setIsPreview}
+                  handlePublish={handlePublish}
+                />
+
+                <div
+                  className="overflow-auto"
+                  ref={scrollContainerRef}
+                  style={{
+                    marginTop: "64px",
+                    marginLeft: "256px",
+                    height: `calc(100vh - 64px)`, // full height minus top bar
+                    width: `calc(100vw - 256px)`, // full width minus sidebar
+                  }}
+                >
+                  <EditorDropZone
+                    ref={editorRef}
+                    onClick={handleBackgroundClick}
+                    style={{
+                      backgroundSize: isGridVisible ? "20px 20px" : "auto",
+                      minHeight: `${editorHeight}px`,
+                      minWidth: `${editorWidth}px`,
+                    }}
+                    // https://ibelick.com/blog/create-grid-and-dot-backgrounds-with-css-tailwind-css
+                    className={`relative transition-all ${
+                      isGridVisible
+                        ? `absolute inset-0 h-full w-full bg-white bg-[linear-gradient(to_right,#e2e5e9_1px,transparent_1px),linear-gradient(to_bottom,#e2e5e9_1px,transparent_1px)] bg-[size:${GRID_SIZE}px_${GRID_SIZE}px]`
+                        : "bg-white"
+                    }`}
+                  >
+                    {!isLoading && components.length === 0 && pages.length < 2 ? (
+                      <h1 className="text-2xl font-bold mb-4 text-gray-400 text-center mt-20">
+                        Drag components here to start building your site!
+                      </h1>
+                    ) : (
+                      components.map(renderComponent)
+                    )}
+
+                    {activeComponent &&
+                      !isDragging &&
+                      (activeComponent.type !== "navBar" ||
+                        pages.length === 1) && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeComponent(activeComponent.id);
+                          }}
+                          style={{
+                            position: "absolute",
+                            top:
+                              activeComponent.position.y < 40
+                                ? `${activeComponent.position.y + activeComponent.size.height + 15}px`
+                                : `${activeComponent.position.y - 25}px`,
+                            left:
+                              activeComponent.type === "navBar" ||
+                              activeComponent.type === "projectCard"
+                                ? "50px"
+                                : `${activeComponent.position.x + activeComponent.size.width - 20}px`,
+                            zIndex: 10,
+                            pointerEvents: "auto",
+                            transition:
+                              "opacity 0.2s ease-in-out, transform 0.1s",
+                          }}
+                          className="w-6 h-6 bg-red-500 text-white rounded shadow-md hover:bg-red-600 hover:scale-110 flex items-center justify-center z-50"
+                        >
+                          <XIcon size={32} />
+                        </button>
+                      )}
+                  </EditorDropZone>
+                </div>
+              </div>
+              {showScrollTop && (
+                <button
+                  onClick={() =>
+                    scrollContainerRef.current?.scrollTo({
+                      top: 0,
+                      behavior: "smooth",
+                    })
+                  }
+                  className="fixed bottom-20 right-5 p-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-700 transition"
+                >
+                  <ArrowUpIcon size={24} />
+                </button>
+              )}
+              <DragOverlay>
+                {renderOverlayContent(activeComponent?.type || null)}
+              </DragOverlay>
+            </DndContext>
+          </EditorContextProvider>
+        </PagesContextProvider>
       )}
     </>
   );
