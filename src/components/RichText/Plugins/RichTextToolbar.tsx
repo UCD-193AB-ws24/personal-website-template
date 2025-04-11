@@ -3,9 +3,12 @@ import {mergeRegister} from '@lexical/utils';
 import {INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND} from '@lexical/list';
 import {TOGGLE_LINK_COMMAND} from '@lexical/link'
 import {
+  $caretRangeFromSelection,
   $getSelection,
   $isRangeSelection,
   $isTextNode,
+  $isElementNode,
+  $isTokenOrSegmented,
   CAN_REDO_COMMAND,
   CAN_UNDO_COMMAND,
   createCommand,
@@ -15,6 +18,14 @@ import {
   REDO_COMMAND,
   SELECTION_CHANGE_COMMAND,
   UNDO_COMMAND,
+  BaseSelection,
+  ElementNode,
+  LexicalEditor,
+  LexicalNode,
+  NodeKey,
+  Point,
+  RangeSelection,
+  TextNode,
 } from 'lexical';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import { Plus, Minus, Undo, Redo, Bold, Italic, Underline, Strikethrough, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, LucideLink} from 'lucide-react';
@@ -30,6 +41,219 @@ function Divider() {
 }
 
 const SET_FONT_SIZE_COMMAND: LexicalCommand<string> = createCommand();
+
+/* https://github.com/facebook/lexical/blob/main/packages/lexical-selection/src/constants.ts */
+export const CSS_TO_STYLES: Map<string, Record<string, string>> = new Map();
+
+/* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+/* https://github.com/facebook/lexical/blob/main/packages/shared/src/invariant.ts */
+export function invariant(
+  cond?: boolean,
+  message?: string,
+  ...args: string[]
+): asserts cond {
+  if (cond) {
+    return;
+  }
+
+  throw new Error(
+    'Internal Lexical error: invariant() is meant to be replaced at compile ' +
+      'time. There is no runtime version. Error: ' +
+      message,
+  );
+}
+
+/* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+/* https://github.com/facebook/lexical/blob/main/packages/lexical-selection/src/utils.ts */
+export function getStyleObjectFromRawCSS(css: string): Record<string, string> {
+  const styleObject: Record<string, string> = {};
+  if (!css) {
+    return styleObject;
+  }
+  const styles = css.split(';');
+
+  for (const style of styles) {
+    if (style !== '') {
+      const [key, value] = style.split(/:([^]+)/); // split on first colon
+      if (key && value) {
+        styleObject[key.trim()] = value.trim();
+      }
+    }
+  }
+
+  return styleObject;
+}
+
+export function getStyleObjectFromCSS(css: string): Record<string, string> {
+  let value = CSS_TO_STYLES.get(css);
+  if (value === undefined) {
+    value = getStyleObjectFromRawCSS(css);
+    CSS_TO_STYLES.set(css, value);
+  }
+
+  return value;
+}
+
+export function getCSSFromStyleObject(styles: Record<string, string>): string {
+  let css = '';
+
+  for (const style in styles) {
+    if (style) {
+      css += `${style}: ${styles[style]};`;
+    }
+  }
+
+  return css;
+}
+
+/* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+/* https://github.com/facebook/lexical/blob/main/packages/lexical-selection/src/lexical-node.ts */
+export function $patchStyle(
+  target: TextNode | RangeSelection | ElementNode,
+  patch: Record<
+    string,
+    | string
+    | null
+    | ((currentStyleValue: string | null, _target: typeof target) => string)
+  >,
+): void {
+  invariant(
+    $isRangeSelection(target)
+      ? target.isCollapsed()
+      : $isTextNode(target) || $isElementNode(target),
+    '$patchStyle must only be called with a TextNode, ElementNode, or collapsed RangeSelection',
+  );
+  const prevStyles = getStyleObjectFromCSS(
+    $isRangeSelection(target)
+      ? target.style
+      : $isTextNode(target)
+      ? target.getStyle()
+      : target.getTextStyle(),
+  );
+  const newStyles = Object.entries(patch).reduce<Record<string, string>>(
+    (styles, [key, value]) => {
+      if (typeof value === 'function') {
+        styles[key] = value(prevStyles[key], target);
+      } else if (value === null) {
+        delete styles[key];
+      } else {
+        styles[key] = value;
+      }
+      return styles;
+    },
+    {...prevStyles},
+  );
+  const newCSSText = getCSSFromStyleObject(newStyles);
+  if ($isRangeSelection(target) || $isTextNode(target)) {
+    target.setStyle(newCSSText);
+  } else {
+    target.setTextStyle(newCSSText);
+  }
+  CSS_TO_STYLES.set(newCSSText, newStyles);
+}
+
+export function $patchStyleText(
+  selection: BaseSelection,
+  patch: Record<
+    string,
+    | string
+    | null
+    | ((
+        currentStyleValue: string | null,
+        target: TextNode | RangeSelection | ElementNode,
+      ) => string)
+  >,
+): void {
+  if ($isRangeSelection(selection) && selection.isCollapsed()) {
+    $patchStyle(selection, patch);
+    const emptyNode = selection.anchor.getNode();
+    if ($isElementNode(emptyNode) && emptyNode.isEmpty()) {
+      $patchStyle(emptyNode, patch);
+    }
+  }
+  $forEachSelectedTextNode((textNode) => {
+    $patchStyle(textNode, patch);
+  });
+}
+
+export function $forEachSelectedTextNode(
+  fn: (textNode: TextNode) => void,
+): void {
+  const selection = $getSelection();
+  if (!selection) {
+    return;
+  }
+
+  const slicedTextNodes = new Map<
+    NodeKey,
+    [startIndex: number, endIndex: number]
+  >();
+  const getSliceIndices = (
+    node: TextNode,
+  ): [startIndex: number, endIndex: number] =>
+    slicedTextNodes.get(node.getKey()) || [0, node.getTextContentSize()];
+
+  if ($isRangeSelection(selection)) {
+    for (const slice of $caretRangeFromSelection(selection).getTextSlices()) {
+      if (slice) {
+        slicedTextNodes.set(
+          slice.caret.origin.getKey(),
+          slice.getSliceIndices(),
+        );
+      }
+    }
+  }
+
+  const selectedNodes = selection.getNodes();
+  for (const selectedNode of selectedNodes) {
+    if (!($isTextNode(selectedNode) && selectedNode.canHaveFormat())) {
+      continue;
+    }
+    const [startOffset, endOffset] = getSliceIndices(selectedNode);
+    // No actual text is selected, so do nothing.
+    if (endOffset === startOffset) {
+      continue;
+    }
+
+    // The entire node is selected or a token/segment, so just format it
+    if (
+      $isTokenOrSegmented(selectedNode) ||
+      (startOffset === 0 && endOffset === selectedNode.getTextContentSize())
+    ) {
+      fn(selectedNode);
+    } else {
+      // The node is partially selected, so split it into two or three nodes
+      // and style the selected one.
+      const splitNodes = selectedNode.splitText(startOffset, endOffset);
+      const replacement = splitNodes[startOffset === 0 ? 0 : 1];
+      fn(replacement);
+    }
+  }
+
+  if (
+    $isRangeSelection(selection) &&
+    selection.anchor.type === 'text' &&
+    selection.focus.type === 'text' &&
+    selection.anchor.key === selection.focus.key
+  ) {
+    $ensureForwardRangeSelection(selection);
+  }
+} 
+
+export function $ensureForwardRangeSelection(selection: RangeSelection): void {
+  if (selection.isBackward()) {
+    const {anchor, focus} = selection;
+    // stash for the in-place swap
+    const {key, offset, type} = anchor;
+    anchor.set(focus.key, focus.offset, focus.type);
+    focus.set(key, offset, type);
+  }
+}
+
+/* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
 
 export default function RichTextToolbarPlugin() {
   const [editor] = useLexicalComposerContext();
@@ -102,16 +326,21 @@ export default function RichTextToolbarPlugin() {
           const match = style?.match(/font-size:\s*([^\s;]+)/);
           const currentFontSize = match?.[1] || null;
 
-          console.log("node: ", node);
-          console.log("match: " + match);
-          console.log("cur size: " + currentFontSize);
+          console.log("(before) fontSizeFound: ", fontSizeFound);
+          console.log("(before)  currentFontSize: " + currentFontSize);
 
-          if (fontSizeFound === null) {
+          if (fontSizeFound === null && currentFontSize === null) {
+            fontSizeFound = "16px";
+          }
+          else if (fontSizeFound === null) {
             fontSizeFound = currentFontSize;
           } else if (fontSizeFound !== currentFontSize) {
             hasMixedFontSizes = true;
             break;
           }
+
+          console.log("(after) fontSizeFound: ", fontSizeFound);
+          console.log("(after)  currentFontSize: " + currentFontSize);
         }
       }
   
@@ -162,10 +391,8 @@ export default function RichTextToolbarPlugin() {
           editor.update(() => {
             const selection = $getSelection();
             if ($isRangeSelection(selection)) {
-              selection.getNodes().forEach(node => {
-                if ($isTextNode(node)) {
-                  node.setStyle('font-size: ' + size);
-                }
+              $patchStyleText(selection, {
+                'font-size': size,
               });
             }
           });
