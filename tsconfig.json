@@ -26,6 +26,7 @@
       "@lib/hooks/*": ["./src/lib/hooks/*"],
       "@lib/requests/*": ["./src/lib/requests/*"],
       "@public/*": ["./public/*"],
+      "@contexts/*": ["./src/contexts/*"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

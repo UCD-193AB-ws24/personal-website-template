@@ -62,7 +62,6 @@
 .RichTextbox-paragraph {
   margin: 0;
   margin-bottom: 8px;
-  position: relative;
 }
 
 .RichTextbox-paragraph:last-child {
@@ -218,8 +217,7 @@ pre::-webkit-scrollbar-thumb {
   margin-bottom: 1px;
   background: #fff;
   padding: 4px;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
+  border-radius: 10px;
   vertical-align: middle;
 }
 

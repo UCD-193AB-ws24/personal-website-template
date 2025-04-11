@@ -75,7 +75,7 @@ export default function DraggableResizableTextbox({
       className="whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg leading-none"
     >
       <LexicalComposer initialConfig={RichTextInitialConfig}>
-        <RichTextbox isPreview={isPreview} textboxState={textboxState} updateTextboxState={updateTextboxState} />
+        <RichTextbox isPreview={isPreview} textboxState={textboxState} updateTextboxState={updateTextboxState} isActive={false} />
       </LexicalComposer>
     </div>) : (
     <LexicalComposer initialConfig={RichTextInitialConfig}>
@@ -114,7 +114,7 @@ export default function DraggableResizableTextbox({
         resizeGrid={[GRID_SIZE, GRID_SIZE]}
       >
         <ActiveOutlineContainer isActive={isActive}>
-          <RichTextbox isPreview={isPreview} textboxState={textboxState} updateTextboxState={updateTextboxState} />
+          <RichTextbox isPreview={isPreview} textboxState={textboxState} updateTextboxState={updateTextboxState} isActive={isActive} />
         </ActiveOutlineContainer>
       </Rnd>
     </LexicalComposer>
