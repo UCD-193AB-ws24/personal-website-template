@@ -14,6 +14,7 @@ import type {
 
 import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
 import { GRID_SIZE } from "@utils/constants";
+import useIsMobile from "@lib/hooks/useIsMobile";
 
 interface ProjectCardContent {
   id: number;
@@ -37,6 +38,7 @@ interface ProjectCardProps {
   onMouseDown?: () => void;
   setIsDragging?: (dragging: boolean) => void;
   isPreview?: boolean;
+  isPublish?: boolean;
 }
 
 export default function ProjectCard({
@@ -50,12 +52,14 @@ export default function ProjectCard({
   onMouseDown: onMouseDown = () => {},
   setIsDragging = () => {},
   isPreview,
+  isPublish = false,
 }: ProjectCardProps) {
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
   const [cards, setCards] = useState<ProjectCardContent[]>([]);
   const cardRefs = useRef<Record<number, HTMLDivElement | null>>({});
   const containerRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     try {
@@ -124,14 +128,14 @@ export default function ProjectCard({
     onMouseDown?.();
   };
 
-  if (isPreview) {
+  if (isPreview || isPublish) {
     return (
       <div
         style={{
-          position: "absolute",
+          position: isPreview ? "absolute" : "relative",
           left: 0,
           top: position.y,
-          width: "calc(100vw - 16rem)",
+          width: isMobile ? "calc(100vw - 2rem)" : "calc(100vw - 16rem)",
           height: "max-content",
         }}
       >
