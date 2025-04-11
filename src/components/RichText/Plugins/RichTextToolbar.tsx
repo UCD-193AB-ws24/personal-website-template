@@ -20,20 +20,16 @@ import {
   UNDO_COMMAND,
   BaseSelection,
   ElementNode,
-  LexicalEditor,
-  LexicalNode,
   NodeKey,
-  Point,
   RangeSelection,
   TextNode,
 } from 'lexical';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import { Plus, Minus, Undo, Redo, Bold, Italic, Underline, Strikethrough, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, LucideLink} from 'lucide-react';
-// ^^ need a plus and minus for increase decrease font
 import { toastError } from '@components/toasts/ErrorToast';
 
 
-const fontSizes = ['12px', '16px', '18px', '20px', '24px', '30px', '36px', '42px', '48px', '60px', '72px']
+const fontSizes = ['12px', '16px', '18px', '24px', '30px', '36px', '42px', '48px', '60px', '72px']
 const LowPriority = 1;
 
 function Divider() {
@@ -51,7 +47,6 @@ export const CSS_TO_STYLES: Map<string, Record<string, string>> = new Map();
 export function invariant(
   cond?: boolean,
   message?: string,
-  ...args: string[]
 ): asserts cond {
   if (cond) {
     return;
@@ -264,8 +259,9 @@ export default function RichTextToolbarPlugin() {
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
   const [isStrikethrough, setIsStrikethrough] = useState(false);
-  // add const for setting font size (set a default size too)
-  const [fontSize, setFontSize] = useState('16px');
+  const [fontSize, setFontSize] = useState('18px');
+  const [sizeChanged, setSizeChanged] = useState(false);
+
 
   // Adapted from https://github.com/facebook/lexical/blob/83205d80a072e76bc56effd78113a0ee99c5306f/packages/lexical-playground/src/utils/url.ts#L1
   const isValidURL = (url: string): string => {
@@ -305,8 +301,6 @@ export default function RichTextToolbarPlugin() {
     const selection = $getSelection();
     if ($isRangeSelection(selection)) {
 
-      console.log("hello");
-
       // Update text format
       setIsBold(selection.hasFormat('bold'));
       setIsItalic(selection.hasFormat('italic'));
@@ -315,43 +309,35 @@ export default function RichTextToolbarPlugin() {
 
       // Update font size
       const nodes = selection.getNodes();
-      let fontSizeFound: string | null = null;
-      let hasMixedFontSizes = false;
+      const prevFontSize: string | null = null;
   
       for (const node of nodes) {
         if ($isTextNode(node)) {
-          console.log("is text node");
 
           const style = node.getStyle();
           const match = style?.match(/font-size:\s*([^\s;]+)/);
           const currentFontSize = match?.[1] || null;
 
-          console.log("(before) fontSizeFound: ", fontSizeFound);
-          console.log("(before)  currentFontSize: " + currentFontSize);
+          // console.log("CFS: ", currentFontSize);
+          // console.log("PSF: ", prevFontSize);
+          // console.log("Fontsize: ", fontSize);
+          // console.log("sizechanged: ", sizeChanged);
 
-          if (fontSizeFound === null && currentFontSize === null) {
-            fontSizeFound = "16px";
+          if (!sizeChanged) {
+            if ((prevFontSize === null) && (currentFontSize === null)) {
+              // default size
+              setFontSize("18px");
+            } else if (currentFontSize !== null) {
+              setFontSize(currentFontSize);
+            }
           }
-          else if (fontSizeFound === null) {
-            fontSizeFound = currentFontSize;
-          } else if (fontSizeFound !== currentFontSize) {
-            hasMixedFontSizes = true;
-            break;
-          }
-
-          console.log("(after) fontSizeFound: ", fontSizeFound);
-          console.log("(after)  currentFontSize: " + currentFontSize);
         }
-      }
-  
-      if (hasMixedFontSizes) {
-        setFontSize('   ');
-      } else {
-        setFontSize(fontSizeFound || fontSize);
       }
     }
 
-  }, [fontSize]);
+    setSizeChanged(false);
+
+  }, [sizeChanged]);
 
   useEffect(() => {
     return mergeRegister(
@@ -384,15 +370,14 @@ export default function RichTextToolbarPlugin() {
         },
         LowPriority,
       ),
-      // BUG: it's modifying text that wasn't selected...
       editor.registerCommand(
         SET_FONT_SIZE_COMMAND,
-        (size: string) => {
+        (newSize: string) => {
           editor.update(() => {
             const selection = $getSelection();
             if ($isRangeSelection(selection)) {
               $patchStyleText(selection, {
-                'font-size': size,
+                'font-size': newSize
               });
             }
           });
@@ -427,34 +412,36 @@ export default function RichTextToolbarPlugin() {
 
       <div className="flex justify-evenly items-center">
 
-        {/* Add functionality for increase decrease font size*/}
-
         {/* Decrease button */}
-        {/* Disable if size is less than [x size] */}
         <button
-          disabled={fontSizes.indexOf(fontSize) === 0}
+          onMouseDown={(e) => e.preventDefault()}
           onClick={() => {
-            console.log("decreasing font size to " + fontSizes[fontSizes.indexOf(fontSize) - 1]);
-            setFontSize(fontSizes[fontSizes.indexOf(fontSize) - 1]);
-            console.log("new size: " + fontSize);
-            editor.dispatchCommand(SET_FONT_SIZE_COMMAND, fontSizes[fontSizes.indexOf(fontSize) - 1]);
+            if (!(fontSizes.indexOf(fontSize) === 0)) {
+              setSizeChanged(true);
+              const newSize = fontSizes[fontSizes.indexOf(fontSize) - 1];
+              setFontSize(newSize);
+              // console.log("decreasing font size to " + newSize);
+              editor.dispatchCommand(SET_FONT_SIZE_COMMAND, newSize);
+            }            
           }}
         >
           <Minus className="format"/>
         </button>
 
         {/* Font Size Label */}
-        <h1>{ fontSize }</h1>
+        <h1> { fontSize } </h1>
 
         {/* Increase button */}
-        {/* Disable if size is more than [y size] */}
         <button
-          disabled={fontSizes.indexOf(fontSize) === (fontSizes.length - 1)}
+          onMouseDown={(e) => e.preventDefault()}
           onClick={() => {
-            console.log("increasing font size to " + fontSizes[fontSizes.indexOf(fontSize) + 1]);
-            setFontSize(fontSizes[fontSizes.indexOf(fontSize) + 1]);
-            console.log("new size: " + fontSize);
-            editor.dispatchCommand(SET_FONT_SIZE_COMMAND, fontSizes[fontSizes.indexOf(fontSize) + 1]);
+            if (!(fontSizes.indexOf(fontSize) === (fontSizes.length - 1))) {
+              setSizeChanged(true);
+              const newSize = fontSizes[fontSizes.indexOf(fontSize) + 1];
+              setFontSize(newSize);
+              // console.log("increasing font size to " + newSize);
+              editor.dispatchCommand(SET_FONT_SIZE_COMMAND, newSize);
+            }
           }}
         >
           <Plus className="format"/>
