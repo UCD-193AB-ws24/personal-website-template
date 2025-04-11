@@ -4,7 +4,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, MenuIcon, XIcon } from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -22,6 +22,7 @@ import { toastError } from '@components/toasts/ErrorToast';
 import SortablePageItem from '@components/SortablePageItem';
 
 import type { ComponentItem } from "@customTypes/componentTypes";
+import useIsMobile from "@lib/hooks/useIsMobile";
 
 interface NavigationBarProps {
   username?: string;
@@ -45,15 +46,15 @@ interface NavigationBarProps {
 export default function NavigationBar({
   username = "",
   components = [],
-  setComponents: setComponents = () => {},
+  setComponents: setComponents = () => { },
   pages = [],
-  setPages: setPages = () => {},
+  setPages: setPages = () => { },
   activePageIndex,
-  setActivePageIndex: setActivePageIndex = () => {},
-  switchPage: switchPage = () => {},
-  addPage: addPage = () => {},
-  deletePage: deletePage = () => {},
-  updatePageName: updatePageName = () => {},
+  setActivePageIndex: setActivePageIndex = () => { },
+  switchPage: switchPage = () => { },
+  addPage: addPage = () => { },
+  deletePage: deletePage = () => { },
+  updatePageName: updatePageName = () => { },
   isPreview,
   isPublish = false,
   onMouseDown,
@@ -63,6 +64,9 @@ export default function NavigationBar({
 
   const [backgroundWidth, setBackgroundWidth] = useState<number | null>(null);
   const sidePadding = 128; // 8rem
+
+  const isMobile = useIsMobile();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const maxRight = Math.max(
@@ -91,21 +95,21 @@ export default function NavigationBar({
     setEditedName(e.target.value);
   };
 
-	const handleEditSubmit = (index: number) => {
-		if (!editedName.trim()) {
-			setEditedName(pages[index].pageName); // Revert to existing name if new name is empty string
-		} else {
-			const isDuplicate = pages.some(
-				(page, i) => i !== index && page.pageName === editedName.trim()
-			);
-			if (isDuplicate) {
-				toastError("Page name must be unique!");
-				return;
-			}
-			updatePageName(index, editedName.trim());
-		}
-		setEditingIndex(null);
-	};
+  const handleEditSubmit = (index: number) => {
+    if (!editedName.trim()) {
+      setEditedName(pages[index].pageName); // Revert to existing name if new name is empty string
+    } else {
+      const isDuplicate = pages.some(
+        (page, i) => i !== index && page.pageName === editedName.trim()
+      );
+      if (isDuplicate) {
+        toastError("Page name must be unique!");
+        return;
+      }
+      updatePageName(index, editedName.trim());
+    }
+    setEditingIndex(null);
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -139,6 +143,55 @@ export default function NavigationBar({
     setActivePageIndex(newIndex);
   };
 
+  if (isPublish && isMobile) {
+    return (
+      <div className="fixed top-0 left-0 w-screen bg-gray-800 text-white shadow-lg z-[100] overflow-x-hidden">
+        <div className="flex items-center justify-end px-4 h-12">
+          <button
+            className="text-white focus:outline-none "
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? (
+              <XIcon size={32} />
+            ) : (
+              <MenuIcon size={32} />
+            )}
+          </button>
+        </div>
+
+        {isMenuOpen && (
+          <div className="flex flex-col items-center px-4 pb-2">
+            {pages.map((page, index) => {
+              const urlFriendlyPageName = encodeURIComponent(
+                page.pageName.replace(/ /g, "-")
+              );
+
+              const isLast = index === pages.length - 1;
+
+              return (
+                <Link
+                  key={index}
+                  href={`/pages/${username}/${urlFriendlyPageName}`}
+                  onClick={() => setIsMenuOpen(false)}
+                  className={`w-full block ${!isLast ? "border-b border-gray-700" : ""}`}
+                >
+                  <div
+                    className={`w-full text-center py-3 transition-all duration-200 text-lg font-medium ${activePageIndex === index
+                        ? "text-blue-400"
+                        : "text-white hover:text-blue-300 hover:bg-gray-700"
+                      }`}
+                  >
+                    {page.pageName}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   if (isPublish) {
     return (
       <div className="absolute top-0 left-0 w-full h-12 bg-gray-800 text-white flex items-center px-4 shadow-lg z-[100]">
@@ -163,11 +216,10 @@ export default function NavigationBar({
               href={`/pages/${username}/${urlFriendlyPageName}`}
             >
               <button
-                className={`px-4 py-2 mx-1 rounded-md transition-all duration-200 ${
-                  activePageIndex === index
-                    ? "bg-blue-500"
-                    : "bg-gray-700 hover:bg-gray-600"
-                }`}
+                className={`px-4 py-2 mx-1 rounded-md transition-all duration-200 ${activePageIndex === index
+                  ? "bg-blue-500"
+                  : "bg-gray-700 hover:bg-gray-600"
+                  }`}
               >
                 {page.pageName}
               </button>
