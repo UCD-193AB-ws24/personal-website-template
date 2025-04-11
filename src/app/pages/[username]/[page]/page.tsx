@@ -4,6 +4,7 @@ import NavigationBar from "@components/editorComponents/NavigationBar";
 import Custom404 from "@components/Custom404";
 
 import { componentMap } from "@utils/componentUtils";
+import { getMaxRight, getLowestY, splitComponentsAtFirstProjectCard, renderGroupedRows } from "@utils/publishRenderUtils";
 
 interface PublishedPageProps {
   params: Promise<{ username: string; page: string }>;
@@ -72,21 +73,22 @@ export default async function PublishedPage({ params }: PublishedPageProps) {
     ) : null;
   };
 
-  const maxRight = Math.max(
-    ...components
-      .filter((c) => c.type !== "navBar" && c.type !== "projectCard")
-      .map((c) => c.position.x + c.size.width),
-  );
+  const maxRight = getMaxRight(components);
+  const lowestY = getLowestY(components);
 
-  const lowestY = Math.max(
-    ...components.map((comp) => comp.position.y + comp.size.height),
-  );
+  const { beforeProjectCard, fromProjectCardOn } = splitComponentsAtFirstProjectCard(components);
 
   return (
-    <div className="flex justify-center bg-white min-h-screen h-auto w-max">
-      <FullWindow width={maxRight} lowestY={lowestY}>
-        {components.map(renderComponent)}
-      </FullWindow>
-    </div>
+    <>
+      {/* Full-screen background to cover the body::before */}
+      <div className="fixed inset-0 z-0 bg-white" />
+
+      <div className="absolute h-screen w-screen overflow-auto">
+        <FullWindow width={maxRight} lowestY={lowestY}>
+          {beforeProjectCard.map(renderComponent)}
+          {renderGroupedRows(fromProjectCardOn)}
+        </FullWindow>
+      </div>
+    </>
   );
 }
