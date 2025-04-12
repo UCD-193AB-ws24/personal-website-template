@@ -20,7 +20,6 @@ import { Text, Search } from "lucide-react";
 import isValidURL from "@components/RichText/utils/isValidURL";
 import { useEditorContext } from "@contexts/EditorContext";
 import { useRouter, usePathname } from "next/navigation";
-import { fetchUsername } from "@lib/requests/fetchUsername";
 import { usePublishContext } from "@contexts/PublishContext";
 import { usePagesContext } from "@contexts/PagesContext";
 
@@ -42,8 +41,6 @@ export default function RichTextLinks({
   const publishContext = usePublishContext();
   const router = useRouter();
 
-  const [username, setUsername] = useState("");
-
   const [editor] = useLexicalComposerContext();
   const linkEditorRef = useRef<HTMLDivElement | null>(null);
 
@@ -63,24 +60,10 @@ export default function RichTextLinks({
     useState<NodeKey>("");
   const [escapePressed, setEscapePressed] = useState(false);
 
-  useEffect(() => {
-    getUsername();
-  }, []);
-
-  const getUsername = async () => {
-    const name = await fetchUsername();
-    if (name === null) {
-      setUsername("Unknown");
-      router.push("/setusername");
-    } else {
-      setUsername(name);
-    }
-  };
   // Using refs inside the useEffect's dependency list since using state variables
   // in the dependency list causes the lexical editor to defocus on change
   const lastActiveLinkNodeKeyRef = useRef(lastActiveLinkNodeKey);
   const escapePressedRef = useRef(escapePressed);
-  const usernameRef = useRef(username);
   const isActiveRef = useRef(isActive);
 
   // Update refs whenever their corresponding state variable updates
@@ -91,10 +74,6 @@ export default function RichTextLinks({
   useEffect(() => {
     escapePressedRef.current = escapePressed;
   }, [escapePressed]);
-
-  useEffect(() => {
-    usernameRef.current = username;
-  }, [username]);
 
   useEffect(() => {
     isActiveRef.current = isActive;
@@ -226,7 +205,7 @@ export default function RichTextLinks({
         LowPriority,
       ),
     );
-  }, [editor, lastActiveLinkNodeKeyRef, escapePressedRef, usernameRef]);
+  }, [editor, lastActiveLinkNodeKeyRef, escapePressedRef]);
 
   const getPageIdx = (name: string): number => {
     for (let i = 0; i < pagesContext.pages.length; i++) {
