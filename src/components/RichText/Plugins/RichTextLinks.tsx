@@ -19,7 +19,7 @@ import { Position } from "@customTypes/componentTypes";
 import { Text, Search } from "lucide-react";
 import isValidURL from "@components/RichText/utils/isValidURL";
 import { useEditorContext } from "@contexts/EditorContext";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { fetchUsername } from "@lib/requests/fetchUsername";
 import { usePublishContext } from "@contexts/PublishContext";
 import { usePagesContext } from "@contexts/PagesContext";
@@ -35,6 +35,7 @@ export default function RichTextLinks({
   isActive,
   isPreview,
 }: RichTextLinksProps) {
+  const pathName = usePathname();
   const editorContext = useEditorContext();
   const pagesContext = usePagesContext();
 
@@ -204,9 +205,8 @@ export default function RichTextLinks({
                     const urlFriendlyPageName = encodeURIComponent(
                       linkParentURL.replace(/ /g, "-"),
                     );
-                    router.push(
-                      `/pages/${usernameRef.current}/${urlFriendlyPageName}`,
-                    );
+                    const redirectPath = getPublishedRedirectPath(urlFriendlyPageName);
+                    router.push(redirectPath);
                     return true;
                   } else {
                     // Handle relative links using handleSwitchPage function
@@ -237,6 +237,23 @@ export default function RichTextLinks({
 
     return -1;
   };
+
+  // In a published page, relative links should redirect to
+  // /pages/[username]/[pageName]
+  const getPublishedRedirectPath = (pageName: string) => {
+    const pathParts = pathName.split("/");
+    const pagesIdx = pathParts.indexOf("pages");
+    const usernameIdx = pagesIdx + 1;
+    if (pagesIdx === -1 || usernameIdx >= pathParts.length) {
+      console.error("Relative link is used in a published context that doesn't follow the /pages/username convention");
+      return "";
+    }
+    
+    const redirectPathParts = pathParts.slice(0, usernameIdx + 1);
+    redirectPathParts.push(pageName);
+
+    return redirectPathParts.join("/");
+  }
 
   return (
     <div
