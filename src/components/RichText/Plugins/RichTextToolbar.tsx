@@ -495,10 +495,7 @@ export default function RichTextToolbarPlugin() {
               if (selection.getTextContent().length === 0) {
                 return;
               }
-
-              if (isValidURL(selection.getTextContent())) {
-                editor.dispatchCommand(TOGGLE_LINK_COMMAND, selection.getTextContent());
-              }
+              editor.dispatchCommand(TOGGLE_LINK_COMMAND, "");
             }
           })
         }}
