@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { Rnd } from "react-rnd";
 import { MoveIcon } from "lucide-react";
 
@@ -49,10 +49,6 @@ export default function WebPageComponent({
   const [size, setSize] = useState(initialSize);
   const [webpageSrc, setWebPageSrc] = useState(content || "");
   const [showOverlay, setShowOverlay] = useState(false);
-
-  // Track the initial mouse position for threshold logic
-  const startPos = useRef<{ x: number; y: number } | null>(null);
-  const dragThreshold = 10; // Minimum movement (px) before dragging starts
 
   const isValidURL = (url: string) => {
     // https://regex101.com/r/3fYy3x/1
@@ -110,33 +106,13 @@ export default function WebPageComponent({
     <Rnd
       size={{ width: size.width, height: size.height }}
       position={{ x: position.x, y: position.y }}
-      onDragStart={() => setIsDragging(true)}
-      onDrag={(e, _d) => {
-        setIsDragging(true);
+      onDragStart={() => {
+        setIsDragging(true)
         setShowOverlay(true);
-        if (startPos.current) {
-          let clientX: number;
-          let clientY: number;
-          if ("clientX" in e) {
-            clientX = e.clientX;
-            clientY = e.clientY;
-          } else if ("touches" in e && e.touches.length > 0) {
-            clientX = e.touches[0].clientX;
-            clientY = e.touches[0].clientY;
-          } else {
-            return;
-          }
-
-          const dx = Math.abs(clientX - startPos.current.x);
-          const dy = Math.abs(clientY - startPos.current.y);
-
-          if (dx > dragThreshold || dy > dragThreshold) {
-            setIsDragging(true);
-          }
-        }
       }}
       onDragStop={(e, d) => {
         setIsDragging(false);
+        setShowOverlay(false);
         handleDragStop(
           id,
           size,
@@ -159,8 +135,7 @@ export default function WebPageComponent({
       minWidth={250}
       minHeight={125}
       bounds="parent"
-      onMouseDown={(e) => {
-        startPos.current = { x: e.clientX, y: e.clientY };
+      onMouseDown={() => {
         setShowOverlay(false);
         onMouseDown();
       }}
