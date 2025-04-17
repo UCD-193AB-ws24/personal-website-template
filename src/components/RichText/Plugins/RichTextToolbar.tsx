@@ -386,7 +386,7 @@ export default function RichTextToolbarPlugin({setBoxColor}: RichTextToolbarPlug
   }, [editor, $updateToolbar]);
 
   return (
-    <div className="toolbar absolute top-[0px] z-[100]" ref={toolbarRef}>
+    <div className="toolbar fixed top-[64px] z-[100]" ref={toolbarRef}>
       <button
         disabled={!canUndo}
         onClick={() => {
