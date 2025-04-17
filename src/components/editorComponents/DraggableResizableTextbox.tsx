@@ -3,8 +3,6 @@
 import React, { useState } from "react";
 import { Rnd } from "react-rnd";
 
-import ActiveOutlineContainer from "@components/editorComponents/ActiveOutlineContainer";
-
 import type {
   ComponentItem,
   Position,
@@ -52,6 +50,7 @@ export default function DraggableResizableTextbox({
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
   const [textboxState, setTextboxState] = useState(content);
+  const [boxColor, setBoxColor] = useState("transparent");
 
   const handleMouseDown = (e: MouseEvent) => {
     e.stopPropagation();
@@ -79,7 +78,7 @@ export default function DraggableResizableTextbox({
       </LexicalComposer>
     </div>) : (
     <LexicalComposer initialConfig={RichTextInitialConfig}>
-      { isActive && <RichTextToolbarPlugin /> }
+      { isActive && <RichTextToolbarPlugin setBoxColor={setBoxColor} /> }
       <Rnd
         size={{ width: size.width, height: size.height }}
         position={{ x: position.x, y: position.y }}
@@ -113,9 +112,16 @@ export default function DraggableResizableTextbox({
         dragGrid={[GRID_SIZE, GRID_SIZE]}
         resizeGrid={[GRID_SIZE, GRID_SIZE]}
       >
-        <ActiveOutlineContainer isActive={isActive}>
+      <div
+        className={`w-full h-full transition-all duration-150 ease-in-out ${
+          isActive
+            ? "outline outline-2 outline-blue-500 shadow-md"
+            : "outline outline-2 outline-transparent hover:outline hover:outline-2 hover:outline-gray-300"
+        }`}
+        style={{backgroundColor: boxColor}}
+      >
           <RichTextbox isPreview={isPreview} textboxState={textboxState} updateTextboxState={updateTextboxState} isActive={isActive} />
-        </ActiveOutlineContainer>
+        </div>
       </Rnd>
     </LexicalComposer>
   )
