@@ -283,7 +283,7 @@ export default function ProjectCard({
         <div
           onMouseEnter={() => setShowOverlay(false)} // remove overlay when interacting with iframe
           onMouseDown={(e) => e.stopPropagation()} // capture mouse movements
-          className="cursor-default"
+          className="cursor-default w-full h-full"
         >
           <div
             ref={containerRef}
