@@ -4,7 +4,7 @@ import {
   INSERT_UNORDERED_LIST_COMMAND,
   INSERT_ORDERED_LIST_COMMAND,
 } from "@lexical/list";
-import { TOGGLE_LINK_COMMAND } from "@lexical/link";
+import { $isLinkNode, $toggleLink, TOGGLE_LINK_COMMAND } from "@lexical/link";
 import {
   $caretRangeFromSelection,
   $getSelection,
@@ -529,7 +529,19 @@ export default function RichTextToolbarPlugin({setBoxColor}: RichTextToolbarPlug
               if (selection.getTextContent().length === 0) {
                 return;
               }
-              editor.dispatchCommand(TOGGLE_LINK_COMMAND, "");
+              if ($isRangeSelection(selection)) {
+                const nodes = selection.getNodes();
+                if (nodes.length > 0) {
+                  const parent = nodes[0].getParent();
+                  if ($isLinkNode(parent) || nodes.find((n) => $isLinkNode(n))) {
+                    // Remove link if selecting a link node or selection has
+                    // a link node
+                    $toggleLink(null);
+                  } else {
+                    editor.dispatchCommand(TOGGLE_LINK_COMMAND, "");
+                  }
+                }
+              }
             }
           });
         }}
