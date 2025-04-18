@@ -52,10 +52,6 @@ export default function VideoComponent({
   const [thumbnail, setThumbnail] = useState<string | null>(null);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
-  // Track the initial mouse position for threshold logic
-  const startPos = useRef<{ x: number; y: number } | null>(null);
-  const dragThreshold = 10; // Minimum movement (px) before dragging starts
-
   useEffect(() => {
     if (videoSrc) {
       const videoId = extractYouTubeId(videoSrc);
@@ -127,33 +123,13 @@ export default function VideoComponent({
     <Rnd
       size={{ width: size.width, height: size.height }}
       position={{ x: position.x, y: position.y }}
-      onDragStart={() => setIsDragging(true)}
-      onDrag={(e, _d) => {
+      onDragStart={() => {
         setIsDragging(true);
         setShowOverlay(true);
-        if (startPos.current) {
-          let clientX: number;
-          let clientY: number;
-          if ("clientX" in e) {
-            clientX = e.clientX;
-            clientY = e.clientY;
-          } else if ("touches" in e && e.touches.length > 0) {
-            clientX = e.touches[0].clientX;
-            clientY = e.touches[0].clientY;
-          } else {
-            return;
-          }
-
-          const dx = Math.abs(clientX - startPos.current.x);
-          const dy = Math.abs(clientY - startPos.current.y);
-
-          if (dx > dragThreshold || dy > dragThreshold) {
-            setIsDragging(true);
-          }
-        }
       }}
       onDragStop={(e, d) => {
         setIsDragging(false);
+        setShowOverlay(false);
         handleDragStop(
           id,
           size,
@@ -177,8 +153,7 @@ export default function VideoComponent({
       minWidth={250}
       minHeight={125}
       bounds="parent"
-      onMouseDown={(e) => {
-        startPos.current = { x: e.clientX, y: e.clientY };
+      onMouseDown={() => {
         setShowOverlay(false);
         onMouseDown();
       }}

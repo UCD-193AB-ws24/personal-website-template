@@ -16,6 +16,20 @@ const fetchStoredAndReferencedFiles = async (
   const storedFiles = await listAll(draftStorageRef);
   const storedImagePaths = storedFiles.items.map((file) => file.fullPath); // Paths of stored images
 
+  const getStoragePathFromUrl = (urlString: string): string | null => {
+    try {
+      const url = new URL(urlString);
+      return decodeURIComponent(
+        url.pathname.replace(
+          `/v0/b/${storage.app.options.storageBucket}/o/`,
+          ""
+        )
+      );
+    } catch {
+      return null;
+    }
+  };
+
   const activeImagePaths = new Set(
     pages.flatMap((page) =>
       page.components
@@ -23,25 +37,33 @@ const fetchStoredAndReferencedFiles = async (
           (comp: any) =>
             (comp.type === "image" ||
               comp.type === "file" ||
-              comp.type === "aboutMeCard") &&
+              comp.type === "aboutMeCard" ||
+              comp.type === "projectCard"
+            ) &&
             comp.content,
         )
-        .map((comp: any) => {
-          const content =
-            comp.type === "aboutMeCard"
-              ? JSON.parse(comp.content).image
-              : comp.content;
+        .flatMap((comp: any) => {
+        try {
+          if (comp.type === "aboutMeCard") {
+            const parsed = JSON.parse(comp.content);
+            return parsed.image
+              ? [getStoragePathFromUrl(parsed.image)]
+              : [];
+          }
 
-          const url = new URL(content);
-          const storagePath = decodeURIComponent(
-            url.pathname.replace(
-              `/v0/b/${storage.app.options.storageBucket}/o/`,
-              "",
-            ),
-          );
+          if (comp.type === "projectCard") {
+            const cards = JSON.parse(comp.content);
+            return cards
+              .filter((card: any) => card.type === "image" && card.imageUrl)
+              .map((card: any) => getStoragePathFromUrl(card.imageUrl));
+          }
 
-          return storagePath;
-        })
+          // default for image or file: content is a string URL
+          return [getStoragePathFromUrl(comp.content)];
+        } catch {
+          return [];
+        }
+      })
     )
   );
 

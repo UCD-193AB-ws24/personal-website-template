@@ -47,6 +47,7 @@ export default function SectionTitleTextbox({
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
   const [text, setText] = useState(content);
+  const [showOverlay, setShowOverlay] = useState(false);
 
   const handleMouseDown = (e: MouseEvent | React.MouseEvent) => {
     e.stopPropagation();
@@ -75,7 +76,10 @@ export default function SectionTitleTextbox({
     <Rnd
       size={{ width: size.width, height: size.height }}
       position={{ x: position.x, y: position.y }}
-      onDragStart={() => setIsDragging(true)}
+      onDragStart={() => {
+        setIsDragging(true);
+        setShowOverlay(false);
+      }}
       onDragStop={(e, d) => {
         setIsDragging(false);
         handleDragStop(
@@ -117,15 +121,31 @@ export default function SectionTitleTextbox({
       resizeGrid={[GRID_SIZE, GRID_SIZE]}
     >
       <ActiveOutlineContainer isActive={isActive}>
-        <h1
+
+        {/* Overlay for enabling drag */}
+        {(showOverlay || !isActive) && (
+          <div
+            className="w-full h-full flex items-center justify-center absolute inset-0 z-10"
+            onMouseDown={() => setShowOverlay(true)}
+          >
+          </div>
+        )}
+
+        <div
+          onMouseEnter={() => setShowOverlay(false)} // remove overlay when interacting with iframe
+          onMouseDown={(e) => e.stopPropagation()} // capture mouse movements
+          className="cursor-default"
+        >
+          <h1
           contentEditable
           suppressContentEditableWarning
           draggable="false"
           className="overflow-hidden w-full h-full text-black text-2xl font-bold outline-none cursor-text p-0 m-0 leading-none"
           onBlur={handleBlur}
-        >
-          {text}
-        </h1>
+          >
+            {text}
+          </h1>
+        </div>        
       </ActiveOutlineContainer>
     </Rnd>
   );
