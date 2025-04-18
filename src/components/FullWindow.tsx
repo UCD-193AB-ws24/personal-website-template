@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState, useEffect, useMemo } from "react";
+import { ReactNode, useState, useEffect } from "react";
 
 import useIsMobile from "@lib/hooks/useIsMobile";
 
@@ -35,7 +35,7 @@ export default function FullWindow({
     }
   }, [lowestY, isMobilePreview]);
 
-  const sidePadding = (isMobile || isMobilePreview) ? 16 : 128; // 1rem on mobile, 8rem on desktop
+  const sidePadding = isMobile || isMobilePreview ? 16 : 128; // 1rem on mobile, 8rem on desktop
   const totalWidth = width + sidePadding * 2;
   const useFullWindowWidth = totalWidth < windowWidth;
 
@@ -65,21 +65,20 @@ export default function FullWindow({
     );
   }
 
-  // Desktop mode
+  // Not Mobile Preview mode
   return (
     <div
       className="flex flex-row relative bg-white"
       style={{
         minWidth: `${useFullWindowWidth ? windowWidth : totalWidth}px`,
         minHeight: height,
-        overflow: undefined,
       }}
     >
       <div
         className="absolute"
         style={{
-          left: "8rem",
-          right: "8rem",
+          left: isMobile ? "1rem" : "8rem",
+          right: isMobile ? "1rem" : "8rem",
           top: 0,
         }}
       >

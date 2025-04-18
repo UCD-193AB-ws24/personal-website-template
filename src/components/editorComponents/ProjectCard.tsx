@@ -38,6 +38,7 @@ interface ProjectCardProps {
   onMouseDown?: () => void;
   setIsDragging?: (dragging: boolean) => void;
   isPreview?: boolean;
+  isMobilePreview?: boolean;
   isPublish?: boolean;
 }
 
@@ -52,6 +53,7 @@ export default function ProjectCard({
   onMouseDown: onMouseDown = () => {},
   setIsDragging = () => {},
   isPreview,
+  isMobilePreview = false,
   isPublish = false,
 }: ProjectCardProps) {
   const [position, setPosition] = useState(initialPos);
@@ -135,7 +137,11 @@ export default function ProjectCard({
           position: isPreview ? "absolute" : "relative",
           left: 0,
           top: position.y,
-          width: isMobile ? "calc(100vw - 2rem)" : "calc(100vw - 16rem)",
+          width: isMobilePreview
+            ? "100%"
+            : isMobile
+              ? "calc(100vw - 2rem)"
+              : "calc(100vw - 16rem)",
           height: "max-content",
         }}
       >
@@ -144,7 +150,11 @@ export default function ProjectCard({
             {cards.map((card) => (
               <div
                 key={card.id}
-                className="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 p-4 border rounded shadow bg-white"
+                className={`p-4 border rounded shadow bg-white ${
+                  isMobilePreview
+                    ? "w-full"
+                    : "w-full sm:w-1/2 lg:w-1/3 xl:w-1/4"
+                }`}
               >
                 <h2 className="text-center text-xl font-semibold p-0 m-0 leading-none break-words whitespace-pre-wrap">
                   {card.title}
