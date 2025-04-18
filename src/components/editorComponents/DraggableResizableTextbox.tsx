@@ -51,6 +51,7 @@ export default function DraggableResizableTextbox({
 }: DraggableResizableTextboxProps) {
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
+  const [showOverlay, setShowOverlay] = useState(false);
   const [textboxState, setTextboxState] = useState(content);
 
   const handleMouseDown = (e: MouseEvent) => {
@@ -83,7 +84,10 @@ export default function DraggableResizableTextbox({
       <Rnd
         size={{ width: size.width, height: size.height }}
         position={{ x: position.x, y: position.y }}
-        onDragStart={() => setIsDragging(true)}
+        onDragStart={() => {
+          setIsDragging(true);
+          setShowOverlay(false);
+        }}
         onDragStop={(e, d) => {
           setIsDragging(false);
           handleDragStop(
@@ -114,7 +118,22 @@ export default function DraggableResizableTextbox({
         resizeGrid={[GRID_SIZE, GRID_SIZE]}
       >
         <ActiveOutlineContainer isActive={isActive}>
-          <RichTextbox isPreview={isPreview} textboxState={textboxState} updateTextboxState={updateTextboxState} isActive={isActive} />
+          {/* Overlay for enabling drag */}
+          {(showOverlay || !isActive) && (
+            <div
+              className="w-full h-full flex items-center justify-center absolute inset-0 z-10"
+              onMouseDown={() => setShowOverlay(true)}
+            >
+            </div>
+          )}
+
+          <div
+            onMouseEnter={() => setShowOverlay(false)} // remove overlay when interacting with iframe
+            onMouseDown={(e) => e.stopPropagation()} // capture mouse movements
+            className="cursor-default"
+          >
+            <RichTextbox isPreview={isPreview} textboxState={textboxState} updateTextboxState={updateTextboxState} isActive={isActive} />
+          </div>
         </ActiveOutlineContainer>
       </Rnd>
     </LexicalComposer>

@@ -59,6 +59,7 @@ export default function WorkEntry({
     duration: "Jan 20XX - Dec 20XX",
     details: "Details",
   });
+  const [showOverlay, setShowOverlay] = useState(false);
 
   useEffect(() => {
     try {
@@ -126,6 +127,7 @@ export default function WorkEntry({
       position={{ x: position.x, y: position.y }}
       onDragStart={() => {
         setIsDragging(true);
+        setShowOverlay(false);
       }}
       onDragStop={(e, d) => {
         setIsDragging(false);
@@ -157,38 +159,80 @@ export default function WorkEntry({
       resizeGrid={[GRID_SIZE, GRID_SIZE]}
     >
       <ActiveOutlineContainer isActive={isActive}>
+
+        {/* Overlay for enabling drag */}
+        {(showOverlay || !isActive) && (
+          <div
+            className="w-full h-full flex items-center justify-center absolute inset-0 z-10"
+            onMouseDown={() => setShowOverlay(true)}
+          >
+          </div>
+        )}
+
         <div
-          className="flex w-full h-full justify-between whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg gap-[50px]"
-          style={{ padding: `${GRID_SIZE}px` }}
+          onMouseEnter={() => setShowOverlay(false)} // remove overlay when interacting with iframe
+          onMouseDown={(e) => e.stopPropagation()} // capture mouse movements
+          className="cursor-default"
         >
-          <div className="flex flex-col gap-[40px]">
-            <div className="flex flex-col gap-[10px]">
-              <h1
-                contentEditable
-                suppressContentEditableWarning
-                draggable="false"
-                className="overflow-hidden min-w-[300px] max-w-[300px] min-h-[27px] max-h-[35px] text-black text-2xl font-bold cursor-text p-0 m-0 leading-none outline outline-gray-300 rounded-sm"
-                style={{
-                  outline: `${!isActive ? "none" : ""}`,
-                }}
-                onBlur={(e) => {
-                  setCurContent((prevContent: WorkEntryContent) => ({
-                    ...prevContent,
-                    company: e.target.innerText,
-                  }));
-                  updateComponent(
-                    id,
-                    position,
-                    size,
-                    JSON.stringify({
-                      ...curContent,
+          <div
+            className="flex w-full h-full justify-between whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg gap-[50px]"
+            style={{ padding: `${GRID_SIZE}px` }}
+          >
+            <div className="flex flex-col gap-[40px]">
+              <div className="flex flex-col gap-[10px]">
+                <h1
+                  contentEditable
+                  suppressContentEditableWarning
+                  draggable="false"
+                  className="overflow-hidden min-w-[300px] max-w-[300px] min-h-[27px] max-h-[35px] text-black text-2xl font-bold cursor-text p-0 m-0 leading-none outline outline-gray-300 rounded-sm"
+                  style={{
+                    outline: `${!isActive ? "none" : ""}`,
+                  }}
+                  onBlur={(e) => {
+                    setCurContent((prevContent: WorkEntryContent) => ({
+                      ...prevContent,
                       company: e.target.innerText,
-                    }),
-                  );
-                }}
-              >
-                {curContent.company}
-              </h1>
+                    }));
+                    updateComponent(
+                      id,
+                      position,
+                      size,
+                      JSON.stringify({
+                        ...curContent,
+                        company: e.target.innerText,
+                      }),
+                    );
+                  }}
+                >
+                  {curContent.company}
+                </h1>
+                <p
+                  contentEditable
+                  suppressContentEditableWarning
+                  draggable="false"
+                  className="overflow-hidden min-h-[24px] max-h-[24px] min-w-[300px] max-w-[300px] outline outline-gray-300 rounded-sm"
+                  style={{
+                    outline: `${!isActive ? "none" : ""}`,
+                  }}
+                  onBlur={(e) => {
+                    setCurContent((prevContent: WorkEntryContent) => ({
+                      ...prevContent,
+                      jobTitle: e.target.innerText,
+                    }));
+                    updateComponent(
+                      id,
+                      position,
+                      size,
+                      JSON.stringify({
+                        ...curContent,
+                        jobTitle: e.target.innerText,
+                      }),
+                    );
+                  }}
+                >
+                  {curContent.jobTitle}
+                </p>
+              </div>
               <p
                 contentEditable
                 suppressContentEditableWarning
@@ -200,7 +244,7 @@ export default function WorkEntry({
                 onBlur={(e) => {
                   setCurContent((prevContent: WorkEntryContent) => ({
                     ...prevContent,
-                    jobTitle: e.target.innerText,
+                    duration: e.target.innerText,
                   }));
                   updateComponent(
                     id,
@@ -208,26 +252,26 @@ export default function WorkEntry({
                     size,
                     JSON.stringify({
                       ...curContent,
-                      jobTitle: e.target.innerText,
+                      duration: e.target.innerText,
                     }),
                   );
                 }}
               >
-                {curContent.jobTitle}
+                {curContent.duration}
               </p>
             </div>
             <p
               contentEditable
               suppressContentEditableWarning
               draggable="false"
-              className="overflow-hidden min-h-[24px] max-h-[24px] min-w-[300px] max-w-[300px] outline outline-gray-300 rounded-sm"
+              className="overflow-hidden min-w-[370px] flex-grow resize-none bg-transparent text-lg leading-none outline outline-gray-300 rounded-sm"
               style={{
                 outline: `${!isActive ? "none" : ""}`,
               }}
               onBlur={(e) => {
                 setCurContent((prevContent: WorkEntryContent) => ({
                   ...prevContent,
-                  duration: e.target.innerText,
+                  details: e.target.innerText,
                 }));
                 updateComponent(
                   id,
@@ -235,40 +279,14 @@ export default function WorkEntry({
                   size,
                   JSON.stringify({
                     ...curContent,
-                    duration: e.target.innerText,
+                    details: e.target.innerText,
                   }),
                 );
               }}
             >
-              {curContent.duration}
+              {curContent.details}
             </p>
           </div>
-          <p
-            contentEditable
-            suppressContentEditableWarning
-            draggable="false"
-            className="overflow-hidden min-w-[370px] flex-grow resize-none bg-transparent text-lg leading-none outline outline-gray-300 rounded-sm"
-            style={{
-              outline: `${!isActive ? "none" : ""}`,
-            }}
-            onBlur={(e) => {
-              setCurContent((prevContent: WorkEntryContent) => ({
-                ...prevContent,
-                details: e.target.innerText,
-              }));
-              updateComponent(
-                id,
-                position,
-                size,
-                JSON.stringify({
-                  ...curContent,
-                  details: e.target.innerText,
-                }),
-              );
-            }}
-          >
-            {curContent.details}
-          </p>
         </div>
       </ActiveOutlineContainer>
     </Rnd>
