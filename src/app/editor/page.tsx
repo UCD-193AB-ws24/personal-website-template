@@ -48,6 +48,7 @@ import { auth } from "@lib/firebase/firebaseApp";
 import { deleteUnusedDraftFiles } from "@lib/requests/deleteUnusedFiles";
 import EditorContextProvider from "@contexts/EditorContext";
 import PagesContextProvider from "@contexts/PagesContext";
+import ProjectCard from "@components/editorComponents/ProjectCard";
 
 interface DraftLoaderProps {
   setPages: any;
@@ -141,6 +142,7 @@ export default function Editor() {
   const [hasLoadedDraftOnce, setHasLoadedDraftOnce] = useState(false);
   const [draftNumber, setDraftNumber] = useState(-1);
   const [isPreview, setIsPreview] = useState(false);
+  const [isMobilePreview, setIsMobilePreview] = useState(false);
   const [pages, setPages] = useState<Page[]>([]);
   const [activePageIndex, setActivePageIndex] = useState<number | null>(null);
   const [isGridVisible, setIsGridVisible] = useState(false);
@@ -178,10 +180,9 @@ export default function Editor() {
     return () => container.removeEventListener("scroll", handleScroll);
   }, []);
 
-
   const componentsRef = useRef(components);
   useEffect(() => {
-    componentsRef.current = components
+    componentsRef.current = components;
   }, [components]);
 
   const handleSwitchPage = (pageIndex: number) => {
@@ -195,7 +196,7 @@ export default function Editor() {
       setActiveComponent,
       setActivePageIndex,
     );
-  }
+  };
 
   const handleUpdatePageName = (pageIndex: number, newName: string) => {
     updatePageName(pageIndex, newName, setPages);
@@ -362,7 +363,7 @@ export default function Editor() {
       setComponents((prev) =>
         prev.map((comp) =>
           comp.id === id ? { ...comp, position, size, content } : comp,
-        )
+        ),
       );
     } else {
       setComponents((prev) =>
@@ -484,7 +485,25 @@ export default function Editor() {
           deletePage={handleDeletePage}
           updatePageName={handleUpdatePageName}
           isPreview={isPreview}
+          isMobilePreview={isMobilePreview}
           onMouseDown={() => handleComponentSelect(comp)}
+        />
+      );
+    } else if (comp.type === "projectCard") {
+      return (
+        <ProjectCard
+          key={comp.id}
+          id={comp.id}
+          initialPos={comp.position}
+          initialSize={comp.size}
+          components={components}
+          content={comp?.content}
+          updateComponent={updateComponent}
+          isActive={activeComponent?.id === comp.id}
+          onMouseDown={() => handleComponentSelect(comp)}
+          setIsDragging={setIsDragging}
+          isPreview={isPreview}
+          isMobilePreview={isMobilePreview}
         />
       );
     }
@@ -529,14 +548,26 @@ export default function Editor() {
       {isPreview ? (
         <PagesContextProvider pages={pages}>
           <EditorContextProvider handleSwitchPage={handleSwitchPage}>
-            <div className="bg-white min-h-screen min-w-[100vw] h-auto w-max">
+            <div
+              className={`bg-white min-w-[100vw] h-auto w-max ${!isMobilePreview ? "min-h-screen" : ""}`}
+            >
+              <button
+                className="text-white text-large font-semibold px-3 py-2 rounded-md mr-2 bg-gray-600 hover:bg-gray-800 shadow-md hover:shadow-lg fixed top-[10px] right-[140px] z-[1000]"
+                onClick={() => setIsMobilePreview(!isMobilePreview)}
+              >
+                {isMobilePreview ? "Switch to Desktop" : "Switch to Mobile"}
+              </button>
               <button
                 className={`text-white text-large font-semibold px-3 py-2 rounded-md mr-1 bg-red-500 transition-all duration-300 hover:bg-red-700 shadow-md hover:shadow-lg fixed top-[10px] right-[0px] z-[1000]`}
                 onClick={() => setIsPreview(!isPreview)}
               >
                 Exit Preview
               </button>
-              <FullWindow width={editorWidth} lowestY={editorHeight - 50}>
+              <FullWindow
+                width={editorWidth}
+                lowestY={editorHeight - 50}
+                isMobilePreview={isMobilePreview}
+              >
                 {components.map(renderComponent)}
               </FullWindow>
             </div>
@@ -620,7 +651,9 @@ export default function Editor() {
                         : "bg-white"
                     }`}
                   >
-                    {!isLoading && components.length === 0 && pages.length < 2 ? (
+                    {!isLoading &&
+                    components.length === 0 &&
+                    pages.length < 2 ? (
                       <h1 className="text-2xl font-bold mb-4 text-gray-400 text-center mt-20">
                         Drag components here to start building your site!
                       </h1>

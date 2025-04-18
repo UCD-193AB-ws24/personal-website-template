@@ -26,7 +26,6 @@ import {
 } from 'lexical';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import { Plus, Minus, Undo, Redo, Bold, Italic, Underline, Strikethrough, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, LucideLink} from 'lucide-react';
-import isValidURL from '@components/RichText/utils/isValidURL';
 
 const fontSizes = ['12px', '16px', '18px', '24px', '30px', '36px', '42px', '48px', '60px', '72px']
 const LowPriority = 1;
@@ -495,10 +494,7 @@ export default function RichTextToolbarPlugin() {
               if (selection.getTextContent().length === 0) {
                 return;
               }
-
-              if (isValidURL(selection.getTextContent())) {
-                editor.dispatchCommand(TOGGLE_LINK_COMMAND, selection.getTextContent());
-              }
+              editor.dispatchCommand(TOGGLE_LINK_COMMAND, "");
             }
           })
         }}

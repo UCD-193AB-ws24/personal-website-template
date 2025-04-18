@@ -18,8 +18,8 @@ import {
   restrictToParentElement,
 } from "@dnd-kit/modifiers";
 
-import { toastError } from '@components/toasts/ErrorToast';
-import SortablePageItem from '@components/SortablePageItem';
+import { toastError } from "@components/toasts/ErrorToast";
+import SortablePageItem from "@components/SortablePageItem";
 
 import type { ComponentItem } from "@customTypes/componentTypes";
 import useIsMobile from "@lib/hooks/useIsMobile";
@@ -40,22 +40,24 @@ interface NavigationBarProps {
   updatePageName?: (index: number, newName: string) => void;
   isPreview?: boolean;
   isPublish?: boolean;
+  isMobilePreview?: boolean;
   onMouseDown?: () => void;
 }
 
 export default function NavigationBar({
   username = "",
   components = [],
-  setComponents: setComponents = () => { },
+  setComponents: setComponents = () => {},
   pages = [],
-  setPages: setPages = () => { },
+  setPages: setPages = () => {},
   activePageIndex,
-  setActivePageIndex: setActivePageIndex = () => { },
-  switchPage: switchPage = () => { },
-  addPage: addPage = () => { },
-  deletePage: deletePage = () => { },
-  updatePageName: updatePageName = () => { },
+  setActivePageIndex: setActivePageIndex = () => {},
+  switchPage: switchPage = () => {},
+  addPage: addPage = () => {},
+  deletePage: deletePage = () => {},
+  updatePageName: updatePageName = () => {},
   isPreview,
+  isMobilePreview = false,
   isPublish = false,
   onMouseDown,
 }: NavigationBarProps) {
@@ -100,7 +102,7 @@ export default function NavigationBar({
       setEditedName(pages[index].pageName); // Revert to existing name if new name is empty string
     } else {
       const isDuplicate = pages.some(
-        (page, i) => i !== index && page.pageName === editedName.trim()
+        (page, i) => i !== index && page.pageName === editedName.trim(),
       );
       if (isDuplicate) {
         toastError("Page name must be unique!");
@@ -143,19 +145,22 @@ export default function NavigationBar({
     setActivePageIndex(newIndex);
   };
 
-  if (isPublish && isMobile) {
+  // Mobile nav bar (with hamburger menu)
+  if ((isPublish && isMobile) || (isPreview && (isMobile || isMobilePreview))) {
     return (
-      <div className="fixed top-0 left-0 w-screen bg-gray-800 text-white shadow-lg z-[100] overflow-x-hidden">
+      <div
+        className={`bg-gray-800 text-white shadow-lg z-[100] overflow-x-hidden ${
+          isPreview
+            ? "fixed top-[calc(4rem+5px)] left-1/2 w-[365px] -translate-x-1/2"
+            : "fixed top-0 left-0 w-screen"
+        }`}
+      >
         <div className="flex items-center justify-end px-4 h-12">
           <button
             className="text-white focus:outline-none "
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            {isMenuOpen ? (
-              <XIcon size={32} />
-            ) : (
-              <MenuIcon size={32} />
-            )}
+            {isMenuOpen ? <XIcon size={32} /> : <MenuIcon size={32} />}
           </button>
         </div>
 
@@ -163,27 +168,48 @@ export default function NavigationBar({
           <div className="flex flex-col items-center px-4 pb-2">
             {pages.map((page, index) => {
               const urlFriendlyPageName = encodeURIComponent(
-                page.pageName.replace(/ /g, "-")
+                page.pageName.replace(/ /g, "-"),
               );
 
               const isLast = index === pages.length - 1;
+              const isActive = activePageIndex === index;
 
               return (
-                <Link
-                  key={index}
-                  href={`/pages/${username}/${urlFriendlyPageName}`}
-                  onClick={() => setIsMenuOpen(false)}
-                  className={`w-full block ${!isLast ? "border-b border-gray-700" : ""}`}
-                >
-                  <div
-                    className={`w-full text-center py-3 transition-all duration-200 text-lg font-medium ${activePageIndex === index
-                        ? "text-blue-400"
-                        : "text-white hover:text-blue-300 hover:bg-gray-700"
-                      }`}
-                  >
-                    {page.pageName}
-                  </div>
-                </Link>
+                <div key={index} className="w-full">
+                  {isPreview ? (
+                    <div
+                      onClick={() => switchPage(index)}
+                      className={`w-full block cursor-pointer ${!isLast ? "border-b border-gray-700" : ""}`}
+                    >
+                      <div
+                        className={`w-full text-center py-3 transition-all duration-200 text-lg font-medium ${
+                          isActive
+                            ? "text-blue-400"
+                            : "text-white hover:text-blue-300 hover:bg-gray-700"
+                        }`}
+                      >
+                        {page.pageName}
+                      </div>
+                    </div>
+                  ) : (
+                    <Link
+                      key={index}
+                      href={`/pages/${username}/${urlFriendlyPageName}`}
+                      onClick={() => setIsMenuOpen(false)}
+                      className={`w-full block ${!isLast ? "border-b border-gray-700" : ""}`}
+                    >
+                      <div
+                        className={`w-full text-center py-3 transition-all duration-200 text-lg font-medium ${
+                          activePageIndex === index
+                            ? "text-blue-400"
+                            : "text-white hover:text-blue-300 hover:bg-gray-700"
+                        }`}
+                      >
+                        {page.pageName}
+                      </div>
+                    </Link>
+                  )}
+                </div>
               );
             })}
           </div>
@@ -216,10 +242,11 @@ export default function NavigationBar({
               href={`/pages/${username}/${urlFriendlyPageName}`}
             >
               <button
-                className={`px-4 py-2 mx-1 rounded-md transition-all duration-200 ${activePageIndex === index
-                  ? "bg-blue-500"
-                  : "bg-gray-700 hover:bg-gray-600"
-                  }`}
+                className={`px-4 py-2 mx-1 rounded-md transition-all duration-200 ${
+                  activePageIndex === index
+                    ? "bg-blue-500"
+                    : "bg-gray-700 hover:bg-gray-600"
+                }`}
               >
                 {page.pageName}
               </button>
