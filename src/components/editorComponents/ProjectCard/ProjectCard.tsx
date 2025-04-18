@@ -71,6 +71,7 @@ export default function ProjectCard({
   const containerRef = useRef<HTMLDivElement>(null);
   const [previewSrcs, setPreviewSrcs] = useState<Record<number, string>>({});
   const isMobile = useIsMobile();
+  const [showOverlay, setShowOverlay] = useState(false);
 
   const draftNumber = useSearchParams().get("draftNumber");
 
@@ -233,7 +234,10 @@ export default function ProjectCard({
       minWidth={"100%"}
       minHeight={minHeight}
       position={{ x: 0, y: position.y }}
-      onDragStart={() => setIsDragging(true)}
+      onDragStart={() => {
+        setIsDragging(true);
+        setShowOverlay(false);
+      }}
       onDragStop={(e, d) => {
         setIsDragging(false);
         handleDragStop(
@@ -266,126 +270,142 @@ export default function ProjectCard({
       enableResizing={{ top: true, right: false, bottom: true, left: false }}
     >
       <ActiveOutlineContainer isActive={isActive}>
+
+        {/* Overlay for enabling drag */}
+        {(showOverlay || !isActive) && (
+          <div
+            className="w-full h-full flex items-center justify-center absolute inset-0 z-10"
+            onMouseDown={() => setShowOverlay(true)}
+          >
+          </div>
+        )}
+
         <div
-          ref={containerRef}
-          className="flex flex-col justify-between w-[calc(100vw - 16rem)] h-full mx-auto p-4"
+          onMouseEnter={() => setShowOverlay(false)} // remove overlay when interacting with iframe
+          onMouseDown={(e) => e.stopPropagation()} // capture mouse movements
+          className="cursor-default"
         >
-          {isActive && cards.length < 3 && (
-            <>
-              <button
-                onClick={addTextCard}
-                className="absolute top-2 right-4 px-3 py-1 bg-blue-600 text-white rounded text-sm shadow hover:bg-blue-700"
-              >
-                Add Text Card
-              </button>
-              <button
-                onClick={addImageCard}
-                className="absolute top-10 right-4 px-3 py-1 bg-green-600 text-white rounded text-sm shadow hover:bg-green-700"
-              >
-                Add Image Card
-              </button>
-            </>
-          )}
+          <div
+            ref={containerRef}
+            className="flex flex-col justify-between w-[calc(100vw - 16rem)] h-full mx-auto p-4"
+          >
+            {isActive && cards.length < 3 && (
+              <>
+                <button
+                  onClick={addTextCard}
+                  className="absolute top-2 right-4 px-3 py-1 bg-blue-600 text-white rounded text-sm shadow hover:bg-blue-700"
+                >
+                  Add Text Card
+                </button>
+                <button
+                  onClick={addImageCard}
+                  className="absolute top-10 right-4 px-3 py-1 bg-green-600 text-white rounded text-sm shadow hover:bg-green-700"
+                >
+                  Add Image Card
+                </button>
+              </>
+            )}
 
-          <div className="flex flex-wrap justify-center h-full items-stretch gap-4">
-            {cards.map((card) => (
-              <div
-                key={card.id}
-                ref={(el) => void (cardRefs.current[card.id] = el)}
-                className={`relative ${
-                    isMobilePreview
-                      ? "w-full"
-                      : "w-full sm:w-1/2 lg:w-1/3 xl:w-1/4"
-                  } flex flex-col border
-                  ${card.type === "image" && isActive ? "border-gray-300" : "border-transparent"}
-                  ${card.type === "image" ? "h-full" : "h-fit bg-white rounded shadow"}`}
-              >
-                {isActive && (
-                  <button
-                    onClick={() => deleteCard(card.id)}
-                    className="absolute top-2 right-2 text-red-500 hover:text-red-700 z-10"
-                    aria-label="Delete Card"
-                  >
-                    <XIcon size={18} />
-                  </button>
-                )}
+            <div className="flex flex-wrap justify-center h-full items-stretch gap-4">
+              {cards.map((card) => (
+                <div
+                  key={card.id}
+                  ref={(el) => void (cardRefs.current[card.id] = el)}
+                  className={`relative ${
+                      isMobilePreview
+                        ? "w-full"
+                        : "w-full sm:w-1/2 lg:w-1/3 xl:w-1/4"
+                    } flex flex-col border
+                    ${card.type === "image" && isActive ? "border-gray-300" : "border-transparent"}
+                    ${card.type === "image" ? "h-full" : "h-fit bg-white rounded shadow"}`}
+                >
+                  {isActive && (
+                    <button
+                      onClick={() => deleteCard(card.id)}
+                      className="absolute top-2 right-2 text-red-500 hover:text-red-700 z-10"
+                      aria-label="Delete Card"
+                    >
+                      <XIcon size={18} />
+                    </button>
+                  )}
 
-                {card.type === "image" ? (
-                  <ImageCard
-                    key={card.id}
-                    cardId={card.id}
-                    imageUrl={card.imageUrl}
-                    previewSrc={previewSrcs[card.id]}
-                    draftNumber={draftNumber}
-                    onImageUpload={(id, url) => {
-                      const updated = cards.map(c => c.id === id ? { ...c, imageUrl: url } : c);
-                      updateContent(updated);
-                    }}
-                    setPreviewSrc={(id, url) => {
-                      setPreviewSrcs(prev => {
-                        if (prev[id]) URL.revokeObjectURL(prev[id]);
-                        const updated = { ...prev };
-                        if (url) updated[id] = url;
-                        else delete updated[id];
-                        return updated;
-                      });
-                    }}
-                    isActive={isActive}
-                    widthPercent={card.widthPercent}
-                    positionPercent={card.positionPercent}
-                    onLayoutChange={(cardId, layout) => {
-                      const current = cards.find((c) => c.id === cardId);
-                      if (
-                        current &&
-                        (current.widthPercent !== layout.widthPercent ||
-                          current.positionPercent?.x !== layout.positionPercent.x ||
-                          current.positionPercent?.y !== layout.positionPercent.y)
-                      ) {
-                        const updated = cards.map((c) =>
-                          c.id === cardId ? { ...c, ...layout } : c
-                        );
+                  {card.type === "image" ? (
+                    <ImageCard
+                      key={card.id}
+                      cardId={card.id}
+                      imageUrl={card.imageUrl}
+                      previewSrc={previewSrcs[card.id]}
+                      draftNumber={draftNumber}
+                      onImageUpload={(id, url) => {
+                        const updated = cards.map(c => c.id === id ? { ...c, imageUrl: url } : c);
                         updateContent(updated);
-                      }
-                    }}
-                  />
-                ) : (
-                  <div className="p-4">
-                    <h2
-                      contentEditable
-                      suppressContentEditableWarning
-                      draggable="false"
-                      className="text-center text-2xl font-semibold cursor-text p-0 m-0 leading-none outline outline-gray-300 rounded-sm break-words whitespace-pre-wrap"
-                      style={{
-                        outline: `${!isActive ? "none" : ""}`,
                       }}
-                      onBlur={(e) => {
-                        handleTextCardChange(
-                          card.id,
-                          "title",
-                          e.currentTarget.innerText,
-                        );
+                      setPreviewSrc={(id, url) => {
+                        setPreviewSrcs(prev => {
+                          if (prev[id]) URL.revokeObjectURL(prev[id]);
+                          const updated = { ...prev };
+                          if (url) updated[id] = url;
+                          else delete updated[id];
+                          return updated;
+                        });
                       }}
-                    >
-                      {card.title}
-                    </h2>
-                    <p
-                      contentEditable
-                      suppressContentEditableWarning
-                      draggable="false"
-                      className="text-gray-700 mt-2 outline outline-gray-300 rounded-sm break-words whitespace-pre-wrap"
-                      style={{
-                        outline: `${!isActive ? "none" : ""}`,
+                      isActive={isActive}
+                      widthPercent={card.widthPercent}
+                      positionPercent={card.positionPercent}
+                      onLayoutChange={(cardId, layout) => {
+                        const current = cards.find((c) => c.id === cardId);
+                        if (
+                          current &&
+                          (current.widthPercent !== layout.widthPercent ||
+                            current.positionPercent?.x !== layout.positionPercent.x ||
+                            current.positionPercent?.y !== layout.positionPercent.y)
+                        ) {
+                          const updated = cards.map((c) =>
+                            c.id === cardId ? { ...c, ...layout } : c
+                          );
+                          updateContent(updated);
+                        }
                       }}
-                      onBlur={(e) => {
-                        handleTextCardChange(card.id, "body", e.target.innerText);
-                      }}
-                    >
-                      {card.body}
-                    </p>
-                  </div>
-                )}
-              </div>
-            ))}
+                    />
+                  ) : (
+                    <div className="p-4">
+                      <h2
+                        contentEditable
+                        suppressContentEditableWarning
+                        draggable="false"
+                        className="text-center text-2xl font-semibold cursor-text p-0 m-0 leading-none outline outline-gray-300 rounded-sm break-words whitespace-pre-wrap"
+                        style={{
+                          outline: `${!isActive ? "none" : ""}`,
+                        }}
+                        onBlur={(e) => {
+                          handleTextCardChange(
+                            card.id,
+                            "title",
+                            e.currentTarget.innerText,
+                          );
+                        }}
+                      >
+                        {card.title}
+                      </h2>
+                      <p
+                        contentEditable
+                        suppressContentEditableWarning
+                        draggable="false"
+                        className="text-gray-700 mt-2 outline outline-gray-300 rounded-sm break-words whitespace-pre-wrap"
+                        style={{
+                          outline: `${!isActive ? "none" : ""}`,
+                        }}
+                        onBlur={(e) => {
+                          handleTextCardChange(card.id, "body", e.target.innerText);
+                        }}
+                      >
+                        {card.body}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </ActiveOutlineContainer>
