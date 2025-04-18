@@ -121,10 +121,9 @@ export default function DraggableResizableTextbox({
           {/* Overlay for enabling drag */}
           {(showOverlay || !isActive) && (
             <div
-              className="w-full h-full flex items-center justify-center absolute inset-0 bg-red-900 bg-opacity-50 z-10"
+              className="w-full h-full flex items-center justify-center absolute inset-0 z-10"
               onMouseDown={() => setShowOverlay(true)}
             >
-             ONLY DRAGGING
             </div>
           )}
 
