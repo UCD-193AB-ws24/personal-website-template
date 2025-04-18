@@ -177,7 +177,11 @@ export default function ProjectCard({
             {cards.map((card) => (
               <div
                 key={card.id}
-                className={`relative w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 flex flex-col border
+                className={`relative ${
+                    isMobilePreview
+                      ? "w-full"
+                      : "w-full sm:w-1/2 lg:w-1/3 xl:w-1/4"
+                  } flex flex-col border
                   ${card.type === "image" ? "border-none" : "h-fit bg-white rounded shadow"}`}
               >
                 {card.type === "image" ? (
