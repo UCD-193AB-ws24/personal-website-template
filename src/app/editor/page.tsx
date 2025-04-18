@@ -141,7 +141,7 @@ export default function Editor() {
   const [hasLoadedDraftOnce, setHasLoadedDraftOnce] = useState(false);
   const [draftNumber, setDraftNumber] = useState(-1);
   const [isPreview, setIsPreview] = useState(false);
-  const [isMobilePreview, setIsMobilePreview] = useState(false)
+  const [isMobilePreview, setIsMobilePreview] = useState(false);
   const [pages, setPages] = useState<Page[]>([]);
   const [activePageIndex, setActivePageIndex] = useState<number | null>(null);
   const [isGridVisible, setIsGridVisible] = useState(false);
@@ -530,24 +530,12 @@ export default function Editor() {
       {isPreview ? (
         <PagesContextProvider pages={pages}>
           <EditorContextProvider handleSwitchPage={handleSwitchPage}>
-            <div 
-              className="bg-white min-h-screen min-w-[100vw] h-auto w-max"
-              style = {{
-                width: isMobilePreview? "100%" : "100vw",
-              }}
-             >
-                <div
-                  className="h-auto"
-                   style={{
-                     width: isMobilePreview ? "375px" : "100%",
-                     border: isMobilePreview ? "1px solid #ccc" : "none",
-                  }}
-                >
+            <div className="bg-white min-h-screen min-w-[100vw] h-auto w-max">
                   <button
-                    className="text-white text-large font-semibold px-3 py-2 rounded-md mr-2 bg-gray-600 hover:bg-gray-800 shadow-md hover:shadow-lg fixed top-[10px] right-  [140px] z-[1000]"
-                    onClick={() => setIsMobilePreview((prev) => !prev)}
+                    className="text-white text-large font-semibold px-3 py-2 rounded-md mr-2 bg-gray-600 hover:bg-gray-800 shadow-md hover:shadow-lg fixed top-[10px] right-[140px] z-[1000]"
+                    onClick={() => setIsMobilePreview(!isMobilePreview)}
                   >
-                    {isMobilePreview? "Desktop View" : "Mobile View"}
+                    {isMobilePreview? "Switch to Desktop" : "Switch to Mobile"}
                   </button>
                   <button
                     className={`text-white text-large font-semibold px-3 py-2 rounded-md mr-1 bg-red-500 transition-all duration-300 hover:bg-red-700 shadow-md hover:shadow-lg fixed top-[10px] right-[0px] z-[1000]`}
@@ -555,10 +543,9 @@ export default function Editor() {
                   >
                     Exit Preview
                   </button>
-                  <FullWindow width={editorWidth} lowestY={editorHeight - 50}>
+                  <FullWindow width={editorWidth} lowestY={editorHeight - 50} isMobilePreview={isMobilePreview}>
                     {components.map(renderComponent)}
                   </FullWindow>
-                </div>
             </div>
           </EditorContextProvider>
         </PagesContextProvider>
