@@ -57,6 +57,7 @@ export default function AcademicEntry({
     subtext: "Degree",
     duration: "Jan 20XX - Dec 20XX",
   });
+  const [showOverlay, setShowOverlay] = useState(false);
 
 	useEffect(() => {
 		try {
@@ -116,6 +117,7 @@ export default function AcademicEntry({
       position={{ x: position.x, y: position.y }}
       onDragStart={() => {
         setIsDragging(true);
+        setShowOverlay(false);
       }}
       onDragStop={(e, d) => {
         setIsDragging(false);
@@ -147,49 +149,92 @@ export default function AcademicEntry({
       resizeGrid={[GRID_SIZE, GRID_SIZE]}
     >
       <ActiveOutlineContainer isActive={isActive}>
+
+        {/* Overlay for enabling drag */}
+        {(showOverlay || !isActive) && (
+          <div
+            className="w-full h-full flex items-center justify-center absolute inset-0 z-10"
+            onMouseDown={() => setShowOverlay(true)}
+          >
+          </div>
+        )}
+
         <div
-          className="flex w-full h-full justify-between whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg"
-          style={{ padding: `${GRID_SIZE}px` }}
+          onMouseEnter={() => setShowOverlay(false)} // remove overlay when interacting with iframe
+          onMouseDown={(e) => e.stopPropagation()} // capture mouse movements
+          className="cursor-default"
         >
-          <div className="flex flex-col justify-between">
-            <h1
-              contentEditable
-              suppressContentEditableWarning
-              draggable="false"
-              className="overflow-hidden min-w-[300px] max-w-[300px] min-h-[26px] max-h-[30px] text-black text-2xl font-bold cursor-text p-0 m-0 leading-none outline outline-gray-300 rounded-sm"
-              style={{
-                outline: `${!isActive ? "none" : ""}`,
-              }}
-              onBlur={(e) => {
-                setCurContent((prevContent: AcademicEntryContent) => ({
-                  ...prevContent,
-                  schoolName: e.target.innerText,
-                }));
-                updateComponent(
-                  id,
-                  position,
-                  size,
-                  JSON.stringify({
-                    ...curContent,
+          <div
+            className="flex w-full h-full justify-between whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg"
+            style={{ padding: `${GRID_SIZE}px` }}
+          >
+            <div className="flex flex-col justify-between">
+              <h1
+                contentEditable
+                suppressContentEditableWarning
+                draggable="false"
+                className="overflow-hidden min-w-[300px] max-w-[300px] min-h-[26px] max-h-[30px] text-black text-2xl font-bold cursor-text p-0 m-0 leading-none outline outline-gray-300 rounded-sm"
+                style={{
+                  outline: `${!isActive ? "none" : ""}`,
+                }}
+                onBlur={(e) => {
+                  setCurContent((prevContent: AcademicEntryContent) => ({
+                    ...prevContent,
                     schoolName: e.target.innerText,
-                  }),
-                );
-              }}
-            >
-              {curContent.schoolName}
-            </h1>
+                  }));
+                  updateComponent(
+                    id,
+                    position,
+                    size,
+                    JSON.stringify({
+                      ...curContent,
+                      schoolName: e.target.innerText,
+                    }),
+                  );
+                }}
+              >
+                {curContent.schoolName}
+              </h1>
+              <p
+                contentEditable
+                suppressContentEditableWarning
+                draggable="false"
+                className="overflow-hidden min-h-[24px] max-h-[24px] min-w-[300px] max-w-[300px] outline outline-gray-300 rounded-sm"
+                style={{
+                  outline: `${!isActive ? "none" : ""}`,
+                }}
+                onBlur={(e) => {
+                  setCurContent((prevContent: AcademicEntryContent) => ({
+                    ...prevContent,
+                    subtext: e.target.innerText,
+                  }));
+                  updateComponent(
+                    id,
+                    position,
+                    size,
+                    JSON.stringify({
+                      ...curContent,
+                      subtext: e.target.innerText,
+                    }),
+                  );
+                }}
+              >
+                {curContent.subtext}
+              </p>
+            </div>
+
             <p
               contentEditable
               suppressContentEditableWarning
               draggable="false"
-              className="overflow-hidden min-h-[24px] max-h-[24px] min-w-[300px] max-w-[300px] outline outline-gray-300 rounded-sm"
+              className="overflow-hidden min-w-[300px] max-w-[300px] resize-none bg-transparent text-lg leading-none outline outline-gray-300 rounded-sm"
               style={{
                 outline: `${!isActive ? "none" : ""}`,
               }}
               onBlur={(e) => {
                 setCurContent((prevContent: AcademicEntryContent) => ({
                   ...prevContent,
-                  subtext: e.target.innerText,
+                  duration: e.target.innerText,
                 }));
                 updateComponent(
                   id,
@@ -197,41 +242,14 @@ export default function AcademicEntry({
                   size,
                   JSON.stringify({
                     ...curContent,
-                    subtext: e.target.innerText,
+                    duration: e.target.innerText,
                   }),
                 );
               }}
             >
-              {curContent.subtext}
+              {curContent.duration}
             </p>
           </div>
-
-          <p
-            contentEditable
-            suppressContentEditableWarning
-            draggable="false"
-            className="overflow-hidden min-w-[300px] max-w-[300px] resize-none bg-transparent text-lg leading-none outline outline-gray-300 rounded-sm"
-            style={{
-              outline: `${!isActive ? "none" : ""}`,
-            }}
-            onBlur={(e) => {
-              setCurContent((prevContent: AcademicEntryContent) => ({
-                ...prevContent,
-                duration: e.target.innerText,
-              }));
-              updateComponent(
-                id,
-                position,
-                size,
-                JSON.stringify({
-                  ...curContent,
-                  duration: e.target.innerText,
-                }),
-              );
-            }}
-          >
-            {curContent.duration}
-          </p>
         </div>
       </ActiveOutlineContainer>
     </Rnd>
