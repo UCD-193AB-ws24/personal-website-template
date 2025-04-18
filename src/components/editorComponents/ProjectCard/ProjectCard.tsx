@@ -3,11 +3,11 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Rnd } from "react-rnd";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useSearchParams } from "next/navigation";
 import { XIcon } from "lucide-react";
 
 import ActiveOutlineContainer from "@components/editorComponents/ActiveOutlineContainer";
+import ImageCard from "./ImageCard";
 
 import type {
   ComponentItem,
@@ -17,7 +17,6 @@ import type {
 
 import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
 import { GRID_SIZE } from "@utils/constants";
-import { auth, storage } from "@lib/firebase/firebaseApp";
 import useIsMobile from "@lib/hooks/useIsMobile";
 
 interface ProjectCardContent {
@@ -26,6 +25,8 @@ interface ProjectCardContent {
   title?: string;
   body?: string;
   imageUrl?: string;
+  widthPercent?: number;
+  positionPercent?: { x: number; y: number };
 }
 
 interface ProjectCardProps {
@@ -71,6 +72,7 @@ export default function ProjectCard({
 
   const draftNumber = useSearchParams().get("draftNumber");
 
+
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -88,7 +90,9 @@ export default function ProjectCard({
       setSize((prev) => ({ ...prev, height: contentHeight }));
     }
     setMinHeight(contentHeight + 32); // 32 for top and bottom padding
+
   }, [cards, size.height]);
+
 
 
   useEffect(() => {
@@ -101,25 +105,6 @@ export default function ProjectCard({
       setCards([]);
     }
   }, [content]);
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const cardHeights = Object.values(cardRefs.current)
-      .filter(Boolean)
-      .map((el) => el!.offsetHeight);
-
-    if (cardHeights.length === 0) return;
-
-    const maxCardHeight = Math.max(...cardHeights);
-
-    setSize((prev) => {
-      if (maxCardHeight !== prev.height) {
-        return { ...prev, height: maxCardHeight };
-      }
-      return prev;
-    });
-  }, [cards]);
 
   const updateContent = (newCards: ProjectCardContent[]) => {
     setCards(newCards);
@@ -165,49 +150,6 @@ export default function ProjectCard({
     updateContent(updatedCards);
   };
 
-  const handleImageUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-    cardId: number,
-  ) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const userId = auth.currentUser?.uid;
-    const filePath = `users/${userId}/drafts/${draftNumber}/${cardId}-${file.name}`;
-    const storageRef = ref(storage, filePath);
-    const uploadTask = uploadBytesResumable(storageRef, file);
-
-    const localPreview = URL.createObjectURL(file);
-    setPreviewSrcs((prev) => {
-      if (prev[cardId]) URL.revokeObjectURL(prev[cardId]);
-      return { ...prev, [cardId]: localPreview };
-    });
-
-    uploadTask.on(
-      "state_changed",
-      null,
-      (error) => {
-        console.error("Upload failed:", error);
-        setPreviewSrcs((prev) => ({ ...prev, [cardId]: "" }));
-      },
-      async () => {
-        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-        const updatedCards = cards.map((card) =>
-          card.id === cardId ? { ...card, imageUrl: downloadURL } : card,
-        );
-        updateContent(updatedCards);
-
-        setPreviewSrcs((prev) => {
-          if (prev[cardId]) URL.revokeObjectURL(prev[cardId]);
-          const updated = { ...prev };
-          delete updated[cardId];
-          return updated;
-        });
-      },
-    );
-  };
-
-
   const handleMouseDown = (e: React.MouseEvent | MouseEvent) => {
     e.stopPropagation();
     onMouseDown?.();
@@ -229,21 +171,32 @@ export default function ProjectCard({
             {cards.map((card) => (
               <div
                 key={card.id}
-                className="h-fit w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 border rounded shadow bg-white"
+                className={`relative w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 flex flex-col border
+                  ${card.type === "image" ? "border-none" : "h-fit bg-white rounded shadow"}`}
               >
                 {card.type === "image" ? (
-                  <div className="w-full h-full flex items-center justify-center cursor-pointer bg-gray-200">
-                    {card.imageUrl ? (
-                      <img
-                        src={card.imageUrl}
-                        alt="Uploaded"
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                        No Image
-                      </div>
-                    )}
+                  <div
+                    style={{
+                      position: "relative",
+                      width: `${card.widthPercent}%`,
+                      left: `${card.positionPercent?.x}%`,
+                      top: `${card.positionPercent?.y}%`,
+                    }}
+                    className="h-auto"
+                  >
+                    <div className="w-full h-full flex items-center justify-center cursor-pointer bg-gray-200">
+                      {card.imageUrl ? (
+                        <img
+                          src={card.imageUrl}
+                          alt="Uploaded"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                          No Image
+                        </div>
+                      )}
+                    </div>
                   </div>
                 ) : (
                   <div className="p-4">
@@ -305,7 +258,7 @@ export default function ProjectCard({
       <ActiveOutlineContainer isActive={isActive}>
         <div
           ref={containerRef}
-          className="flex flex-col justify-between w-[calc(100vw - 16rem)] mx-auto p-4"
+          className="flex flex-col justify-between w-[calc(100vw - 16rem)] h-full mx-auto p-4"
         >
           {isActive && cards.length < 3 && (
             <>
@@ -324,47 +277,63 @@ export default function ProjectCard({
             </>
           )}
 
-          <div className="flex flex-wrap justify-center items-stretch gap-4">
+          <div className="flex flex-wrap justify-center h-full items-stretch gap-4">
             {cards.map((card) => (
               <div
                 key={card.id}
                 ref={(el) => void (cardRefs.current[card.id] = el)}
-                className="h-fit relative w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 border rounded shadow bg-white flex flex-col transition-all duration-300 ease-in-out"
+                className={`relative w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 flex flex-col border
+                  ${card.type === "image" && isActive ? "border-gray-300" : "border-transparent"}
+                  ${card.type === "image" ? "h-full" : "h-fit bg-white rounded shadow"}`}
               >
-                <button
-                  onClick={() => deleteCard(card.id)}
-                  className="absolute top-2 right-2 text-red-500 hover:text-red-700"
-                  aria-label="Delete Card"
-                >
-                  <XIcon size={18} />
-                </button>
+                {isActive && (
+                  <button
+                    onClick={() => deleteCard(card.id)}
+                    className="absolute top-2 right-2 text-red-500 hover:text-red-700 z-10"
+                    aria-label="Delete Card"
+                  >
+                    <XIcon size={18} />
+                  </button>
+                )}
 
                 {card.type === "image" ? (
-                  <div className="w-full h-full flex items-center justify-center cursor-pointer bg-gray-200">
-                    {previewSrcs[card.id] ? (
-                      <img
-                        src={previewSrcs[card.id]}
-                        alt="Preview"
-                        className="w-full h-full object-cover"
-                      />
-                    ) : card.imageUrl ? (
-                      <img
-                        src={card.imageUrl}
-                        alt="Uploaded"
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <label className="w-full h-48 flex items-center justify-center cursor-pointer bg-gray-200">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => handleImageUpload(e, card.id)}
-                          className="hidden"
-                        />
-                        Click to Upload an Image
-                      </label>
-                    )}
-                  </div>
+                  <ImageCard
+                    key={card.id}
+                    cardId={card.id}
+                    imageUrl={card.imageUrl}
+                    previewSrc={previewSrcs[card.id]}
+                    draftNumber={draftNumber}
+                    onImageUpload={(id, url) => {
+                      const updated = cards.map(c => c.id === id ? { ...c, imageUrl: url } : c);
+                      updateContent(updated);
+                    }}
+                    setPreviewSrc={(id, url) => {
+                      setPreviewSrcs(prev => {
+                        if (prev[id]) URL.revokeObjectURL(prev[id]);
+                        const updated = { ...prev };
+                        if (url) updated[id] = url;
+                        else delete updated[id];
+                        return updated;
+                      });
+                    }}
+                    isActive={isActive}
+                    widthPercent={card.widthPercent}
+                    positionPercent={card.positionPercent}
+                    onLayoutChange={(cardId, layout) => {
+                      const current = cards.find((c) => c.id === cardId);
+                      if (
+                        current &&
+                        (current.widthPercent !== layout.widthPercent ||
+                          current.positionPercent?.x !== layout.positionPercent.x ||
+                          current.positionPercent?.y !== layout.positionPercent.y)
+                      ) {
+                        const updated = cards.map((c) =>
+                          c.id === cardId ? { ...c, ...layout } : c
+                        );
+                        updateContent(updated);
+                      }
+                    }}
+                  />
                 ) : (
                   <div className="p-4">
                     <h2
