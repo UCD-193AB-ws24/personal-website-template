@@ -277,10 +277,10 @@ export function $ensureForwardRangeSelection(selection: RangeSelection): void {
 /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
 
 interface RichTextToolbarPluginProps {
-  setBoxColor: (val: string) => void;
+  updateBackgroundColor: (val: string) => void;
 }
 
-export default function RichTextToolbarPlugin({setBoxColor}: RichTextToolbarPluginProps) {
+export default function RichTextToolbarPlugin({updateBackgroundColor}: RichTextToolbarPluginProps) {
   const [editor] = useLexicalComposerContext();
   const toolbarRef = useRef(null);
   const [canUndo, setCanUndo] = useState(false);
@@ -628,7 +628,7 @@ export default function RichTextToolbarPlugin({setBoxColor}: RichTextToolbarPlug
         <input
           className="absolute w-[0px] h-[0px]"
           onChange={(e) => {
-            setBoxColor(e.target.value);
+            updateBackgroundColor(e.target.value);
           }}
           ref={boxColorPickerRef}
           type="color"
