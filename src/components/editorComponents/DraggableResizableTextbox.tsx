@@ -53,7 +53,7 @@ export default function DraggableResizableTextbox({
   const [size, setSize] = useState(initialSize);
   const [showOverlay, setShowOverlay] = useState(false);
   const [data, setData] = useState(content);
-  const [textboxState, setTextboxState] = useState(content);
+  // const [textboxState, setTextboxState] = useState(content);
 
   const handleMouseDown = (e: MouseEvent) => {
     e.stopPropagation();
@@ -69,7 +69,7 @@ export default function DraggableResizableTextbox({
       newData = { ...data, textboxState: newState };
     }
     setData(newData);
-    setTextboxState(newState);
+    // setTextboxState(newState);
     updateComponent(id, position, size, newData);
   };
 
