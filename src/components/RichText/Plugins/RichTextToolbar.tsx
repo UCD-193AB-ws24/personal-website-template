@@ -66,6 +66,7 @@ function Divider() {
 }
 
 const SET_FONT_SIZE_COMMAND: LexicalCommand<string> = createCommand();
+const SET_FONT_COLOR_COMMAND: LexicalCommand<string> = createCommand();
 
 /* https://github.com/facebook/lexical/blob/main/packages/lexical-selection/src/constants.ts */
 export const CSS_TO_STYLES: Map<string, Record<string, string>> = new Map();
@@ -295,7 +296,6 @@ export default function RichTextToolbarPlugin({updateBackgroundColor}: RichTextT
   const boxColorPickerRef = useRef(null);
   const [isFontColorPickerOpened, setIsFontColorPickerOpened] = useState(false);
   const [isBoxColorPickerOpened, setIsBoxColorPickerOpened] = useState(false);
-  const [fontColor, setFontColor] = useState("");
 
   const $updateToolbar = useCallback(() => {
     const selection = $getSelection();
@@ -315,11 +315,6 @@ export default function RichTextToolbarPlugin({updateBackgroundColor}: RichTextT
           const style = node.getStyle();
           const match = style?.match(/font-size:\s*([^\s;]+)/);
           const currentFontSize = match?.[1] || null;
-
-          // console.log("CFS: ", currentFontSize);
-          // console.log("PSF: ", prevFontSize);
-          // console.log("Fontsize: ", fontSize);
-          // console.log("sizechanged: ", sizeChanged);
 
           if (!sizeChanged) {
             if (prevFontSize === null && currentFontSize === null) {
@@ -375,6 +370,21 @@ export default function RichTextToolbarPlugin({updateBackgroundColor}: RichTextT
             if ($isRangeSelection(selection)) {
               $patchStyleText(selection, {
                 "font-size": newSize,
+              });
+            }
+          });
+          return true;
+        },
+        LowPriority,
+      ),
+      editor.registerCommand(
+        SET_FONT_COLOR_COMMAND,
+        (newColor: string) => {
+          editor.update(() => {
+            const selection = $getSelection();
+            if ($isRangeSelection(selection)) {
+              $patchStyleText(selection, {
+                color: newColor,
               });
             }
           });
@@ -512,9 +522,8 @@ export default function RichTextToolbarPlugin({updateBackgroundColor}: RichTextT
         <input
           className="absolute w-[0px] h-[0px]"
           onChange={(e) => {
-            setFontColor(e.target.value);
-            console.log(e.target.value);
-            console.log(fontColor);
+            const fontColor = e.target.value;
+            editor.dispatchCommand(SET_FONT_COLOR_COMMAND, fontColor);
           }}
           ref={fontColorPickerRef}
           type="color"

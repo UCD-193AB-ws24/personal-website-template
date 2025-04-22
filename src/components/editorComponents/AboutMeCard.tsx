@@ -64,6 +64,7 @@ export default function AboutMeCard({
 
   const [loading, setLoading] = useState(!!content);
   const [previewSrc, setPreviewSrc] = useState<string | null>(null);
+  const [showOverlay, setShowOverlay] = useState(false);
 
   const draftNumber = useSearchParams().get("draftNumber");
 
@@ -173,10 +174,10 @@ export default function AboutMeCard({
         height: size.height,
         padding: `${GRID_SIZE}px`,
       }}
-      className="flex w-full h-full justify-between whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg"
+      className="flex w-full h-full gap-[40px] whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg"
     >
 
-      <div className="flex flex-col align-center">
+      <div className="h-full flex flex-col align-center">
         {previewSrc ? (
           <img
             src={previewSrc}
@@ -201,17 +202,18 @@ export default function AboutMeCard({
         )}
       </div>
 
-      <div className="flex flex-col justify-around">
+      <div className="flex flex-col gap-[60px] mt-4">
         <p
           draggable="false"
-          className="overflow-hidden min-w-[300px] max-w-[300px] max-h-[60px] text-black cursor-text p-0 m-0 leading-none rounded-sm"
-        >
+          className="overflow-hidden min-w-[300px] max-w-[300px] max-h-[60px] flex-grow text-black cursor-text p-0 m-0 leading-none rounded-sm"
+       
+       >
           {curContent.bio}
         </p>
 
         <p
           draggable="false"
-          className="overflow-hidden min-w-[300px] max-w-[300px] max-h-[60px] text-black cursor-text p-0 m-0 leading-none rounded-sm"
+          className="overflow-hidden min-w-[300px] max-w-[300px] max-h-[60px] flex-grow text-black cursor-text p-0 m-0 leading-none rounded-sm"
         >
           {curContent.contact}
         </p>
@@ -223,6 +225,7 @@ export default function AboutMeCard({
       position={{ x: position.x, y: position.y }}
       onDragStart={() => {
         setIsDragging(true);
+        setShowOverlay(false);
       }}
       onDragStop={(e, d) => {
         setIsDragging(false);
@@ -254,96 +257,112 @@ export default function AboutMeCard({
       resizeGrid={[GRID_SIZE, GRID_SIZE]}
     >
       <ActiveOutlineContainer isActive={isActive}>
-        <div
-          className="flex w-full h-full justify-between whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg"
-          style={{ padding: `${GRID_SIZE}px` }}
-        >
 
-          <div className="flex flex-col align-center">
-            {previewSrc ? (
-              <img
-                src={previewSrc}
-                alt="Uploading Preview"
-                className="w-full h-full"
-                draggable="false"
-              />
-            ) : curContent.image != "No Image" ? (
-              <img
-                draggable="false"
-                src={curContent.image}
-                alt="Uploaded"
-                className="w-full h-full"
-                onLoad={() => setLoading(false)}
-                onError={() => setLoading(false)}
-                style={{ display: loading ? "none" : "block" }}
-              />
-            ) : (
-              <label className="w-full h-full flex items-center justify-center cursor-pointer bg-gray-200">
-                Click to Upload an Image
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                />
-              </label>
-            )}
+        {/* Overlay for enabling drag */}
+        {(showOverlay || !isActive) && (
+          <div
+            className="w-full h-full flex items-center justify-center absolute inset-0 z-10"
+            onMouseDown={() => setShowOverlay(true)}
+          >
           </div>
+        )}
 
-          <div className="flex flex-col justify-around">
-            <p
-              contentEditable
-              suppressContentEditableWarning
-              draggable="false"
-              className="overflow-hidden min-w-[300px] max-w-[300px] max-h-[120px] text-black cursor-text p-0 m-0 leading-none outline outline-gray-300 rounded-sm"
-              style={{
-                outline: `${!isActive ? "none" : ""}`,
-              }}
-              onBlur={(e) => {
-                setCurContent((prevContent: AboutMeCardContent) => ({
-                  ...prevContent,
-                  bio: e.target.innerText,
-                }));
-                updateComponent(
-                  id,
-                  position,
-                  size,
-                  JSON.stringify({
-                    ...curContent,
+        <div
+          onMouseEnter={() => setShowOverlay(false)} // remove overlay when interacting with iframe
+          onMouseDown={(e) => e.stopPropagation()} // capture mouse movements
+          className="w-full h-full cursor-default"
+        >
+          <div
+            className="flex w-full h-full gap-[40px] whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg"
+            style={{ padding: `${GRID_SIZE}px` }}
+          >
+
+            <div className="h-full flex flex-col align-center">
+              {previewSrc ? (
+                <img
+                  src={previewSrc}
+                  alt="Uploading Preview"
+                  className="w-full h-full"
+                  draggable="false"
+                />
+              ) : curContent.image != "No Image" ? (
+                <img
+                  draggable="false"
+                  src={curContent.image}
+                  alt="Uploaded"
+                  className="w-full h-full"
+                  onLoad={() => setLoading(false)}
+                  onError={() => setLoading(false)}
+                  style={{ display: loading ? "none" : "block" }}
+                />
+              ) : (
+                <label className="w-full h-full flex items-center justify-center cursor-pointer bg-gray-200">
+                  Click to Upload an Image
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                </label>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-[60px] mt-4">
+              <p
+                contentEditable
+                suppressContentEditableWarning
+                draggable="false"
+                className="overflow-hidden min-w-[300px] max-w-[300px] max-h-[120px] flex-grow text-black cursor-text p-0 m-0 leading-none outline outline-gray-300 rounded-sm"
+                style={{
+                  outline: `${!isActive ? "none" : ""}`,
+                }}
+                onBlur={(e) => {
+                  setCurContent((prevContent: AboutMeCardContent) => ({
+                    ...prevContent,
                     bio: e.target.innerText,
-                  })
-                );
-              }}
-            >
-              {curContent.bio}
-            </p>
+                  }));
+                  updateComponent(
+                    id,
+                    position,
+                    size,
+                    JSON.stringify({
+                      ...curContent,
+                      bio: e.target.innerText,
+                    })
+                  );
+                }}
+              >
+                {curContent.bio}
+              </p>
 
-            <p
-              contentEditable
-              suppressContentEditableWarning
-              draggable="false"
-              className="overflow-hidden min-w-[300px] max-w-[300px] max-h-[60px] text-black cursor-text p-0 m-0 leading-none outline outline-gray-300 rounded-sm"
-              style={{
-                outline: `${!isActive ? "none" : ""}`,
-              }}
-              onBlur={(e) => {
-                setCurContent((prevContent: AboutMeCardContent) => ({
-                  ...prevContent,
-                  contact: e.target.innerText,
-                }));
-                updateComponent(
-                  id,
-                  position,
-                  size,
-                  JSON.stringify({
-                    ...curContent,
+              <p
+                contentEditable
+                suppressContentEditableWarning
+                draggable="false"
+                className="overflow-hidden min-w-[300px] max-w-[300px] max-h-[60px] flex-grow text-black cursor-text p-0 m-0 leading-none outline outline-gray-300 rounded-sm"
+                style={{
+                  outline: `${!isActive ? "none" : ""}`,
+                }}
+                onBlur={(e) => {
+                  setCurContent((prevContent: AboutMeCardContent) => ({
+                    ...prevContent,
                     contact: e.target.innerText,
-                  })
-                );
-              }}
-            >
-              {curContent.contact}
-            </p>
+                  }));
+                  updateComponent(
+                    id,
+                    position,
+                    size,
+                    JSON.stringify({
+                      ...curContent,
+                      contact: e.target.innerText,
+                    })
+                  );
+                }}
+              >
+                {curContent.contact}
+              </p>
+            </div>
           </div>
         </div>
       </ActiveOutlineContainer>
