@@ -181,7 +181,7 @@ export default function ProjectCard({
                 className={`relative ${
                     isMobilePreview
                       ? "w-full"
-                      : "w-full sm:w-1/2 lg:w-1/3 xl:w-1/4"
+                      : "w-full sm:w-1/2 md:w-[90%] lg:w-1/3 xl:w-1/4"
                   } flex flex-col border
                   ${card.type === "image" ? "border-none" : "h-fit bg-white rounded shadow"}`}
               >
@@ -314,7 +314,7 @@ export default function ProjectCard({
                   className={`relative ${
                       isMobilePreview
                         ? "w-full"
-                        : "w-full sm:w-1/2 lg:w-1/3 xl:w-1/4"
+                        : "w-full sm:w-1/2 md:w-[90%] lg:w-1/3 xl:w-1/4"
                     } flex flex-col border
                     ${card.type === "image" && isActive ? "border-gray-300" : "border-transparent"}
                     ${card.type === "image" ? "h-full" : "h-fit bg-white rounded shadow"}`}
