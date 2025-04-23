@@ -45,8 +45,8 @@ export default function FullWindow({
       <div
         className="bg-white border-[5px] border-black rounded-md shadow-lg mx-auto mt-16"
         style={{
-          width: "375px",
-          height: "667px",
+          width: "44.97vh",
+          height: "80vh",
           overflow: "auto",
           position: "relative",
         }}
