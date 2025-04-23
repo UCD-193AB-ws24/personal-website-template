@@ -7,6 +7,7 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useSearchParams } from "next/navigation";
 
 import ActiveOutlineContainer from "@components/editorComponents/ActiveOutlineContainer";
+import { toastError } from "@components/toasts/ErrorToast";
 import SkeletonLoader from "@components/editorComponents/SkeletonLoader";
 
 import type {
@@ -15,7 +16,7 @@ import type {
   Size,
 } from "@customTypes/componentTypes";
 import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
-import { GRID_SIZE } from "@utils/constants";
+import { GRID_SIZE, MAX_FILE_SIZE } from "@utils/constants";
 import { auth, storage } from "@lib/firebase/firebaseApp";
 
 interface ImageComponentProps {
@@ -82,6 +83,11 @@ export default function ImageComponent({
 
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      if (file.size > MAX_FILE_SIZE) {
+        toastError("Image size exceeds the 5MB limit. Please upload a smaller image.");
+        return;
+      }
+
       const filePath = `users/${userId}/drafts/${draftNumber}/${id}-${file.name}`;
       const storageRef = ref(storage, filePath);
       const uploadTask = uploadBytesResumable(storageRef, file);

@@ -7,6 +7,7 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useSearchParams } from "next/navigation";
 
 import ActiveOutlineContainer from "@components/editorComponents/ActiveOutlineContainer";
+import { toastError } from "@components/toasts/ErrorToast";
 
 import type {
   ComponentItem,
@@ -15,7 +16,7 @@ import type {
 } from "@customTypes/componentTypes";
 
 import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
-import { GRID_SIZE } from "@utils/constants";
+import { GRID_SIZE, MAX_FILE_SIZE } from "@utils/constants";
 import { auth, storage } from "@lib/firebase/firebaseApp";
 
 interface AboutMeCardContent {
@@ -107,6 +108,11 @@ export default function AboutMeCard({
 
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      if (file.size > MAX_FILE_SIZE) {
+        toastError("Image size exceeds the 5MB limit. Please upload a smaller image.");
+        return;
+      }
+
       const filePath = `users/${userId}/drafts/${draftNumber}/${id}-${file.name}`;
 
       const storageRef = ref(storage, filePath);
@@ -206,7 +212,6 @@ export default function AboutMeCard({
         <p
           draggable="false"
           className="overflow-hidden min-w-[300px] max-w-[300px] max-h-[60px] flex-grow text-black cursor-text p-0 m-0 leading-none rounded-sm"
-       
        >
           {curContent.bio}
         </p>
