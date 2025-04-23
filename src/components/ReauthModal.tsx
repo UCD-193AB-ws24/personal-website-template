@@ -9,45 +9,57 @@ import {
 import { auth } from "@lib/firebase/firebaseApp";
 import { LogIn } from "lucide-react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { useState } from "react";
-import { EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
+import { useEffect, useState } from "react";
+import {
+  EmailAuthProvider,
+  GoogleAuthProvider,
+  reauthenticateWithCredential,
+  reauthenticateWithPopup,
+} from "firebase/auth";
+import Image from "next/image";
 
 interface ReauthModalProps {
   open: boolean;
   setOpen: (val: boolean) => void;
   reauthSuccess: () => void;
-  showError: boolean;
+  reauthFailure: (error: any) => void;
 }
 
 export default function ReauthModal({
   open,
   setOpen,
   reauthSuccess,
-  showError,
+  reauthFailure,
 }: ReauthModalProps) {
   const [user] = useAuthState(auth);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errorVisible, setErrorVisible] = useState(showError);
+  const [isGoogleSignIn, setIsGoogleSignIn] = useState(false);
 
   const reauthWithEmail = (email: string, password: string) => {
     const credentials = EmailAuthProvider.credential(email, password);
     reauthenticateWithCredential(user!, credentials)
       .then(() => {
         reauthSuccess();
-        setErrorVisible(false);
       })
-      .catch((_error) => {
-        setErrorVisible(true);
+      .catch((error) => {
+        reauthFailure(error);
       });
   };
+
+  useEffect(() => {
+    if (user) {
+      setIsGoogleSignIn(
+        user.providerData[0].providerId.indexOf("google") !== -1,
+      );
+    }
+  }, [user]);
 
   return (
     <Dialog
       open={open}
       onClose={() => {
         setOpen(false);
-        setErrorVisible(false);
       }}
       className="relative z-10"
     >
@@ -76,61 +88,87 @@ export default function ReauthModal({
                   </DialogTitle>
                   <div className="mt-2">
                     <p className="text-sm text-gray-500">
-                      Please reauthenticate with your email and password before
-                      deleting your account.
+                      Please reauthenticate with your{" "}
+                      {isGoogleSignIn ? "Google account" : "email and password"}{" "}
+                      before deleting your account.
                     </p>
                   </div>
-                  <div className="flex justify-between mt-5">
-                    <div className="flex flex-col g-2">
-                      <label className="text-md" htmlFor="email">
-                        Email
-                      </label>
-                      <input
-                        className="border rounded"
-                        id="email"
-                        type="email"
-                        onChange={(e) => {
-                          setEmail(e.target.value);
+                  {isGoogleSignIn ? (
+                    <div className="flex justify-center mt-5">
+                      <button
+                        className="p-1 border rounded"
+                        onClick={() => {
+                          if (user) {
+                            reauthenticateWithPopup(
+                              user,
+                              new GoogleAuthProvider(),
+                            )
+                              .then(() => {
+                                reauthSuccess();
+                              })
+                              .catch((error) => {
+                                reauthFailure(error);
+                              });
+                          }
                         }}
-                      />
+                      >
+                        <Image
+                          src="/googlelogo.svg"
+                          alt="Google logo"
+                          width={24}
+                          height={24}
+                        />
+                      </button>
                     </div>
-                    <div className="flex flex-col g-2">
-                      <label className="text-md" htmlFor="password">
-                        Password
-                      </label>
-                      <input
-                        className="border rounded"
-                        id="password"
-                        type="password"
-                        onChange={(e) => {
-                          setPassword(e.target.value);
-                        }}
-                      />
+                  ) : (
+                    <div className="flex justify-between mt-5">
+                      <div className="flex flex-col g-2">
+                        <label className="text-md" htmlFor="email">
+                          Email
+                        </label>
+                        <input
+                          className="border rounded"
+                          id="email"
+                          type="email"
+                          onChange={(e) => {
+                            setEmail(e.target.value);
+                          }}
+                        />
+                      </div>
+                      <div className="flex flex-col g-2">
+                        <label className="text-md" htmlFor="password">
+                          Password
+                        </label>
+                        <input
+                          className="border rounded"
+                          id="password"
+                          type="password"
+                          onChange={(e) => {
+                            setPassword(e.target.value);
+                          }}
+                        />
+                      </div>
                     </div>
-                  </div>
-                  {errorVisible && (
-                    <p className="mt-3 text-center text-sm text-red-500">
-                      Invalid credentials
-                    </p>
                   )}
                 </div>
               </div>
             </div>
             <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-              <button
-                type="button"
-                onClick={() => {
-                  reauthWithEmail(email, password);
-                }}
-                className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-red-500 sm:ml-3 sm:w-auto"
-              >
-                Log in
-              </button>
+              {!isGoogleSignIn && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    reauthWithEmail(email, password);
+                  }}
+                  className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-red-500 sm:ml-3 sm:w-auto"
+                >
+                  Log in
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => {
                   setOpen(false);
-                  setErrorVisible(false);
                 }}
                 className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto"
               >

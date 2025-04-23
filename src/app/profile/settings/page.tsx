@@ -1,23 +1,19 @@
 "use client";
+
 import DeleteAccountModal from "@components/DeleteAccountModal";
 import ReauthModal from "@components/ReauthModal";
 import { toastError } from "@components/toasts/ErrorToast";
 import { toastSuccess } from "@components/toasts/SuccessToast";
 import { changeUsername } from "@lib/requests/changeUsername";
 import { fetchUsername } from "@lib/requests/fetchUsername";
-import { auth } from "@lib/firebase/firebaseApp";
 import { useEffect, useState } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
 import { ToastContainer } from "react-toastify";
-import { reauthenticateWithPopup } from "firebase/auth";
-import { GoogleAuthProvider } from "firebase/auth/web-extension";
 
 export default function Settings() {
   const [username, setUsername] = useState("");
   const [usernameInput, setUsernameInput] = useState(username);
   const [deleteAccModalOpen, setDeleteAccModalOpen] = useState(false);
   const [reauthModalOpen, setReauthModalOpen] = useState(false);
-  const [user] = useAuthState(auth);
 
   useEffect(() => {
     getUsername();
@@ -38,9 +34,22 @@ export default function Settings() {
     }
   };
 
-  const reauthSuccessWithEmail = () => {
+  const reauthSuccess = () => {
     setReauthModalOpen(false);
     setDeleteAccModalOpen(true);
+  };
+
+  const reauthFailure = (error: any) => {
+    setReauthModalOpen(false);
+    if (error?.code === "auth/user-mismatch") {
+      toastError(
+        "Attempted to sign in as a different user. Please reauthenticate with the same account.",
+      );
+    } else if (error?.code === "auth/invalid-credential") {
+      toastError("Invalid credentials");
+    } else {
+      toastError("Error reauthenticating. Please try again.")
+    }
   };
 
   return (
@@ -64,15 +73,7 @@ export default function Settings() {
         onClick={() => {
           // Reauthenticate user: in order to delete a user from auth,
           // they must have signed in at least 5 minutes before deleteUser is called
-          if (user!.providerData[0].providerId.indexOf("google") !== -1) {
-            reauthenticateWithPopup(user!, new GoogleAuthProvider()).then(
-              () => {
-                setDeleteAccModalOpen(true);
-              },
-            );
-          } else {
-            setReauthModalOpen(true);
-          }
+          setReauthModalOpen(true);
         }}
       >
         Delete account
@@ -84,7 +85,8 @@ export default function Settings() {
       <ReauthModal
         open={reauthModalOpen}
         setOpen={setReauthModalOpen}
-        reauthSuccess={reauthSuccessWithEmail}
+        reauthSuccess={reauthSuccess}
+        reauthFailure={reauthFailure}
       />
     </div>
   );
