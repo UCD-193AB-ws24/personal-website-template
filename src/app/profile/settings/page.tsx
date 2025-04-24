@@ -19,7 +19,7 @@ export default function Settings() {
   const [user] = useAuthState(auth);
   const router = useRouter();
   const [username, setUsername] = useState("");
-  const [usernameInput, setUsernameInput] = useState(username);
+  const [usernameInput, setUsernameInput] = useState("");
   const [deleteAccModalOpen, setDeleteAccModalOpen] = useState(false);
   const [reauthModalOpen, setReauthModalOpen] = useState(false);
 
@@ -35,7 +35,6 @@ export default function Settings() {
     }
 
     setUsername(name);
-    setUsernameInput(name);
   };
 
   const handleSignOut = async () => {
@@ -109,6 +108,7 @@ export default function Settings() {
               <input
                 className="px-1 border rounded text-sm"
                 placeholder="New username"
+                maxLength={20}
                 onChange={(e) => {
                   setUsernameInput(e.target.value);
                 }}

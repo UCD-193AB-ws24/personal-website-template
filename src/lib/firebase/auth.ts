@@ -15,6 +15,7 @@ import {
 
 import { auth, db } from "./firebaseApp";
 import { APIResponse } from "@customTypes/apiResponse";
+import isValidUsername from "@utils/isValidUsername";
 
 export const signUpWithEmail = async (
   email: string,
@@ -22,6 +23,11 @@ export const signUpWithEmail = async (
   password: string,
 ) => {
   try {
+    const errMsg = isValidUsername(username);
+    if (errMsg.length !== 0) {
+      throw new Error(errMsg);
+    }
+
     const q = query(collection(db, "users"), where("username", "==", username));
     const querySnapshot = await getDocs(q);
 
@@ -118,8 +124,13 @@ export const signInWithGoogle = async () => {
   }
 };
 
-export const setUsername = async (username: any) => {
+export const setUsername = async (username: string) => {
   try {
+    const errMsg = isValidUsername(username);
+    if (errMsg.length !== 0) {
+      throw new Error(errMsg);
+    }
+
     if (!auth.currentUser) {
       throw new Error("No user is signed in.");
     }
