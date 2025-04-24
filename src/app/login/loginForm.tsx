@@ -1,10 +1,11 @@
 "use client";
 
-import Image from 'next/image';
+import Image from "next/image";
 import Link from "next/link";
 import { signInWithGoogle, signInWithEmail } from "@lib/firebase/auth";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { fetchUsername } from "@lib/requests/fetchUsername";
 
 export default function LogInForm() {
   const [email, setEmail] = useState("");
@@ -31,9 +32,12 @@ export default function LogInForm() {
 
     const isOk = await signInWithGoogle();
     if (isOk) {
-      router.push("/profile");
-      setSuccess(true);
-      return;
+      const username = await fetchUsername();
+      if (username.length === 0) {
+        router.push("/setusername");
+      } else {
+        router.push("/profile");
+      }
     }
   };
 
