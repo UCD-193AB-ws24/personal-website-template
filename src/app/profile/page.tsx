@@ -18,13 +18,9 @@ export default function Profile() {
   const [username, setUsername] = useState("");
   const [publishedDraftNumber, setPublishedDraftNumber] = useState(0);
   const [views, setViews] = useState("0");
-  const [draftMappings, setDraftMappings] = useState<
-    Array<{ id: number; name: string }>
-  >([]);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  
   const handleSignOut = async () => {
     try {
       await signUserOut();
@@ -34,7 +30,7 @@ export default function Profile() {
       console.error("Error logging out:", error);
     }
   };
-  
+
   const getUsername = useCallback(async () => {
     const name = await fetchUsername();
     if (name === null) {
@@ -44,29 +40,7 @@ export default function Profile() {
       setUsername(name);
     }
   }, [router]);
-  
-  const getDraftMappings = () => {
-    setIsLoading(true);
-    fetch("/api/user/get-drafts", {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-    .then((res) => res.json())
-    .then((res) => {
-      if (res.success) {
-        setDraftMappings(res.data);
-        setIsLoading(false);
-      } else {
-        throw new Error(res.error);
-      }
-    })
-    .catch((error) => {
-      console.log(error.message);
-      setIsLoading(false);
-    });
-  };
-  
+
   const handleOpenWebsite = async () => {
     try {
       window.open(`/pages/${username}`, "_blank");
@@ -74,14 +48,14 @@ export default function Profile() {
       console.log("Error opening website:", error.message);
     }
   };
-  
-  const getViews = useCallback(async(publishedDraftNumber: number) => {
+
+  const getViews = useCallback(async (publishedDraftNumber: number) => {
     if (publishedDraftNumber === 0) {
       return;
     }
-    
+
     setIsLoading(true);
-    
+
     try {
       const response = await fetch(
         `/api/user/get-published-views?publishedDraftNumber=${publishedDraftNumber}`,
@@ -91,16 +65,16 @@ export default function Profile() {
           },
         },
       );
-      
+
       const resBody = (await response.json()) as APIResponse<string>;
-      
+
       if (response.ok && resBody.success) {
         console.log("views: ", resBody.data);
-        
+
         if (resBody.data !== undefined) {
           setViews(resBody.data);
         }
-        
+
         setIsLoading(false);
       } else {
         throw new Error("views could not be returned");
@@ -117,12 +91,11 @@ export default function Profile() {
     getViews(pubDraftNum);
     setPublishedDraftNumber(pubDraftNum);
   }, [getViews]);
-  
+
   useEffect(() => {
     if (user) {
       getUsername();
       getPublishedDraftNumber();
-      getDraftMappings();
     }
   }, [user, getUsername, getPublishedDraftNumber]);
 
@@ -131,17 +104,17 @@ export default function Profile() {
       <header>
         {user ? (
           <Navbar
-          user={true}
-          username={username}
-          onSignOut={handleSignOut}
-          navLinks={[
-            { label: "Home", href: "/" },
-            { label: "Drafts", href: "/saveddrafts" },
-          ]}
+            user={true}
+            username={username}
+            onSignOut={handleSignOut}
+            navLinks={[
+              { label: "Home", href: "/" },
+              { label: "Drafts", href: "/saveddrafts" },
+            ]}
           />
         ) : (
           <Navbar
-          user={false}
+            user={false}
             navLinks={[
               { label: "Log In", href: "/login" },
               { label: "Sign Up", href: "/signup" },
@@ -197,23 +170,19 @@ export default function Profile() {
             <LoadingSpinner show={isLoading} />
 
             <div>
-              <div className="mb-4 text-5xl font-bold text-white">
-                {draftMappings ? draftMappings.length : 0}
-              </div>
-
               <h3 className="mb-4 text-3xl text-center font-bold text-white bg-gray-900">
-                Saved drafts
+                Settings
               </h3>
             </div>
 
             <div>
               <button
-                onClick={() => router.push("/saveddrafts")}
+                onClick={() => router.push("/profile/settings")}
                 className="relative inline-flex px-6 py-4 w-1/2 text-lg font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#f08700] hover:text-black shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50 items-center justify-center text-center"
               >
                 <div className="text-left rtl:text-right">
                   <div className="-mt-1 font-sans text-lg font-semibold">
-                    View Drafts
+                    View Settings
                   </div>
                 </div>
               </button>

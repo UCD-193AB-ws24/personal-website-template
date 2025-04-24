@@ -11,8 +11,10 @@ import { auth } from "@lib/firebase/firebaseApp";
 import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { ToastContainer } from "react-toastify";
+import { Check } from "lucide-react";
 import { signUserOut } from "@lib/firebase/auth";
 import { useRouter } from "next/navigation";
+import LoadingSpinner from "@components/LoadingSpinner";
 
 export default function Settings() {
   const [user] = useAuthState(auth);
@@ -21,6 +23,7 @@ export default function Settings() {
   const [usernameInput, setUsernameInput] = useState("");
   const [deleteAccModalOpen, setDeleteAccModalOpen] = useState(false);
   const [reauthModalOpen, setReauthModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     getUsername();
@@ -32,22 +35,29 @@ export default function Settings() {
   };
 
   const handleSignOut = async () => {
+    setIsLoading(true);
     try {
       await signUserOut();
       setUsername("");
+      setIsLoading(false);
       router.push("/");
     } catch (error) {
       console.error("Error logging out:", error);
+      setIsLoading(false);
     }
   };
 
   const updateUsername = async (newUsername: string) => {
+    setIsLoading(true);
     const res = await changeUsername(newUsername);
     if (res.length === 0) {
       toastSuccess(`Successfully changed your username to ${newUsername}`);
+      setUsername(newUsername);
+      setUsernameInput("");
     } else {
       toastError(`Couldn't change your username: ${res}`);
     }
+    setIsLoading(false);
   };
 
   const reauthSuccess = () => {
@@ -99,19 +109,30 @@ export default function Settings() {
             </h1>
             <div className="flex justify-between p-2 border-b border-gray-100">
               <p>Change username</p>
-              <input
-                className="px-1 border rounded text-sm"
-                placeholder="New username"
-                maxLength={20}
-                onChange={(e) => {
-                  setUsernameInput(e.target.value);
-                }}
-                onKeyUp={(e) => {
-                  if (e.key === "Enter") {
+              <div className="flex items-center gap-1">
+                <input
+                  className="px-1 border rounded text-sm focus:outline-[1px] focus:outline-[#f08700]"
+                  placeholder="New username"
+                  maxLength={20}
+                  value={usernameInput}
+                  onChange={(e) => {
+                    setUsernameInput(e.target.value);
+                  }}
+                  onKeyUp={(e) => {
+                    if (e.key === "Enter") {
+                      updateUsername(usernameInput);
+                    }
+                  }}
+                />
+                <button
+                  className="rounded p-[3px] bg-[#f08700]"
+                  onClick={() => {
                     updateUsername(usernameInput);
-                  }
-                }}
-              />
+                  }}
+                >
+                  <Check size={16} color="white" strokeWidth={3} />
+                </button>
+              </div>
             </div>
             <div className="flex justify-between items-center p-2">
               <p>Delete account</p>
@@ -128,6 +149,7 @@ export default function Settings() {
             </div>
           </div>
         </div>
+        <LoadingSpinner show={isLoading} />
         <ToastContainer />
         <DeleteAccountModal
           open={deleteAccModalOpen}
