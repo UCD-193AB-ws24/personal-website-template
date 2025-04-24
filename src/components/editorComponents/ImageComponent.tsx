@@ -18,6 +18,8 @@ import type {
 import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
 import { GRID_SIZE, MAX_FILE_SIZE } from "@utils/constants";
 import { auth, storage } from "@lib/firebase/firebaseApp";
+import {Link as LinkIcon, Search } from "lucide-react";
+import isValidURL from "@components/RichText/utils/isValidURL";
 
 interface ImageComponentProps {
   id?: string;
@@ -54,6 +56,9 @@ export default function ImageComponent({
   const [imageSrc, setImageSrc] = useState(content || "");
   const [loading, setLoading] = useState(!!content);
   const [previewSrc, setPreviewSrc] = useState<string | null>(null);
+  const [isLinkEditing, setIsLinkEditing] = useState(false);
+  const [linkInputField, setLinkInputField] = useState("");
+  const [link, setLink] = useState<string>("");
 
   const draftNumber = useSearchParams().get("draftNumber");
 
@@ -231,6 +236,55 @@ export default function ImageComponent({
           </label>
         )}
       </ActiveOutlineContainer>
+      {isActive && (
+        <div className="absolute -bottom-14 left-0 z-10 flex items-center gap-[4px]">
+          {!isLinkEditing ? (
+            <button
+              onClick={() => {
+                setIsLinkEditing(true);
+                setLinkInputField(link);
+              }}
+              className="flex items-center gap-1 text-sm bg-white border border-gray-300 px-2 py-1 rounded shadow hover:bg-gray-100"
+            >
+              <LinkIcon className="w-4 h-4 text-gray-700" />
+              <span className="text-gray-800">Add Link</span>
+            </button>
+          ) : (
+            <>
+              <div className="flex justify-center items-center gap-[4px] p-1 border rounded-md focus-within:border-blue-500 bg-white shadow w-72">
+              <Search size={16} className="text-gray-500" />
+              <input
+                type="url"
+                value={link}
+                autoFocus
+                onChange={(e) => setLinkInputField(e.target.value)}
+                placeholder="URL"
+                className="flex-1 text-sm focus:outline-none bg-transparent"
+              />
+            </div>
+            <button
+              className="text-sm text-blue-500 font-bold ml-2"
+              onClick={() => {
+                if (linkInputField && isValidURL(linkInputField)) {
+                  setLink(linkInputField);
+                  setIsLinkEditing(false);
+                } else {
+                  alert("Please enter a valid URL.");
+                }
+              }}
+            >
+              Apply
+            </button>
+            <button
+              className="text-sm text-gray-400 ml-1"
+              onClick={() => setIsLinkEditing(false)}
+            >
+              Cancel
+            </button>
+            </>
+          )}
+        </div>
+      )}
     </Rnd>
   );
 }
