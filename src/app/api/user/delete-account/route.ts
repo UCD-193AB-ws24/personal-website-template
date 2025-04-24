@@ -29,20 +29,20 @@ export async function POST() {
       throw new Error("Couldn't retrieve user data");
     }
 
-		// Delete drafts
+    // Delete drafts
     const draftMappings = userData.draftMappings;
-		if (draftMappings) {
-			draftMappings.forEach(async (mapping: { id: number; name: string }) => {
-				const query = db
-					.collection("drafts")
-					.where("draftId", "==", `${user.uid}-${mapping.id}`);
-				query.get().then((draftSnapshot) => {
-					draftSnapshot.docs.forEach((doc) => {
-						doc.ref.delete();
-					});
-				});
-			});
-		}
+    if (draftMappings) {
+      draftMappings.forEach(async (mapping: { id: number; name: string }) => {
+        const query = db
+          .collection("drafts")
+          .where("draftId", "==", `${user.uid}-${mapping.id}`);
+        query.get().then((draftSnapshot) => {
+          draftSnapshot.docs.forEach((doc) => {
+            doc.ref.delete();
+          });
+        });
+      });
+    }
 
     userDoc.delete();
 

@@ -1,5 +1,4 @@
 "use client";
-/* eslint-disable react-hooks/exhaustive-deps */
 
 import Navbar from "@components/Navbar";
 import DeleteAccountModal from "@components/DeleteAccountModal";
@@ -29,11 +28,6 @@ export default function Settings() {
 
   const getUsername = async () => {
     const name = await fetchUsername();
-    if (name === "") {
-      // Redirect to sign up page if no username found
-      router.push("/signup");
-    }
-
     setUsername(name);
   };
 
