@@ -18,7 +18,8 @@ import type {
 import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
 import { GRID_SIZE, MAX_FILE_SIZE } from "@utils/constants";
 import { auth, storage } from "@lib/firebase/firebaseApp";
-import {Link as LinkIcon, Search } from "lucide-react";
+import { Link as LinkIcon, Search } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import isValidURL from "@components/RichText/utils/isValidURL";
 
 interface ImageComponentProps {
@@ -59,6 +60,8 @@ export default function ImageComponent({
   const [isLinkEditing, setIsLinkEditing] = useState(false);
   const [linkInputField, setLinkInputField] = useState("");
   const [link, setLink] = useState<string>("");
+  const [isEditingExistingLink, setIsEditingExistingLink] = useState(false);
+  const [prevLink, setPrevLink] = useState<string>("");
 
   const draftNumber = useSearchParams().get("draftNumber");
 
@@ -237,12 +240,68 @@ export default function ImageComponent({
         )}
       </ActiveOutlineContainer>
       {isActive && (
-        <div className="absolute -bottom-14 left-0 z-10 flex items-center gap-[4px]">
-          {!isLinkEditing ? (
+        <div className="absolute -bottom-10 left-0 z-10 flex items-center gap-[4px]">
+          {isLinkEditing ? (
+            <div className="absolute -bottom-5 left-0 z-10">
+              <div className = "flex items-center p-2 gap-[4px] bg-white shadow-[0px_0px_37px_-14px_rgba(0,_0,_0,_1)] rounded-md border">
+                <div 
+                  className="flex justify-center items-center bg-white gap-[4px] p-1 border rounded-md focus-within:border-blue-500"
+                  onMouseDown={(e) => e.stopPropagation()}
+                >
+                  <Search size={16}/>
+                  <input
+                    className="text-sm focus:outline-none"
+                    type="url"
+                    placeholder="URL"
+                    value={linkInputField}
+                    onChange={(e) => setLinkInputField(e.target.value)}
+                  />
+                </div>
+                <button
+                  className="text-sm text-blue-500 font-bold ml-2"
+                  onClick={() => {
+                    if (linkInputField && isValidURL(linkInputField)) {
+                      setLink(linkInputField);
+                      setIsLinkEditing(false);
+                      setIsEditingExistingLink(false);
+                      setPrevLink("");
+                    } else {
+                      alert("Please enter a valid URL.");
+                    }
+                  }}
+                >
+                  Apply
+                </button>
+                {isEditingExistingLink ? (
+                    <button
+                      className="text-sm text-gray-400 ml-1"
+                      onClick={() => {
+                        setLinkInputField(prevLink);
+                        setIsLinkEditing(false);
+                        setIsEditingExistingLink(false);
+                      }}
+                    >
+                      Cancel
+                    </button>
+              ) : (
+                <button
+                  className="text-sm text-gray-400 ml-1"
+                  onClickCapture={() => {
+                    setLinkInputField("");
+                     setIsLinkEditing(false);
+                   }}
+                >
+                  Cancel
+                </button>
+              )}
+              </div>
+            </div>
+          ) : !link ? (
             <button
               onClick={() => {
                 setIsLinkEditing(true);
-                setLinkInputField(link);
+                setLinkInputField("");
+                setPrevLink("");
               }}
               className="flex items-center gap-1 text-sm bg-white border border-gray-300 px-2 py-1 rounded shadow hover:bg-gray-100"
             >
@@ -251,35 +310,30 @@ export default function ImageComponent({
             </button>
           ) : (
             <>
-              <div className="flex justify-center items-center gap-[4px] p-1 border rounded-md focus-within:border-blue-500 bg-white shadow w-72">
-              <Search size={16} className="text-gray-500" />
-              <input
-                type="url"
-                value={link}
-                autoFocus
-                onChange={(e) => setLinkInputField(e.target.value)}
-                placeholder="URL"
-                className="flex-1 text-sm focus:outline-none bg-transparent"
-              />
-            </div>
-            <button
-              className="text-sm text-blue-500 font-bold ml-2"
-              onClick={() => {
-                if (linkInputField && isValidURL(linkInputField)) {
-                  setLink(linkInputField);
-                  setIsLinkEditing(false);
-                } else {
-                  alert("Please enter a valid URL.");
-                }
+              <button
+                onClick={() => {
+                setIsLinkEditing(true);
+                setIsEditingExistingLink(true);
+                setLinkInputField(link);
+                setPrevLink(link);
               }}
-            >
-              Apply
+              className="flex items-center gap-1 text-sm text-blue-600 bg-white px-2 py-1 rounded shadow hover:bg-gray-100"
+              >
+                <Pencil className="w-4 h-4" />
+                Edit Link
             </button>
             <button
-              className="text-sm text-gray-400 ml-1"
-              onClick={() => setIsLinkEditing(false)}
+              className="flex items-center gap-1 text-sm text-red-500 ml-2 px-2 py-1 bg-white rounded shadow hover:bg-gray-100"
+                onClick={() => {
+                  setLink("");
+                  setLinkInputField("");
+                  setIsLinkEditing(false);
+                  setIsEditingExistingLink(false);
+                  setPrevLink("");
+              }}
             >
-              Cancel
+              <Trash2 className="w-4 h-4" />
+              Remove Link
             </button>
             </>
           )}
