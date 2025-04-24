@@ -11,7 +11,6 @@ export default function LogInForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
 
   const router = useRouter();
 
@@ -77,7 +76,6 @@ export default function LogInForm() {
           </button>
         </form>
 
-        {success && <p>Log in successful!</p>}
         {error && <p style={{ color: "red" }}>{error}</p>}
 
         {/* Google Sign-In Button */}
