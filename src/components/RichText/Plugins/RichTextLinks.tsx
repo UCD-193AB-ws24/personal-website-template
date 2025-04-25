@@ -118,11 +118,7 @@ export default function RichTextLinks({
               // If the user clicks escape while editing a link, we want
               // to hide the link editor until the user clicks on another node
               // and then clicks back on the link
-              if (
-                !escapePressedRef.current ||
-                (escapePressedRef.current &&
-                  linkParent.getKey() !== lastActiveLinkNodeKeyRef.current)
-              ) {
+              if (!escapePressedRef.current) {
                 setIsLinkEditorVisible(true);
                 setLinkEditorTextField(node.getTextContent());
                 setLinkEditorURLField(linkParent.getURL());
@@ -135,7 +131,7 @@ export default function RichTextLinks({
               setLinkEditorTextField("");
               setLinkEditorURLField("");
               setLastActiveLinkNodeKey("");
-              setEscapePressed(true);
+              setEscapePressed(false);
             }
           } else {
             // Reset escape pressed if the cursor isn't over a link node
@@ -234,6 +230,35 @@ export default function RichTextLinks({
     return redirectPathParts.join("/");
   }
 
+  const updateLink = () => {
+    if (
+      getPageIdx(linkEditorURLField) !== -1 ||
+      isValidURL(linkEditorURLField)
+    ) {
+      setIsLinkEditorVisible(false);
+      setEscapePressed(true);
+
+      editor.update(() => {
+        const selection = $getSelection();
+        if ($isRangeSelection(selection)) {
+          const node = getSelectedNode(selection);
+          const linkParent = $findMatchingParent(node, $isLinkNode);
+
+          if (linkParent) {
+            setLastActiveLinkNodeKey(linkParent.getKey());
+
+            // Replace the old link with a new link node containing the entered fields
+            const newLink = $createLinkNode(linkEditorURLField);
+            newLink.append($createTextNode(linkEditorTextField));
+
+            linkParent.replace(newLink);
+            newLink.select(0);
+          }
+        }
+      });
+    }
+  }
+
   return (
     <div
       ref={linkEditorRef}
@@ -254,6 +279,12 @@ export default function RichTextLinks({
           onChange={(e) => {
             setLinkEditorTextField(e.target.value);
           }}
+          onKeyUp={(e) => {
+            // Enter key pressed
+            if (e.key === "Enter" || e.keyCode === 13) {
+              updateLink();
+            }
+          }}
         />
       </div>
       <div className="flex justify-center items-center gap-[4px] p-1 border rounded-md focus-within:border-blue-500">
@@ -266,33 +297,17 @@ export default function RichTextLinks({
           onChange={(e) => {
             setLinkEditorURLField(e.target.value);
           }}
+          onKeyUp={(e) => {
+            // Enter key is pressed
+            if (e.key === "Enter" || e.keyCode === 13) {
+              updateLink();
+            }
+          }}
         />
       </div>
       <button
         className="text-sm text-blue-500 font-bold ml-[16px]"
-        onClick={() => {
-          if (
-            getPageIdx(linkEditorURLField) !== -1 ||
-            isValidURL(linkEditorURLField)
-          ) {
-            editor.update(() => {
-              const selection = $getSelection();
-              if ($isRangeSelection(selection)) {
-                const node = getSelectedNode(selection);
-                const linkParent = $findMatchingParent(node, $isLinkNode);
-
-                if (linkParent) {
-                  // Replace the old link with a new link node containing the entered fields
-                  const newLink = $createLinkNode(linkEditorURLField);
-                  newLink.append($createTextNode(linkEditorTextField));
-
-                  linkParent.replace(newLink);
-                  newLink.select();
-                }
-              }
-            });
-          }
-        }}
+        onClick={() => {updateLink()}}
       >
         Apply
       </button>

@@ -70,12 +70,12 @@ export default function RichTextbox({
   };
 
   return (
-    <div className="relative rounded-[2px] text-left h-full whitespace-pre-wrap bg-transparent resize-none text-lg leading-none bg-white">
-      <div className="bg-white h-full">
+    <div className="relative rounded-[2px] text-left h-full whitespace-pre-wrap bg-transparent resize-none text-lg leading-none">
+      <div className="bg-transparent h-full">
         <RichTextPlugin
           contentEditable={
             <ContentEditable
-              className="min-h-[150px] h-full resize-none outline-0"
+              className="min-h-[150px] h-full resize-none outline-0 bg-transparent"
               aria-placeholder={"Enter some text..."}
               placeholder={
                 <div className="absolute top-0 left-0 text-[#999999]">

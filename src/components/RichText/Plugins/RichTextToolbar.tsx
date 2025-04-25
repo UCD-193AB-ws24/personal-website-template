@@ -1,7 +1,10 @@
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {mergeRegister} from '@lexical/utils';
-import {INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND} from '@lexical/list';
-import {TOGGLE_LINK_COMMAND} from '@lexical/link'
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { mergeRegister } from "@lexical/utils";
+import {
+  INSERT_UNORDERED_LIST_COMMAND,
+  INSERT_ORDERED_LIST_COMMAND,
+} from "@lexical/list";
+import { $isLinkNode, $toggleLink, TOGGLE_LINK_COMMAND } from "@lexical/link";
 import {
   $caretRangeFromSelection,
   $getSelection,
@@ -23,11 +26,39 @@ import {
   NodeKey,
   RangeSelection,
   TextNode,
-} from 'lexical';
-import {useCallback, useEffect, useRef, useState} from 'react';
-import { Plus, Minus, Undo, Redo, Bold, Italic, Underline, Strikethrough, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, LucideLink} from 'lucide-react';
+} from "lexical";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  Plus,
+  Minus,
+  Undo,
+  Redo,
+  Bold,
+  Italic,
+  Underline,
+  Strikethrough,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  List,
+  ListOrdered,
+  LucideLink,
+  Baseline,
+  PaintBucket,
+} from "lucide-react";
 
-const fontSizes = ['12px', '16px', '18px', '24px', '30px', '36px', '42px', '48px', '60px', '72px']
+const fontSizes = [
+  "12px",
+  "16px",
+  "18px",
+  "24px",
+  "30px",
+  "36px",
+  "42px",
+  "48px",
+  "60px",
+  "72px",
+];
 const LowPriority = 1;
 
 function Divider() {
@@ -35,6 +66,7 @@ function Divider() {
 }
 
 const SET_FONT_SIZE_COMMAND: LexicalCommand<string> = createCommand();
+const SET_FONT_COLOR_COMMAND: LexicalCommand<string> = createCommand();
 
 /* https://github.com/facebook/lexical/blob/main/packages/lexical-selection/src/constants.ts */
 export const CSS_TO_STYLES: Map<string, Record<string, string>> = new Map();
@@ -42,17 +74,14 @@ export const CSS_TO_STYLES: Map<string, Record<string, string>> = new Map();
 /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
 
 /* https://github.com/facebook/lexical/blob/main/packages/shared/src/invariant.ts */
-export function invariant(
-  cond?: boolean,
-  message?: string,
-): asserts cond {
+export function invariant(cond?: boolean, message?: string): asserts cond {
   if (cond) {
     return;
   }
 
   throw new Error(
-    'Internal Lexical error: invariant() is meant to be replaced at compile ' +
-      'time. There is no runtime version. Error: ' +
+    "Internal Lexical error: invariant() is meant to be replaced at compile " +
+      "time. There is no runtime version. Error: " +
       message,
   );
 }
@@ -65,10 +94,10 @@ export function getStyleObjectFromRawCSS(css: string): Record<string, string> {
   if (!css) {
     return styleObject;
   }
-  const styles = css.split(';');
+  const styles = css.split(";");
 
   for (const style of styles) {
-    if (style !== '') {
+    if (style !== "") {
       const [key, value] = style.split(/:([^]+)/); // split on first colon
       if (key && value) {
         styleObject[key.trim()] = value.trim();
@@ -90,7 +119,7 @@ export function getStyleObjectFromCSS(css: string): Record<string, string> {
 }
 
 export function getCSSFromStyleObject(styles: Record<string, string>): string {
-  let css = '';
+  let css = "";
 
   for (const style in styles) {
     if (style) {
@@ -117,18 +146,18 @@ export function $patchStyle(
     $isRangeSelection(target)
       ? target.isCollapsed()
       : $isTextNode(target) || $isElementNode(target),
-    '$patchStyle must only be called with a TextNode, ElementNode, or collapsed RangeSelection',
+    "$patchStyle must only be called with a TextNode, ElementNode, or collapsed RangeSelection",
   );
   const prevStyles = getStyleObjectFromCSS(
     $isRangeSelection(target)
       ? target.style
       : $isTextNode(target)
-      ? target.getStyle()
-      : target.getTextStyle(),
+        ? target.getStyle()
+        : target.getTextStyle(),
   );
   const newStyles = Object.entries(patch).reduce<Record<string, string>>(
     (styles, [key, value]) => {
-      if (typeof value === 'function') {
+      if (typeof value === "function") {
         styles[key] = value(prevStyles[key], target);
       } else if (value === null) {
         delete styles[key];
@@ -137,7 +166,7 @@ export function $patchStyle(
       }
       return styles;
     },
-    {...prevStyles},
+    { ...prevStyles },
   );
   const newCSSText = getCSSFromStyleObject(newStyles);
   if ($isRangeSelection(target) || $isTextNode(target)) {
@@ -228,19 +257,19 @@ export function $forEachSelectedTextNode(
 
   if (
     $isRangeSelection(selection) &&
-    selection.anchor.type === 'text' &&
-    selection.focus.type === 'text' &&
+    selection.anchor.type === "text" &&
+    selection.focus.type === "text" &&
     selection.anchor.key === selection.focus.key
   ) {
     $ensureForwardRangeSelection(selection);
   }
-} 
+}
 
 export function $ensureForwardRangeSelection(selection: RangeSelection): void {
   if (selection.isBackward()) {
-    const {anchor, focus} = selection;
+    const { anchor, focus } = selection;
     // stash for the in-place swap
-    const {key, offset, type} = anchor;
+    const { key, offset, type } = anchor;
     anchor.set(focus.key, focus.offset, focus.type);
     focus.set(key, offset, type);
   }
@@ -248,7 +277,11 @@ export function $ensureForwardRangeSelection(selection: RangeSelection): void {
 
 /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
 
-export default function RichTextToolbarPlugin() {
+interface RichTextToolbarPluginProps {
+  updateBackgroundColor: (val: string) => void;
+}
+
+export default function RichTextToolbarPlugin({updateBackgroundColor}: RichTextToolbarPluginProps) {
   const [editor] = useLexicalComposerContext();
   const toolbarRef = useRef(null);
   const [canUndo, setCanUndo] = useState(false);
@@ -257,37 +290,34 @@ export default function RichTextToolbarPlugin() {
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
   const [isStrikethrough, setIsStrikethrough] = useState(false);
-  const [fontSize, setFontSize] = useState('18px');
+  const [fontSize, setFontSize] = useState("18px");
   const [sizeChanged, setSizeChanged] = useState(false);
+  const fontColorPickerRef = useRef(null);
+  const boxColorPickerRef = useRef(null);
+  const [isFontColorPickerOpened, setIsFontColorPickerOpened] = useState(false);
+  const [isBoxColorPickerOpened, setIsBoxColorPickerOpened] = useState(false);
 
   const $updateToolbar = useCallback(() => {
     const selection = $getSelection();
     if ($isRangeSelection(selection)) {
-
       // Update text format
-      setIsBold(selection.hasFormat('bold'));
-      setIsItalic(selection.hasFormat('italic'));
-      setIsUnderline(selection.hasFormat('underline'));
-      setIsStrikethrough(selection.hasFormat('strikethrough'));
+      setIsBold(selection.hasFormat("bold"));
+      setIsItalic(selection.hasFormat("italic"));
+      setIsUnderline(selection.hasFormat("underline"));
+      setIsStrikethrough(selection.hasFormat("strikethrough"));
 
       // Update font size
       const nodes = selection.getNodes();
       const prevFontSize: string | null = null;
-  
+
       for (const node of nodes) {
         if ($isTextNode(node)) {
-
           const style = node.getStyle();
           const match = style?.match(/font-size:\s*([^\s;]+)/);
           const currentFontSize = match?.[1] || null;
 
-          // console.log("CFS: ", currentFontSize);
-          // console.log("PSF: ", prevFontSize);
-          // console.log("Fontsize: ", fontSize);
-          // console.log("sizechanged: ", sizeChanged);
-
           if (!sizeChanged) {
-            if ((prevFontSize === null) && (currentFontSize === null)) {
+            if (prevFontSize === null && currentFontSize === null) {
               // default size
               setFontSize("18px");
             } else if (currentFontSize !== null) {
@@ -299,12 +329,11 @@ export default function RichTextToolbarPlugin() {
     }
 
     setSizeChanged(false);
-
   }, [sizeChanged]);
 
   useEffect(() => {
     return mergeRegister(
-      editor.registerUpdateListener(({editorState}) => {
+      editor.registerUpdateListener(({ editorState }) => {
         editorState.read(() => {
           $updateToolbar();
         });
@@ -340,7 +369,22 @@ export default function RichTextToolbarPlugin() {
             const selection = $getSelection();
             if ($isRangeSelection(selection)) {
               $patchStyleText(selection, {
-                'font-size': newSize
+                "font-size": newSize,
+              });
+            }
+          });
+          return true;
+        },
+        LowPriority,
+      ),
+      editor.registerCommand(
+        SET_FONT_COLOR_COMMAND,
+        (newColor: string) => {
+          editor.update(() => {
+            const selection = $getSelection();
+            if ($isRangeSelection(selection)) {
+              $patchStyleText(selection, {
+                color: newColor,
               });
             }
           });
@@ -352,14 +396,15 @@ export default function RichTextToolbarPlugin() {
   }, [editor, $updateToolbar]);
 
   return (
-    <div className="toolbar absolute top-[0px] z-[100]" ref={toolbarRef}>
+    <div className="toolbar fixed top-[64px] z-[100]" ref={toolbarRef}>
       <button
         disabled={!canUndo}
         onClick={() => {
           editor.dispatchCommand(UNDO_COMMAND, undefined);
         }}
         className="toolbar-item spaced"
-        aria-label="Undo">
+        aria-label="Undo"
+      >
         <Undo className="format undo" />
       </button>
       <button
@@ -368,13 +413,12 @@ export default function RichTextToolbarPlugin() {
           editor.dispatchCommand(REDO_COMMAND, undefined);
         }}
         className="toolbar-item"
-        aria-label="Redo">
+        aria-label="Redo"
+      >
         <Redo className="format redo" />
       </button>
       <Divider />
-
       <div className="flex justify-evenly items-center">
-
         {/* Decrease button */}
         <button
           onMouseDown={(e) => e.preventDefault()}
@@ -385,20 +429,20 @@ export default function RichTextToolbarPlugin() {
               setFontSize(newSize);
               // console.log("decreasing font size to " + newSize);
               editor.dispatchCommand(SET_FONT_SIZE_COMMAND, newSize);
-            }            
+            }
           }}
         >
-          <Minus className="format"/>
+          <Minus className="format" />
         </button>
 
         {/* Font Size Label */}
-        <h1> { fontSize } </h1>
+        <h1> {fontSize} </h1>
 
         {/* Increase button */}
         <button
           onMouseDown={(e) => e.preventDefault()}
           onClick={() => {
-            if (!(fontSizes.indexOf(fontSize) === (fontSizes.length - 1))) {
+            if (!(fontSizes.indexOf(fontSize) === fontSizes.length - 1)) {
               setSizeChanged(true);
               const newSize = fontSizes[fontSizes.indexOf(fontSize) + 1];
               setFontSize(newSize);
@@ -407,85 +451,85 @@ export default function RichTextToolbarPlugin() {
             }
           }}
         >
-          <Plus className="format"/>
+          <Plus className="format" />
         </button>
       </div>
-
       <Divider />
       <button
         onClick={() => {
-          editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold');
+          editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold");
         }}
-        className={'toolbar-item spaced ' + (isBold ? 'active' : '')}
-        aria-label="Format Bold">
+        className={"toolbar-item spaced " + (isBold ? "active" : "")}
+        aria-label="Format Bold"
+      >
         <Bold className="format bold" />
       </button>
       <button
         onClick={() => {
-          editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic');
+          editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic");
         }}
-        className={'toolbar-item spaced ' + (isItalic ? 'active' : '')}
-        aria-label="Format Italics">
+        className={"toolbar-item spaced " + (isItalic ? "active" : "")}
+        aria-label="Format Italics"
+      >
         <Italic className="format italic" />
       </button>
       <button
         onClick={() => {
-          editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline');
+          editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline");
         }}
-        className={'toolbar-item spaced ' + (isUnderline ? 'active' : '')}
-        aria-label="Format Underline">
+        className={"toolbar-item spaced " + (isUnderline ? "active" : "")}
+        aria-label="Format Underline"
+      >
         <Underline className="format underline" />
       </button>
       <button
         onClick={() => {
-          editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough');
+          editor.dispatchCommand(FORMAT_TEXT_COMMAND, "strikethrough");
         }}
-        className={'toolbar-item spaced ' + (isStrikethrough ? 'active' : '')}
-        aria-label="Format Strikethrough">
+        className={"toolbar-item spaced " + (isStrikethrough ? "active" : "")}
+        aria-label="Format Strikethrough"
+      >
         <Strikethrough className="format strikethrough" />
       </button>
+      <div className="relative">
+        <button
+          onMouseDown={() => {
+            const fontColorPicker =
+              fontColorPickerRef.current! as HTMLInputElement;
+            const boxColorPicker =
+              boxColorPickerRef.current! as HTMLInputElement;
+            if (isFontColorPickerOpened) {
+              // Calling click again doesn't close the color picker
+              // Instead, call blur to close it
+              fontColorPicker.blur();
+              setIsFontColorPickerOpened(false);
+            } else {
+              fontColorPicker.click();
+              setIsFontColorPickerOpened(true);
+
+              // Close box color picker if it's opened
+              if (isBoxColorPickerOpened) {
+                boxColorPicker.blur();
+                setIsBoxColorPickerOpened(false);
+              }
+            }
+          }}
+          className="toolbar-item spaced"
+          aria-label="Change text color"
+        >
+          <Baseline className="format justify-align" />
+        </button>
+        <input
+          className="absolute w-[0px] h-[0px]"
+          onChange={(e) => {
+            const fontColor = e.target.value;
+            editor.dispatchCommand(SET_FONT_COLOR_COMMAND, fontColor);
+          }}
+          ref={fontColorPickerRef}
+          type="color"
+        />
+      </div>
       <Divider />
-      <button
-        onClick={() => {
-          editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'left');
-        }}
-        className="toolbar-item spaced"
-        aria-label="Left Align">
-        <AlignLeft className="format left-align" />
-      </button>
-      <button
-        onClick={() => {
-          editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'center');
-        }}
-        className="toolbar-item spaced"
-        aria-label="Center Align">
-        <AlignCenter className="format center-align" />
-        
-      </button>
-      <button
-        onClick={() => {
-          editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'right');
-        }}
-        className="toolbar-item spaced"
-        aria-label="Right Align">
-        <AlignRight className="format right-align" />
-      </button>
-      <button
-        onClick={() => {
-          editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
-        }}
-        className="toolbar-item spaced"
-        aria-label="Insert ordered list">
-        <ListOrdered className="format justify-align" />
-      </button>{' '}
-      <button
-        onClick={() => {
-          editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined);
-        }}
-        className="toolbar-item spaced"
-        aria-label="Insert unordered list">
-        <List className="format justify-align" />
-      </button>{' '}
       <button
         onClick={() => {
           editor.update(() => {
@@ -494,14 +538,111 @@ export default function RichTextToolbarPlugin() {
               if (selection.getTextContent().length === 0) {
                 return;
               }
-              editor.dispatchCommand(TOGGLE_LINK_COMMAND, "");
+              if ($isRangeSelection(selection)) {
+                const nodes = selection.getNodes();
+                if (nodes.length > 0) {
+                  const parent = nodes[0].getParent();
+                  if ($isLinkNode(parent) || nodes.find((n) => $isLinkNode(n))) {
+                    // Remove link if selecting a link node or selection has
+                    // a link node
+                    $toggleLink(null);
+                  } else {
+                    editor.dispatchCommand(TOGGLE_LINK_COMMAND, "");
+                  }
+                }
+              }
             }
-          })
+          });
         }}
         className="toolbar-item spaced"
-        aria-label="Insert unordered list">
+        aria-label="Toggle link"
+      >
         <LucideLink className="format justify-align" />
-      </button>{' '}
+      </button>
+      <button
+        onClick={() => {
+          editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
+        }}
+        className="toolbar-item spaced"
+        aria-label="Insert ordered list"
+      >
+        <ListOrdered className="format justify-align" />
+      </button>
+      <button
+        onClick={() => {
+          editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined);
+        }}
+        className="toolbar-item spaced"
+        aria-label="Insert unordered list"
+      >
+        <List className="format justify-align" />
+      </button>
+      <Divider />
+      <button
+        onClick={() => {
+          editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "left");
+        }}
+        className="toolbar-item spaced"
+        aria-label="Left Align"
+      >
+        <AlignLeft className="format left-align" />
+      </button>
+      <button
+        onClick={() => {
+          editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "center");
+        }}
+        className="toolbar-item spaced"
+        aria-label="Center Align"
+      >
+        <AlignCenter className="format center-align" />
+      </button>
+      <button
+        onClick={() => {
+          editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "right");
+        }}
+        className="toolbar-item spaced"
+        aria-label="Right Align"
+      >
+        <AlignRight className="format right-align" />
+      </button>
+      <Divider />
+      <div className="relative">
+        <button
+          onMouseDown={() => {
+            const boxColorPicker =
+              boxColorPickerRef.current! as HTMLInputElement;
+            const fontColorPicker =
+              fontColorPickerRef.current! as HTMLInputElement;
+            if (isBoxColorPickerOpened) {
+              // Calling click again doesn't close the color picker
+              // Instead, call blur to close it
+              boxColorPicker.blur();
+              setIsBoxColorPickerOpened(false);
+            } else {
+              boxColorPicker.click();
+              setIsBoxColorPickerOpened(true);
+
+              // Close font color picker if it's opened
+              if (isFontColorPickerOpened) {
+                fontColorPicker.blur();
+                setIsFontColorPickerOpened(false);
+              }
+            }
+          }}
+          className="toolbar-item spaced"
+          aria-label="Change textbox color"
+        >
+          <PaintBucket className="format justify-align" />
+        </button>{" "}
+        <input
+          className="absolute w-[0px] h-[0px]"
+          onChange={(e) => {
+            updateBackgroundColor(e.target.value);
+          }}
+          ref={boxColorPickerRef}
+          type="color"
+        />
+      </div>
     </div>
   );
 }
