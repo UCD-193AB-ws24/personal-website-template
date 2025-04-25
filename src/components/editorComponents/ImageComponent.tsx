@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Rnd } from "react-rnd";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useSearchParams } from "next/navigation";
@@ -57,7 +57,7 @@ export default function ImageComponent({
   const normalizedContent = typeof content === "string" ? { image: content } : content;
   const [imageSrc, setImageSrc] = useState(normalizedContent.image || "");
   const [link, setLink] = useState(normalizedContent.link || "");
-  const [loading, setLoading] = useState(!!content);
+  const [loading, setLoading] = useState(!!normalizedContent.image);
   const [previewSrc, setPreviewSrc] = useState<string | null>(null);
   const [isLinkEditing, setIsLinkEditing] = useState(false);
   const [linkInputField, setLinkInputField] = useState("");
@@ -66,6 +66,21 @@ export default function ImageComponent({
   const [drag, setDrag] = useState(false);
 
   const draftNumber = useSearchParams().get("draftNumber");
+
+  useEffect(() => {
+    if (!imageSrc || !loading) return;
+  
+    const img = new Image();
+    img.src = imageSrc;
+  
+    if (img.complete) {
+      // Chrome fix for cached images
+      setLoading(false);
+    } else {
+      img.onload = () => setLoading(false);
+      img.onerror = () => setLoading(false);
+    }
+  }, [imageSrc, loading]);
 
   const handleMouseDown = (e: MouseEvent) => {
     e.stopPropagation();
@@ -152,20 +167,49 @@ export default function ImageComponent({
     >
       {loading && <SkeletonLoader width={size.width} height={size.height} />}
       {previewSrc ? (
-        <img
-          src={previewSrc}
-          alt="Uploading Preview"
-          className="w-full h-full object-cover"
-        />
+        link ? (
+          <a href={link} target="_blank" rel="noopener noreferrer">
+            <img
+              src={previewSrc}
+              alt="Uploading Preview"
+              className="w-full h-full object-cover"
+              onLoad={() => setLoading(false)}
+              onError={() => setLoading(false)}
+              style={{ display: loading ? "none" : "block" }}
+            />
+          </a>
+        ) : (
+          <img
+            src={previewSrc}
+            alt="Uploading Preview"
+            className="w-full h-full object-cover"
+            onLoad={() => setLoading(false)}
+            onError={() => setLoading(false)}
+            style={{ display: loading ? "none" : "block" }}
+          />
+        )
       ) : imageSrc ? (
-        <img
-          src={imageSrc}
-          alt="Uploaded"
-          className="w-full h-full object-cover"
-          onLoad={() => setLoading(false)}
-          onError={() => setLoading(false)}
-          style={{ display: loading ? "none" : "block" }}
-        />
+        link ? (
+          <a href={link} target="_blank" rel="noopener noreferrer">
+            <img
+              src={imageSrc}
+              alt="Uploaded"
+              className="w-full h-full object-cover"
+              onLoad={() => setLoading(false)}
+              onError={() => setLoading(false)}
+              style={{ display: loading ? "none" : "block" }}
+            />
+          </a>
+        ) : (
+          <img
+            src={imageSrc}
+            alt="Uploaded"
+            className="w-full h-full object-cover"
+            onLoad={() => setLoading(false)}
+            onError={() => setLoading(false)}
+            style={{ display: loading ? "none" : "block" }}
+          />
+        )
       ) : (
         <div className="w-full h-full flex items-center justify-center bg-gray-200">
           No Image
@@ -223,20 +267,48 @@ export default function ImageComponent({
           {loading && <SkeletonLoader width={size.width} height={size.height} />}
 
           {previewSrc ? (
-            <img
-              src={previewSrc}
-              alt="Uploading Preview"
-              className="w-full h-full object-cover"
-            />
+            <div className="relative w-full h-full">
+              <img
+                src={previewSrc}
+                alt="Uploading Preview"
+                className="w-full h-full object-cover"
+              />
+              {!isActive && link && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    window.open(link, "_blank", "noopener,noreferrer");
+                  }}
+                  className="absolute bottom-2 right-2 bg-white/80 backdrop-blur-sm rounded-full p-1 shadow-md hover:scale-105 transition-transform"
+                >
+                  <LinkIcon className="w-5 h-5 text-gray-700 opacity-80" />
+                </button>
+              )}
+            </div>
           ) : imageSrc ? (
-            <img
-              src={imageSrc}
-              alt="Uploaded"
-              className="w-full h-full object-cover"
-              onLoad={() => setLoading(false)}
-              onError={() => setLoading(false)}
-              style={{ display: loading ? "none" : "block" }}
-            />
+            <div className="relative w-full h-full">
+              <img
+                src={imageSrc}
+                alt="Uploaded"
+                className="w-full h-full object-cover"
+                onLoad={() => setLoading(false)}
+                onError={() => setLoading(false)}
+                style={{ display: loading ? "none" : "block" }}
+              />
+              {!isActive && link && (
+                <button
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    window.open(link, "_blank", "noopener,noreferrer");
+                  }}
+                  className="absolute bottom-2 right-2 bg-white/80 backdrop-blur-sm rounded-full p-1 shadow-md hover:scale-105 transition-transform"
+                >
+                  <LinkIcon className="w-5 h-5 text-gray-700 opacity-80" />
+                </button>
+              )}
+
+            </div>
           ) : (
             <label className="w-full h-full flex items-center justify-center cursor-pointer bg-gray-200">
               Click to Upload an Image
