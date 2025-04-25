@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useState } from "react";
 import { signInWithGoogle, signUpWithEmail } from "@lib/firebase/auth";
 import { useRouter } from "next/navigation";
+import { fetchUsername } from '@lib/requests/fetchUsername';
 
 export default function SignUpForm() {
   const [email, setEmail] = useState("");
@@ -45,8 +46,12 @@ export default function SignUpForm() {
 
     const isOk = await signInWithGoogle();
     if (isOk) {
-      router.push("/setusername");
-      return;
+      const username = await fetchUsername();
+      if (username.length === 0) {
+        router.push("/setusername");
+      } else {
+        router.push("/profile");
+      }
     }
   };
 

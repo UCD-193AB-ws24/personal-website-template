@@ -15,6 +15,9 @@ import {
 
 import { auth, db } from "./firebaseApp";
 import { APIResponse } from "@customTypes/apiResponse";
+import isValidUsername from "@utils/isValidUsername";
+import { setUsernameCookie } from "@lib/requests/setUsernameCookie";
+import { fetchUsername } from "@lib/requests/fetchUsername";
 
 export const signUpWithEmail = async (
   email: string,
@@ -22,6 +25,11 @@ export const signUpWithEmail = async (
   password: string,
 ) => {
   try {
+    let errMsg = isValidUsername(username);
+    if (errMsg.length !== 0) {
+      throw new Error(errMsg);
+    }
+
     const q = query(collection(db, "users"), where("username", "==", username));
     const querySnapshot = await getDocs(q);
 
@@ -40,6 +48,11 @@ export const signUpWithEmail = async (
       username,
       email,
     });
+
+    errMsg = await setUsernameCookie(username);
+    if (errMsg.length !== 0) {
+      throw new Error(errMsg);
+    }
 
     const idToken = await userCredentials.user.getIdToken();
     const response = await fetch("/api/auth/login", {
@@ -78,6 +91,11 @@ export const signInWithEmail = async (email: string, password: string) => {
       },
       body: JSON.stringify({ idToken }),
     });
+
+    const username = await fetchUsername();
+    if (username.length === 0) {
+      throw new Error("No username found");
+    }
 
     const resBody = (await response.json()) as APIResponse<string>;
     return resBody;
@@ -118,8 +136,13 @@ export const signInWithGoogle = async () => {
   }
 };
 
-export const setUsername = async (username: any) => {
+export const setUsername = async (username: string) => {
   try {
+    let errMsg = isValidUsername(username);
+    if (errMsg.length !== 0) {
+      throw new Error(errMsg);
+    }
+
     if (!auth.currentUser) {
       throw new Error("No user is signed in.");
     }
@@ -139,6 +162,11 @@ export const setUsername = async (username: any) => {
       { username, email },
       { merge: true },
     );
+
+    errMsg = await setUsernameCookie(username);
+    if (errMsg.length !== 0) {
+      throw new Error(errMsg);
+    }
   } catch (error: any) {
     console.log("Error setting username:", error.message);
     throw error;
