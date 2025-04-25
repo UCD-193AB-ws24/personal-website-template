@@ -1,16 +1,16 @@
 "use client";
 
-import Image from 'next/image';
+import Image from "next/image";
 import Link from "next/link";
 import { signInWithGoogle, signInWithEmail } from "@lib/firebase/auth";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { fetchUsername } from "@lib/requests/fetchUsername";
 
 export default function LogInForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
 
   const router = useRouter();
 
@@ -31,9 +31,12 @@ export default function LogInForm() {
 
     const isOk = await signInWithGoogle();
     if (isOk) {
-      router.push("/profile");
-      setSuccess(true);
-      return;
+      const username = await fetchUsername();
+      if (username.length === 0) {
+        router.push("/setusername");
+      } else {
+        router.push("/profile");
+      }
     }
   };
 
@@ -73,7 +76,6 @@ export default function LogInForm() {
           </button>
         </form>
 
-        {success && <p>Log in successful!</p>}
         {error && <p style={{ color: "red" }}>{error}</p>}
 
         {/* Google Sign-In Button */}
