@@ -27,12 +27,12 @@ interface ImageComponentProps {
   initialPos?: Position;
   initialSize?: Size;
   components?: ComponentItem[];
-  content?: string;
+  content?: any;
   updateComponent?: (
     id: string,
     newPos: Position,
     newSize: Size,
-    content?: string,
+    content?: any,
   ) => void;
   isActive?: boolean;
   onMouseDown?: () => void;
@@ -54,12 +54,13 @@ export default function ImageComponent({
 }: ImageComponentProps) {
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
-  const [imageSrc, setImageSrc] = useState(content || "");
+  const normalizedContent = typeof content === "string" ? { image: content } : content;
+  const [imageSrc, setImageSrc] = useState(normalizedContent.image || "");
+  const [link, setLink] = useState(normalizedContent.link || "");
   const [loading, setLoading] = useState(!!content);
   const [previewSrc, setPreviewSrc] = useState<string | null>(null);
   const [isLinkEditing, setIsLinkEditing] = useState(false);
   const [linkInputField, setLinkInputField] = useState("");
-  const [link, setLink] = useState<string>("");
   const [isEditingExistingLink, setIsEditingExistingLink] = useState(false);
   const [prevLink, setPrevLink] = useState<string>("");
   const [drag, setDrag] = useState(false);
@@ -133,7 +134,7 @@ export default function ImageComponent({
             const { width, height } = await resizeImage(downloadURL);
             setSize({ width, height });
           }
-          updateComponent(id, position, size, downloadURL);
+          updateComponent(id, position, size, { image: downloadURL, link });
         },
       );
     }
@@ -285,6 +286,7 @@ export default function ImageComponent({
                       setIsLinkEditing(false);
                       setIsEditingExistingLink(false);
                       setPrevLink("");
+                      updateComponent(id, position, size, { image: imageSrc, link: linkInputField });
                     }
                   }}
                 >
@@ -348,6 +350,7 @@ export default function ImageComponent({
                   setIsLinkEditing(false);
                   setIsEditingExistingLink(false);
                   setPrevLink("");
+                  updateComponent(id, position, size, { image: imageSrc, link: "" });
                 }}
               >
                 <Trash2 className="w-4 h-4" />
