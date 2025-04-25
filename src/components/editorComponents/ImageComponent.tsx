@@ -46,10 +46,10 @@ export default function ImageComponent({
   initialSize = { width: 200, height: 150 },
   components = [],
   content = "",
-  updateComponent = () => {},
+  updateComponent = () => { },
   isActive = false,
-  onMouseDown = () => {},
-  setIsDragging = () => {},
+  onMouseDown = () => { },
+  setIsDragging = () => { },
   isPreview = false,
 }: ImageComponentProps) {
   const [position, setPosition] = useState(initialPos);
@@ -62,6 +62,7 @@ export default function ImageComponent({
   const [link, setLink] = useState<string>("");
   const [isEditingExistingLink, setIsEditingExistingLink] = useState(false);
   const [prevLink, setPrevLink] = useState<string>("");
+  const [drag, setDrag] = useState(false);
 
   const draftNumber = useSearchParams().get("draftNumber");
 
@@ -143,8 +144,7 @@ export default function ImageComponent({
       style={{
         position: "absolute",
         left: position.x,
-        top: position.y,
-        width: size.width,
+        top: position.y, width: size.width,
         height: size.height,
       }}
       className="overflow-hidden"
@@ -172,83 +172,103 @@ export default function ImageComponent({
       )}
     </div>
   ) : (
-    <Rnd
-      size={{ width: size.width, height: size.height }}
-      position={{ x: position.x, y: position.y }}
-      onDragStart={(e) => {
-        setIsDragging(true);
-        e.preventDefault();
-      }}
-      onDragStop={(e, d) => {
-        setIsDragging(false);
-        handleDragStop(
-          id,
-          size,
-          components,
-          updateComponent,
-          setPosition,
-        )(e, d);
-      }}
-      onResizeStart={() => setIsDragging(true)}
-      onResizeStop={(e, d, ref, delta, newPosition) => {
-        setIsDragging(false);
-        handleResizeStop(id, components, updateComponent, setSize, setPosition)(
-          e,
-          d,
-          ref,
-          delta,
-          newPosition,
-        );
-      }}
-      lockAspectRatio={true}
-      minWidth={100}
-      minHeight={100}
-      bounds="parent"
-      onMouseDown={handleMouseDown}
-      style={{ pointerEvents: "auto" }}
-      dragGrid={[GRID_SIZE, GRID_SIZE]}
-      resizeGrid={[GRID_SIZE, GRID_SIZE]}
-    >
-      <ActiveOutlineContainer isActive={isActive}>
-        {loading && <SkeletonLoader width={size.width} height={size.height} />}
+    <>
+      <Rnd
+        size={{ width: size.width, height: size.height }}
+        position={{ x: position.x, y: position.y }}
+        onDragStart={(e) => {
+          setIsDragging(true);
+          setDrag(true);
+          setIsLinkEditing(false);
+          e.preventDefault();
+        }}
+        onDragStop={(e, d) => {
+          setIsDragging(false);
+          setDrag(false);
+          handleDragStop(
+            id,
+            size,
+            components,
+            updateComponent,
+            setPosition,
+          )(e, d);
+        }}
+        onResizeStart={() => {
+          setIsDragging(true);
+          setDrag(true);
+          setIsLinkEditing(false);
+        }}
+        onResizeStop={(e, d, ref, delta, newPosition) => {
+          setIsDragging(false);
+          setDrag(false);
+          handleResizeStop(id, components, updateComponent, setSize, setPosition)(
+            e,
+            d,
+            ref,
+            delta,
+            newPosition,
+          );
+        }}
+        lockAspectRatio={true}
+        minWidth={100}
+        minHeight={100}
+        bounds="parent"
+        onMouseDown={handleMouseDown}
+        style={{ pointerEvents: "auto" }}
+        dragGrid={[GRID_SIZE, GRID_SIZE]}
+        resizeGrid={[GRID_SIZE, GRID_SIZE]}
+      >
+        <ActiveOutlineContainer isActive={isActive}>
+          {loading && <SkeletonLoader width={size.width} height={size.height} />}
 
-        {previewSrc ? (
-          <img
-            src={previewSrc}
-            alt="Uploading Preview"
-            className="w-full h-full object-cover"
-          />
-        ) : imageSrc ? (
-          <img
-            src={imageSrc}
-            alt="Uploaded"
-            className="w-full h-full object-cover"
-            onLoad={() => setLoading(false)}
-            onError={() => setLoading(false)}
-            style={{ display: loading ? "none" : "block" }}
-          />
-        ) : (
-          <label className="w-full h-full flex items-center justify-center cursor-pointer bg-gray-200">
-            Click to Upload an Image
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
+          {previewSrc ? (
+            <img
+              src={previewSrc}
+              alt="Uploading Preview"
+              className="w-full h-full object-cover"
             />
-          </label>
-        )}
-      </ActiveOutlineContainer>
-      {isActive && (
-        <div className="absolute -bottom-10 left-0 z-10 flex items-center gap-[4px]">
+          ) : imageSrc ? (
+            <img
+              src={imageSrc}
+              alt="Uploaded"
+              className="w-full h-full object-cover"
+              onLoad={() => setLoading(false)}
+              onError={() => setLoading(false)}
+              style={{ display: loading ? "none" : "block" }}
+            />
+          ) : (
+            <label className="w-full h-full flex items-center justify-center cursor-pointer bg-gray-200">
+              Click to Upload an Image
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+            </label>
+          )}
+        </ActiveOutlineContainer>
+      </Rnd>
+      {!drag && isActive && (
+        <div
+          className="flex items-center gap-[4px]"
+          style={{
+            position: "absolute",
+            top: `${position.y + size.height + 10}px`,
+            left: `${position.x}px`,
+            zIndex: 10,
+            pointerEvents: "auto",
+            transition: "opacity 0.2s ease-in-out, transform 0.1s",
+          }}
+        >
           {isLinkEditing ? (
-            <div className="absolute -bottom-5 left-0 z-10">
-              <div className = "flex items-center p-2 gap-[4px] bg-white shadow-[0px_0px_37px_-14px_rgba(0,_0,_0,_1)] rounded-md border">
-                <div 
+            <div className="absolute top-0 left-0 z-10">
+              <div className="flex items-center p-2 gap-[4px] bg-white shadow-[0px_0px_37px_-14px_rgba(0,_0,_0,_1)] rounded-md border">
+                <div
                   className="flex justify-center items-center bg-white gap-[4px] p-1 border rounded-md focus-within:border-blue-500"
                   onMouseDown={(e) => e.stopPropagation()}
                 >
-                  <Search size={16}/>
+                  <Search size={16} />
                   <input
                     className="text-sm focus:outline-none"
                     type="url"
@@ -271,27 +291,27 @@ export default function ImageComponent({
                   Apply
                 </button>
                 {isEditingExistingLink ? (
-                    <button
-                      className="text-sm text-gray-400 ml-1"
-                      onClick={() => {
-                        setLinkInputField(prevLink);
-                        setIsLinkEditing(false);
-                        setIsEditingExistingLink(false);
-                      }}
-                    >
-                      Cancel
-                    </button>
-              ) : (
-                <button
-                  className="text-sm text-gray-400 ml-1"
-                  onClickCapture={() => {
-                    setLinkInputField("");
-                     setIsLinkEditing(false);
-                   }}
-                >
-                  Cancel
-                </button>
-              )}
+                  <button
+                    className="text-sm text-gray-400 ml-1"
+                    onClick={() => {
+                      setLinkInputField(prevLink);
+                      setIsLinkEditing(false);
+                      setIsEditingExistingLink(false);
+                    }}
+                  >
+                    Cancel
+                  </button>
+                ) : (
+                  <button
+                    className="text-sm text-gray-400 ml-1"
+                    onClickCapture={() => {
+                      setLinkInputField("");
+                      setIsLinkEditing(false);
+                    }}
+                  >
+                    Cancel
+                  </button>
+                )}
               </div>
             </div>
           ) : !link ? (
@@ -310,33 +330,33 @@ export default function ImageComponent({
             <>
               <button
                 onClick={() => {
-                setIsLinkEditing(true);
-                setIsEditingExistingLink(true);
-                setLinkInputField(link);
-                setPrevLink(link);
-              }}
-              className="flex items-center gap-1 text-sm text-blue-600 bg-white px-2 py-1 rounded shadow hover:bg-gray-100 min-w-[120px] justify-center"
+                  setIsLinkEditing(true);
+                  setIsEditingExistingLink(true);
+                  setLinkInputField(link);
+                  setPrevLink(link);
+                }}
+                className="flex items-center gap-1 text-sm text-blue-600 bg-white px-2 py-1 rounded shadow hover:bg-gray-100 min-w-[120px] justify-center"
               >
                 <Pencil className="w-4 h-4" />
                 Edit Link
-            </button>
-            <button
-              className="flex items-center gap-1 text-sm text-red-500 ml-2 px-2 py-1 bg-white rounded shadow hover:bg-gray-100 min-w-[120px] justify-center"
+              </button>
+              <button
+                className="flex items-center gap-1 text-sm text-red-500 ml-2 px-2 py-1 bg-white rounded shadow hover:bg-gray-100 min-w-[120px] justify-center"
                 onClick={() => {
                   setLink("");
                   setLinkInputField("");
                   setIsLinkEditing(false);
                   setIsEditingExistingLink(false);
                   setPrevLink("");
-              }}
-            >
-              <Trash2 className="w-4 h-4" />
-              Remove Link
-            </button>
+                }}
+              >
+                <Trash2 className="w-4 h-4" />
+                Remove Link
+              </button>
             </>
           )}
         </div>
       )}
-    </Rnd>
+    </>
   );
 }
