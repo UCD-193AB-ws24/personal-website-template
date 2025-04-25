@@ -58,6 +58,14 @@ const fetchStoredAndReferencedFiles = async (
               .map((card: any) => getStoragePathFromUrl(card.imageUrl));
           }
 
+          if (comp.type === "image") {
+            const imageUrl = typeof comp.content === "string"
+              ? comp.content
+              : comp.content?.image;
+
+            return imageUrl ? [getStoragePathFromUrl(imageUrl)] : [];
+          }
+
           // default for image or file: content is a string URL
           return [getStoragePathFromUrl(comp.content)];
         } catch {
