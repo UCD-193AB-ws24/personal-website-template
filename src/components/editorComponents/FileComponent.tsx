@@ -16,7 +16,7 @@ import type {
   Size,
 } from "@customTypes/componentTypes";
 import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
-import { GRID_SIZE } from "@utils/constants";
+import { GRID_SIZE, MAX_FILE_SIZE } from "@utils/constants";
 import { auth, storage } from "@lib/firebase/firebaseApp";
 
 interface FileComponentProps {
@@ -57,9 +57,6 @@ export default function FileComponent({
   const [showOverlay, setShowOverlay] = useState(false);
 
   const draftNumber = useSearchParams().get("draftNumber");
-
-  // https://stackoverflow.com/questions/58488416/open-base64-encoded-pdf-file-using-javascript-issue-with-file-size-larger-than
-  const MAX_FILE_SIZE = 5 * 1024 * 1025; // max 5MB upload for now
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const userId = auth.currentUser?.uid;

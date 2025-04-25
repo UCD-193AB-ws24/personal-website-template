@@ -1,5 +1,6 @@
 import { EditorThemeClasses } from "lexical";
 import { ParagraphNode, TextNode } from "lexical";
+import { HeadingNode } from "@lexical/rich-text";
 import { ListItemNode, ListNode } from '@lexical/list';
 import { LinkNode } from '@lexical/link';
 
@@ -50,11 +51,23 @@ export const RichTextTheme: EditorThemeClasses =  {
 
 export const RichTextInitialConfig = {
 	namespace: "RichTextbox",
-	nodes: [ParagraphNode, TextNode, ListNode, ListItemNode, LinkNode],
+	nodes: [ParagraphNode, TextNode, ListNode, ListItemNode, LinkNode, HeadingNode],
 	onError(error: Error) {
 		throw error;
 	},
 	theme: RichTextTheme,
 };
 
-export const BlankRichTextEditorState = '{"root":{"children":[{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""}],"direction":null,"format":"","indent":0,"type":"root","version":1}}'
+const BlankRichTextEditorState = '{"root":{"children":[{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""}],"direction":null,"format":"","indent":0,"type":"root","version":1}}';
+
+const BlankHeaderRichTextEditorState = '{"root":{"children":[{"children":[],"direction":null,"format":"bold","indent":0,"type":"heading","tag":"h1","version":1}],"direction":null,"format":"","indent":0,"type":"root","version":1}}';
+
+export const RichTextDefaultContent = {
+	textboxState: BlankRichTextEditorState,
+	backgroundColor: "transparent",
+}
+
+export const HeaderRichTextDefaultContent = {
+	textboxState: BlankHeaderRichTextEditorState,
+	backgroundColor: "transparent",
+}

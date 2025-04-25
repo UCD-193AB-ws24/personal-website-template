@@ -5,8 +5,10 @@ import { useState, useRef, useLayoutEffect } from "react";
 import { Rnd } from "react-rnd";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
+import { toastError } from "@components/toasts/ErrorToast";
+
 import { auth, storage } from "@lib/firebase/firebaseApp";
-import { GRID_SIZE } from "@utils/constants";
+import { GRID_SIZE, MAX_FILE_SIZE } from "@utils/constants";
 
 interface ImageCardProps {
   cardId: number;
@@ -59,6 +61,10 @@ export default function ImageCard({
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size > MAX_FILE_SIZE) {
+      toastError("Image size exceeds the 5MB limit. Please upload a smaller image.");
+      return;
+    }
 
     const userId = auth.currentUser?.uid;
     const filePath = `users/${userId}/drafts/${draftNumber}/${cardId}-${file.name}`;

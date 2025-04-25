@@ -151,7 +151,7 @@ export default function NavigationBar({
       <div
         className={`bg-gray-800 text-white shadow-lg z-[100] overflow-x-hidden ${
           isPreview
-            ? "fixed top-[calc(4rem+5px)] left-1/2 w-[365px] -translate-x-1/2"
+            ? "fixed top-[calc(4rem+5px)] left-1/2 w-[calc(44.97vh_-_5px)] -translate-x-1/2"
             : "fixed top-0 left-0 w-screen"
         }`}
       >
