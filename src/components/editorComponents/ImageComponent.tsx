@@ -265,8 +265,6 @@ export default function ImageComponent({
                       setIsLinkEditing(false);
                       setIsEditingExistingLink(false);
                       setPrevLink("");
-                    } else {
-                      alert("Please enter a valid URL.");
                     }
                   }}
                 >
@@ -317,13 +315,13 @@ export default function ImageComponent({
                 setLinkInputField(link);
                 setPrevLink(link);
               }}
-              className="flex items-center gap-1 text-sm text-blue-600 bg-white px-2 py-1 rounded shadow hover:bg-gray-100"
+              className="flex items-center gap-1 text-sm text-blue-600 bg-white px-2 py-1 rounded shadow hover:bg-gray-100 min-w-[120px] justify-center"
               >
                 <Pencil className="w-4 h-4" />
                 Edit Link
             </button>
             <button
-              className="flex items-center gap-1 text-sm text-red-500 ml-2 px-2 py-1 bg-white rounded shadow hover:bg-gray-100"
+              className="flex items-center gap-1 text-sm text-red-500 ml-2 px-2 py-1 bg-white rounded shadow hover:bg-gray-100 min-w-[120px] justify-center"
                 onClick={() => {
                   setLink("");
                   setLinkInputField("");
