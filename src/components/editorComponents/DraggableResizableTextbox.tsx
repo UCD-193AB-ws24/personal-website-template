@@ -98,10 +98,7 @@ export default function DraggableResizableTextbox({
     >
       <LexicalComposer initialConfig={RichTextInitialConfig}>
         <div
-          className={`w-full h-full transition-all duration-150 ease-in-out rounded ${isActive
-              ? "outline outline-2 outline-blue-500 shadow-md"
-              : "outline outline-2 outline-transparent hover:outline hover:outline-2 hover:outline-gray-300"
-            }`}
+          className={"w-full h-full transition-all duration-150 ease-in-out rounded"}
           style={{ backgroundColor: data.backgroundColor || "transparent" }}
         >
           <RichTextbox
