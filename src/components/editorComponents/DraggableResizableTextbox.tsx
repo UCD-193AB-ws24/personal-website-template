@@ -97,12 +97,21 @@ export default function DraggableResizableTextbox({
       className="whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg leading-none rounded"
     >
       <LexicalComposer initialConfig={RichTextInitialConfig}>
-        <RichTextbox
-          isPreview={isPreview}
-          textboxState={data.textboxState || data}
-          updateTextboxState={updateTextboxState}
-          isActive={false}
-        />
+        <div
+          className={`w-full h-full transition-all duration-150 ease-in-out rounded ${
+            isActive
+              ? "outline outline-2 outline-blue-500 shadow-md"
+              : "outline outline-2 outline-transparent hover:outline hover:outline-2 hover:outline-gray-300"
+          }`}
+          style={{ backgroundColor: data.backgroundColor || "transparent" }}
+        >
+          <RichTextbox
+            isPreview={isPreview}
+            textboxState={data.textboxState || data}
+            updateTextboxState={updateTextboxState}
+            isActive={false}
+          />
+        </div>
       </LexicalComposer>
     </div>
   ) : (
