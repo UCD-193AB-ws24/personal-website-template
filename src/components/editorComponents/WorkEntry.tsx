@@ -159,14 +159,12 @@ export default function WorkEntry({
       resizeGrid={[GRID_SIZE, GRID_SIZE]}
     >
       <ActiveOutlineContainer isActive={isActive}>
-
         {/* Overlay for enabling drag */}
         {(showOverlay || !isActive) && (
           <div
             className="w-full h-full flex items-center justify-center absolute inset-0 z-10"
             onMouseDown={() => setShowOverlay(true)}
-          >
-          </div>
+          ></div>
         )}
 
         <div

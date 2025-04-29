@@ -1,10 +1,10 @@
 "use client";
 
-import Image from 'next/image';
+import Image from "next/image";
 import { useState } from "react";
 import { signInWithGoogle, signUpWithEmail } from "@lib/firebase/auth";
 import { useRouter } from "next/navigation";
-import { fetchUsername } from '@lib/requests/fetchUsername';
+import { fetchUsername } from "@lib/requests/fetchUsername";
 
 export default function SignUpForm() {
   const [email, setEmail] = useState("");

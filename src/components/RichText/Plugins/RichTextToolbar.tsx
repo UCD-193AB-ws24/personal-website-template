@@ -281,7 +281,9 @@ interface RichTextToolbarPluginProps {
   updateBackgroundColor: (val: string) => void;
 }
 
-export default function RichTextToolbarPlugin({updateBackgroundColor}: RichTextToolbarPluginProps) {
+export default function RichTextToolbarPlugin({
+  updateBackgroundColor,
+}: RichTextToolbarPluginProps) {
   const [editor] = useLexicalComposerContext();
   const toolbarRef = useRef(null);
   const [canUndo, setCanUndo] = useState(false);
@@ -542,7 +544,10 @@ export default function RichTextToolbarPlugin({updateBackgroundColor}: RichTextT
                 const nodes = selection.getNodes();
                 if (nodes.length > 0) {
                   const parent = nodes[0].getParent();
-                  if ($isLinkNode(parent) || nodes.find((n) => $isLinkNode(n))) {
+                  if (
+                    $isLinkNode(parent) ||
+                    nodes.find((n) => $isLinkNode(n))
+                  ) {
                     // Remove link if selecting a link node or selection has
                     // a link node
                     $toggleLink(null);

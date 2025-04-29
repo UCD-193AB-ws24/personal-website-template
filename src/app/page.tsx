@@ -2,7 +2,10 @@
 
 import "./homePage.css";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@lib/firebase/firebaseApp";
+// import { auth } from "@lib/firebase/firebaseApp";
+import { getFirebaseAuth } from "@lib/firebase/firebaseApp";
+const auth = getFirebaseAuth();
+
 import { signUserOut } from "@lib/firebase/auth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -100,6 +103,7 @@ export default function Home() {
             </p>
             <div className="justify-self-center md:col-start-2 md:justify-self-start space-y-4 sm:flex sm:space-y-0 sm:space-x-4 rtl:space-x-reverse">
               <button
+                data-testid="new-draft-button"
                 onClick={handleNewDraft}
                 className="relative px-6 py-4 font-semibold text-white bg-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#d67500] hover:border-[#d67500] shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50"
               >
@@ -200,6 +204,7 @@ export default function Home() {
           </h3>
           <p className="mb-4 text-white">No coding. No hassle. Just results.</p>
           <button
+            data-testid="new-draft-button"
             onClick={handleNewDraft}
             className="relative inline-flex px-6 py-4 text-lg font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#f08700] hover:text-black shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50 items-center justify-center text-center"
           >

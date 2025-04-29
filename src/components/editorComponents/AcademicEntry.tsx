@@ -59,18 +59,18 @@ export default function AcademicEntry({
   });
   const [showOverlay, setShowOverlay] = useState(false);
 
-	useEffect(() => {
-		try {
-			const jsonContent = JSON.parse(content);
-			setCurContent(jsonContent);
-		} catch {
-			setCurContent({
-				schoolName: 'School',
-				subtext: 'Degree',
-				duration: 'Jan 20XX - Dec 20XX',
-			});
-		}
-	}, [content]);
+  useEffect(() => {
+    try {
+      const jsonContent = JSON.parse(content);
+      setCurContent(jsonContent);
+    } catch {
+      setCurContent({
+        schoolName: "School",
+        subtext: "Degree",
+        duration: "Jan 20XX - Dec 20XX",
+      });
+    }
+  }, [content]);
 
   const handleMouseDown = (e: MouseEvent) => {
     e.stopPropagation();
@@ -149,14 +149,12 @@ export default function AcademicEntry({
       resizeGrid={[GRID_SIZE, GRID_SIZE]}
     >
       <ActiveOutlineContainer isActive={isActive}>
-
         {/* Overlay for enabling drag */}
         {(showOverlay || !isActive) && (
           <div
             className="w-full h-full flex items-center justify-center absolute inset-0 z-10"
             onMouseDown={() => setShowOverlay(true)}
-          >
-          </div>
+          ></div>
         )}
 
         <div

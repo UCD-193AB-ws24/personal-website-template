@@ -17,7 +17,11 @@ import type {
 } from "@customTypes/componentTypes";
 import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
 import { GRID_SIZE, MAX_FILE_SIZE } from "@utils/constants";
-import { auth, storage } from "@lib/firebase/firebaseApp";
+// import { auth, storage } from "@lib/firebase/firebaseApp";
+import { getFirebaseAuth, getFirebaseStorage } from "@lib/firebase/firebaseApp";
+const auth = getFirebaseAuth();
+const storage = getFirebaseStorage();
+
 import { Link as LinkIcon, Search } from "lucide-react";
 import { Pencil, Trash2 } from "lucide-react";
 import isValidURL from "@components/RichText/utils/isValidURL";
@@ -46,15 +50,16 @@ export default function ImageComponent({
   initialSize = { width: 200, height: 150 },
   components = [],
   content = "",
-  updateComponent = () => { },
+  updateComponent = () => {},
   isActive = false,
-  onMouseDown = () => { },
-  setIsDragging = () => { },
+  onMouseDown = () => {},
+  setIsDragging = () => {},
   isPreview = false,
 }: ImageComponentProps) {
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
-  const normalizedContent = typeof content === "string" ? { image: content } : content;
+  const normalizedContent =
+    typeof content === "string" ? { image: content } : content;
   const [imageSrc, setImageSrc] = useState(normalizedContent.image || "");
   const [link, setLink] = useState(normalizedContent.link || "");
   const [loading, setLoading] = useState(!!normalizedContent.image);
@@ -69,10 +74,10 @@ export default function ImageComponent({
 
   useEffect(() => {
     if (!imageSrc || !loading) return;
-  
+
     const img = new Image();
     img.src = imageSrc;
-  
+
     if (img.complete) {
       // Chrome fix for cached images
       setLoading(false);
@@ -109,7 +114,9 @@ export default function ImageComponent({
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       if (file.size > MAX_FILE_SIZE) {
-        toastError("Image size exceeds the 5MB limit. Please upload a smaller image.");
+        toastError(
+          "Image size exceeds the 5MB limit. Please upload a smaller image.",
+        );
         return;
       }
 
@@ -160,7 +167,8 @@ export default function ImageComponent({
       style={{
         position: "absolute",
         left: position.x,
-        top: position.y, width: size.width,
+        top: position.y,
+        width: size.width,
         height: size.height,
       }}
       className="overflow-hidden"
@@ -246,13 +254,13 @@ export default function ImageComponent({
         onResizeStop={(e, d, ref, delta, newPosition) => {
           setIsDragging(false);
           setDrag(false);
-          handleResizeStop(id, components, updateComponent, setSize, setPosition)(
-            e,
-            d,
-            ref,
-            delta,
-            newPosition,
-          );
+          handleResizeStop(
+            id,
+            components,
+            updateComponent,
+            setSize,
+            setPosition,
+          )(e, d, ref, delta, newPosition);
         }}
         lockAspectRatio={true}
         minWidth={100}
@@ -264,7 +272,9 @@ export default function ImageComponent({
         resizeGrid={[GRID_SIZE, GRID_SIZE]}
       >
         <ActiveOutlineContainer isActive={isActive}>
-          {loading && <SkeletonLoader width={size.width} height={size.height} />}
+          {loading && (
+            <SkeletonLoader width={size.width} height={size.height} />
+          )}
 
           {previewSrc ? (
             <div className="relative w-full h-full">
@@ -307,7 +317,6 @@ export default function ImageComponent({
                   <LinkIcon className="w-5 h-5 text-gray-700 opacity-80" />
                 </button>
               )}
-
             </div>
           ) : (
             <label className="w-full h-full flex items-center justify-center cursor-pointer bg-gray-200">
@@ -358,7 +367,10 @@ export default function ImageComponent({
                       setIsLinkEditing(false);
                       setIsEditingExistingLink(false);
                       setPrevLink("");
-                      updateComponent(id, position, size, { image: imageSrc, link: linkInputField });
+                      updateComponent(id, position, size, {
+                        image: imageSrc,
+                        link: linkInputField,
+                      });
                     }
                   }}
                 >
@@ -422,7 +434,10 @@ export default function ImageComponent({
                   setIsLinkEditing(false);
                   setIsEditingExistingLink(false);
                   setPrevLink("");
-                  updateComponent(id, position, size, { image: imageSrc, link: "" });
+                  updateComponent(id, position, size, {
+                    image: imageSrc,
+                    link: "",
+                  });
                 }}
               >
                 <Trash2 className="w-4 h-4" />

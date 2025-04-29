@@ -13,7 +13,11 @@ import {
   where,
 } from "firebase/firestore";
 
-import { auth, db } from "./firebaseApp";
+import { getFirebaseAuth, getFirebaseDB } from "./firebaseApp";
+const auth = getFirebaseAuth();
+const db = getFirebaseDB();
+// import { auth, db } from "./firebaseApp";
+
 import { APIResponse } from "@customTypes/apiResponse";
 import isValidUsername from "@utils/isValidUsername";
 import { setUsernameCookie } from "@lib/requests/setUsernameCookie";

@@ -107,7 +107,7 @@ export default function WebPageComponent({
       size={{ width: size.width, height: size.height }}
       position={{ x: position.x, y: position.y }}
       onDragStart={() => {
-        setIsDragging(true)
+        setIsDragging(true);
         setShowOverlay(true);
       }}
       onDragStop={(e, d) => {

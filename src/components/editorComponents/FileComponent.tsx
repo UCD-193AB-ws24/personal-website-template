@@ -17,7 +17,10 @@ import type {
 } from "@customTypes/componentTypes";
 import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
 import { GRID_SIZE, MAX_FILE_SIZE } from "@utils/constants";
-import { auth, storage } from "@lib/firebase/firebaseApp";
+// import { auth, storage } from "@lib/firebase/firebaseApp";
+import { getFirebaseAuth, getFirebaseStorage } from "@lib/firebase/firebaseApp";
+const auth = getFirebaseAuth();
+const storage = getFirebaseStorage();
 
 interface FileComponentProps {
   id?: string;
@@ -63,7 +66,9 @@ export default function FileComponent({
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       if (file.size > MAX_FILE_SIZE) {
-        toastError("File size exceeds the 5MB limit. Please upload a smaller file.");
+        toastError(
+          "File size exceeds the 5MB limit. Please upload a smaller file.",
+        );
         return;
       }
       const filePath = `users/${userId}/drafts/${draftNumber}/${id}-${file.name}`;

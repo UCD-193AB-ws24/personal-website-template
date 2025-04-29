@@ -43,10 +43,10 @@ export default function DraggableResizableTextbox({
   initialSize = { width: 200, height: 50 },
   components = [],
   content = RichTextDefaultContent,
-  updateComponent = () => { },
+  updateComponent = () => {},
   isActive = true,
-  onMouseDown: onMouseDown = () => { },
-  setIsDragging = () => { },
+  onMouseDown: onMouseDown = () => {},
+  setIsDragging = () => {},
   isPreview = false,
 }: DraggableResizableTextboxProps) {
   const [position, setPosition] = useState(initialPos);
@@ -98,7 +98,9 @@ export default function DraggableResizableTextbox({
     >
       <LexicalComposer initialConfig={RichTextInitialConfig}>
         <div
-          className={"w-full h-full transition-all duration-150 ease-in-out rounded"}
+          className={
+            "w-full h-full transition-all duration-150 ease-in-out rounded"
+          }
           style={{ backgroundColor: data.backgroundColor || "transparent" }}
         >
           <RichTextbox
@@ -152,10 +154,11 @@ export default function DraggableResizableTextbox({
         resizeGrid={[GRID_SIZE, GRID_SIZE]}
       >
         <div
-          className={`w-full h-full transition-all duration-150 ease-in-out rounded ${isActive
+          className={`w-full h-full transition-all duration-150 ease-in-out rounded ${
+            isActive
               ? "outline outline-2 outline-blue-500 shadow-md"
               : "outline outline-2 outline-transparent hover:outline hover:outline-2 hover:outline-gray-300"
-            }`}
+          }`}
           style={{ backgroundColor: data.backgroundColor || "transparent" }}
         >
           {/* Overlay for enabling drag */}
@@ -163,8 +166,7 @@ export default function DraggableResizableTextbox({
             <div
               className="w-full h-full flex items-center justify-center absolute inset-0 z-10"
               onMouseDown={() => setShowOverlay(true)}
-            >
-            </div>
+            ></div>
           )}
 
           <div

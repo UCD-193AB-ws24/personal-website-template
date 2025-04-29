@@ -17,7 +17,11 @@ import type {
 
 import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
 import { GRID_SIZE, MAX_FILE_SIZE } from "@utils/constants";
-import { auth, storage } from "@lib/firebase/firebaseApp";
+
+// import { auth, storage } from "@lib/firebase/firebaseApp";
+import { getFirebaseAuth, getFirebaseStorage } from "@lib/firebase/firebaseApp";
+const auth = getFirebaseAuth();
+const storage = getFirebaseStorage();
 
 interface AboutMeCardContent {
   image: string;
@@ -35,7 +39,7 @@ interface AboutMeCardProps {
     id: string,
     newPos: Position,
     newSize: Size,
-    content?: any
+    content?: any,
   ) => void;
   isActive?: boolean;
   onMouseDown?: () => void;
@@ -89,7 +93,7 @@ export default function AboutMeCard({
 
   const resizeImage = (
     imageSrc: string,
-    baseWidth: number = 300
+    baseWidth: number = 300,
   ): Promise<{ width: number; height: number }> => {
     return new Promise((resolve) => {
       const img = new Image();
@@ -109,7 +113,9 @@ export default function AboutMeCard({
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       if (file.size > MAX_FILE_SIZE) {
-        toastError("Image size exceeds the 5MB limit. Please upload a smaller image.");
+        toastError(
+          "Image size exceeds the 5MB limit. Please upload a smaller image.",
+        );
         return;
       }
 
@@ -163,9 +169,9 @@ export default function AboutMeCard({
             JSON.stringify({
               ...curContent,
               image: downloadURL,
-            })
+            }),
           );
-        }
+        },
       );
     }
   };
@@ -182,7 +188,6 @@ export default function AboutMeCard({
       }}
       className="flex w-full h-full gap-[40px] whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg"
     >
-
       <div className="h-full flex flex-col align-center">
         {previewSrc ? (
           <img
@@ -212,7 +217,7 @@ export default function AboutMeCard({
         <p
           draggable="false"
           className="overflow-hidden min-w-[300px] max-w-[300px] max-h-[60px] flex-grow text-black cursor-text p-0 m-0 leading-none rounded-sm"
-       >
+        >
           {curContent.bio}
         </p>
 
@@ -239,7 +244,7 @@ export default function AboutMeCard({
           size,
           components,
           updateComponent,
-          setPosition
+          setPosition,
         )(e, d);
       }}
       onResizeStart={() => setIsDragging(true)}
@@ -250,7 +255,7 @@ export default function AboutMeCard({
           d,
           ref,
           delta,
-          newPosition
+          newPosition,
         );
       }}
       minHeight={215}
@@ -262,14 +267,12 @@ export default function AboutMeCard({
       resizeGrid={[GRID_SIZE, GRID_SIZE]}
     >
       <ActiveOutlineContainer isActive={isActive}>
-
         {/* Overlay for enabling drag */}
         {(showOverlay || !isActive) && (
           <div
             className="w-full h-full flex items-center justify-center absolute inset-0 z-10"
             onMouseDown={() => setShowOverlay(true)}
-          >
-          </div>
+          ></div>
         )}
 
         <div
@@ -281,7 +284,6 @@ export default function AboutMeCard({
             className="flex w-full h-full gap-[40px] whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg"
             style={{ padding: `${GRID_SIZE}px` }}
           >
-
             <div className="h-full flex flex-col align-center">
               {previewSrc ? (
                 <img
@@ -334,7 +336,7 @@ export default function AboutMeCard({
                     JSON.stringify({
                       ...curContent,
                       bio: e.target.innerText,
-                    })
+                    }),
                   );
                 }}
               >
@@ -361,7 +363,7 @@ export default function AboutMeCard({
                     JSON.stringify({
                       ...curContent,
                       contact: e.target.innerText,
-                    })
+                    }),
                   );
                 }}
               >

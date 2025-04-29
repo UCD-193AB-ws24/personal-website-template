@@ -36,22 +36,22 @@ export const componentMap: Record<
 };
 
 export const componentSizes: Record<string, { width: number; height: number }> =
-{
-  textBlock: { width: 200, height: 150 },
-  sectionTitle: { width: 350, height: 30 },
-  image: { width: 200, height: 150 },
-  file: { width: 425, height: 550 },
-  video: { width: 450, height: 250 },
-  navBar: { width: 100000, height: 48 },
-  academicEntry: { width: 620, height: 70 },
-  webPage: { width: 800, height: 600 },
-  workEntry: { width: 750, height: 150 },
-  horizontalLine: { width: 350, height: 2 },
-  verticalLine: { width: 2, height: 350 },
-  icon: { width: 100, height: 100 },
-  aboutMeCard: { width: 600, height: 70 },
-  projectCard: { width: 100000, height: 200 },
-};
+  {
+    textBlock: { width: 200, height: 150 },
+    sectionTitle: { width: 350, height: 30 },
+    image: { width: 200, height: 150 },
+    file: { width: 425, height: 550 },
+    video: { width: 450, height: 250 },
+    navBar: { width: 100000, height: 48 },
+    academicEntry: { width: 620, height: 70 },
+    webPage: { width: 800, height: 600 },
+    workEntry: { width: 750, height: 150 },
+    horizontalLine: { width: 350, height: 2 },
+    verticalLine: { width: 2, height: 350 },
+    icon: { width: 100, height: 100 },
+    aboutMeCard: { width: 600, height: 70 },
+    projectCard: { width: 100000, height: 200 },
+  };
 
 export const renderOverlayContent = (activeType: string | null) => {
   switch (activeType) {
@@ -78,11 +78,11 @@ export const renderOverlayContent = (activeType: string | null) => {
     case "verticalLine":
       return <VerticalLine />;
     case "aboutMeCard":
-      return <AboutMeCard />
+      return <AboutMeCard />;
     case "icon":
       return <IconComponent />;
     case "aboutMeCard":
-      return <AboutMeCard />
+      return <AboutMeCard />;
     case "projectCard":
       return <ProjectCard />;
     default:
