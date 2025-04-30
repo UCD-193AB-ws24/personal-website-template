@@ -263,6 +263,7 @@ export default function SavedDrafts() {
         <div className="flex gap-10">
           <p className="text-2xl sm:text-5xl"> Saved Drafts </p>
           <button
+            data-testid="new-draft-btn"
             onClick={() => {
               setIsModalHidden(false);
               handleNewDraft();
@@ -273,6 +274,7 @@ export default function SavedDrafts() {
           </button>
 
           <button
+            data-testid="select-template-btn"
             onClick={() => router.push("/templates")}
             className="bg-[#f08700] hover:bg-[#d67900] transition duration-300 text-white font-bold py-2 px-4 rounded-md border-none text-[#111827]"
           >
