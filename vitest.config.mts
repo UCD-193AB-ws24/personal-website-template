@@ -19,6 +19,4 @@ export default defineConfig({
     }
   },
 
-  // Uncomment below if needed:
-  // tsconfig: './tsconfig.vitest.json'
 })
