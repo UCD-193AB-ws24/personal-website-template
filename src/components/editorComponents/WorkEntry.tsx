@@ -88,7 +88,6 @@ export default function WorkEntry({
         top: position.y,
         width: size.width,
         height: size.height,
-        padding: `${GRID_SIZE}px`,
       }}
       className="flex w-full h-full justify-between whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg gap-[50px]"
     >
@@ -172,7 +171,7 @@ export default function WorkEntry({
         <div
           onMouseEnter={() => setShowOverlay(false)} // remove overlay when interacting with iframe
           onMouseDown={(e) => e.stopPropagation()} // capture mouse movements
-          className="cursor-default"
+          className="w-full h-full cursor-default"
         >
           <div
             className="flex w-full h-full justify-between whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg gap-[50px]"
