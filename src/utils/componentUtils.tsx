@@ -48,7 +48,7 @@ export const componentSizes: Record<string, { width: number; height: number }> =
   workEntry: { width: 750, height: 150 },
   horizontalLine: { width: 350, height: 2 },
   verticalLine: { width: 2, height: 350 },
-  icon: { width: 100, height: 100 },
+  icon: { width: 50, height: 50 },
   aboutMeCard: { width: 600, height: 70 },
   projectCard: { width: 100000, height: 200 },
 };
@@ -58,7 +58,7 @@ export const renderOverlayContent = (activeType: string | null) => {
     case "textBlock":
       return <DraggableResizableTextbox isDragOverlay={true} />;
     case "sectionTitle":
-      return <SectionTitleTextbox />;
+      return <SectionTitleTextbox isDragOverlay={true} />;
     case "navBar":
       return <NavigationBar />;
     case "image":
@@ -80,7 +80,7 @@ export const renderOverlayContent = (activeType: string | null) => {
     case "aboutMeCard":
       return <AboutMeCard />
     case "icon":
-      return <IconComponent />;
+      return <IconComponent isDragOverlay={true} />;
     case "aboutMeCard":
       return <AboutMeCard />
     case "projectCard":
