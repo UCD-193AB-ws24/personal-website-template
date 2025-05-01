@@ -56,7 +56,7 @@ export const componentSizes: Record<string, { width: number; height: number }> =
 export const renderOverlayContent = (activeType: string | null) => {
   switch (activeType) {
     case "textBlock":
-      return <DraggableResizableTextbox />;
+      return <DraggableResizableTextbox isDragOverlay={true} />;
     case "sectionTitle":
       return <SectionTitleTextbox />;
     case "navBar":
