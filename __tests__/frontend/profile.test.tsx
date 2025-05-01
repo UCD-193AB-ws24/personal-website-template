@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import Profile from '../src/app/profile/page'
-import Settings from '../src/app/profile/settings/page'
-import { mockRouter } from '../vitest.setup'
+import Profile from '../../src/app/profile/page'
+import Settings from '../../src/app/profile/settings/page'
+import { mockRouter } from '../../vitest.setup'
 import { expect, test } from 'vitest';
 
 let calls = 0
