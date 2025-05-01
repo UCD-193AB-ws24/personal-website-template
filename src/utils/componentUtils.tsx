@@ -60,7 +60,7 @@ export const renderOverlayContent = (activeType: string | null) => {
     case "sectionTitle":
       return <SectionTitleTextbox isDragOverlay={true} />;
     case "navBar":
-      return <NavigationBar />;
+      return <NavigationBar isDragOverlay={true} />;
     case "image":
       return <ImageComponent />;
     case "file":
@@ -84,7 +84,7 @@ export const renderOverlayContent = (activeType: string | null) => {
     case "aboutMeCard":
       return <AboutMeCard />
     case "projectCard":
-      return <ProjectCard />;
+      return <ProjectCard isDragOverlay={true} />;
     default:
       return null;
   }
