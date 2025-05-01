@@ -634,9 +634,9 @@ export default function Editor() {
                   ref={scrollContainerRef}
                   style={{
                     marginTop: "64px",
-                    marginLeft: "256px",
+                    marginLeft: "16rem",
                     height: `calc(100vh - 64px)`, // full height minus top bar
-                    width: `calc(100vw - 256px)`, // full width minus sidebar
+                    width: `calc(100vw - 16rem)`, // full width minus sidebar
                   }}
                 >
                   <EditorDropZone
