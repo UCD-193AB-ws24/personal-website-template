@@ -4,7 +4,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Rnd } from "react-rnd";
 import { useSearchParams } from "next/navigation";
-import { XIcon } from "lucide-react";
+import { ArrowLeftToLine, ArrowRightToLine, XIcon } from "lucide-react";
 
 import ActiveOutlineContainer from "@components/editorComponents/ActiveOutlineContainer";
 import ImageCard from "./ImageCard";
@@ -52,6 +52,7 @@ interface ProjectCardProps {
   isPreview?: boolean;
   isMobilePreview?: boolean;
   isPublish?: boolean;
+  isDragOverlay?: boolean;
 }
 
 export default function ProjectCard({
@@ -67,6 +68,7 @@ export default function ProjectCard({
   isPreview = false,
   isMobilePreview = false,
   isPublish = false,
+  isDragOverlay = false,
 }: ProjectCardProps) {
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
@@ -176,6 +178,21 @@ export default function ProjectCard({
     e.stopPropagation();
     onMouseDown?.();
   };
+
+  if (isDragOverlay) {
+    return <div className="w-[400px] h-[200px] flex justify-between items-center gap-2">
+      <ArrowLeftToLine size={24} color="gray" />
+      <div className="relative w-full h-full bg-gray-100 flex justify-end items-center p-1 outline outline-2 outline-blue-500">
+        <div className="absolute top-2 right-4 px-3 py-1 bg-blue-600 text-white text-sm rounded shadow">
+          Add Text Card
+        </div>
+        <div className="absolute top-10 right-4 px-3 py-1 bg-green-600 text-white text-sm rounded shadow">
+          Add Image Card
+        </div>
+      </div>
+      <ArrowRightToLine size={24} color="gray" />
+    </div>
+  }
 
   if (isPreview || isPublish) {
     return (

@@ -36,12 +36,13 @@ interface SectionTitleProps {
   onMouseDown?: () => void;
   setIsDragging?: (dragging: boolean) => void;
   isPreview?: boolean;
+  isDragOverlay?: boolean;
 }
 
 export default function SectionTitleTextbox({
   id = "",
   initialPos = { x: -1, y: -1 },
-  initialSize = { width: 350, height: 40 },
+  initialSize = { width: 350, height: 30 },
   components = [],
   content = '{"root":{"children":[{"children":[{"detail":0,"format":1,"mode":"normal","style":"","text":"Type section title here...","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"heading","version":1,"tag":"h1"}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}',
   updateComponent = () => { },
@@ -49,6 +50,7 @@ export default function SectionTitleTextbox({
   onMouseDown: onMouseDown = () => { },
   setIsDragging = () => { },
   isPreview = false,
+  isDragOverlay = false,
 }: SectionTitleProps) {
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
@@ -83,6 +85,17 @@ export default function SectionTitleTextbox({
     setData(newData);
     updateComponent(id, position, size, newData);
   };
+
+  if (isDragOverlay) {
+    return <div
+      style={{
+        width: size.width,
+        height: size.height,
+      }}
+      className="outline outline-2 outline-blue-500"
+    >
+    </div>
+  }
 
   return isPreview ? (
     <div
