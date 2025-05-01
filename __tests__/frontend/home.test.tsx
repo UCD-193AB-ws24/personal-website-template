@@ -1,6 +1,6 @@
-import { render, screen, fireEvent } from '@testing-library/react'
-import Home from '../../src/app/page'
-import { mockRouter } from '../../vitest.setup'
+import { render, screen, fireEvent } from '@testing-library/react';
+import Home from '../../src/app/page';
+import { mockRouter } from '../../vitest.setup';
 import { expect, test } from 'vitest';
 
 test('testing new draft buttons', () => {

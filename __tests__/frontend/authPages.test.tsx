@@ -1,6 +1,6 @@
-import { render, screen, fireEvent } from '@testing-library/react'
-import LogInForm from '../../src/app/login/loginForm'
-import SignUpForm from '../../src/app/signup/signupForm'
+import { render, screen } from '@testing-library/react';
+import LogInForm from '../../src/app/login/loginForm';
+import SignUpForm from '../../src/app/signup/signupForm';
 
 import { expect, test } from 'vitest';
 

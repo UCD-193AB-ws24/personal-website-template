@@ -1,6 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react'
-import Templates from '../../src/app/setupdraft/page'
-import { mockRouter } from '../../vitest.setup'
+import { render, screen } from '@testing-library/react';
+import Templates from '../../src/app/setupdraft/page';
 import { expect, test } from 'vitest';
 
 

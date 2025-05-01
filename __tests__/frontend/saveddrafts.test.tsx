@@ -1,6 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react'
-import SavedDrafts from '../../src/app/saveddrafts/page'
-import { mockRouter } from '../../vitest.setup'
+import { render, screen } from '@testing-library/react';
+import SavedDrafts from '../../src/app/saveddrafts/page';
 import { expect, test } from 'vitest';
 
 test('testing buttons are there', () => {
