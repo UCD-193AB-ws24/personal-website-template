@@ -94,7 +94,7 @@ export default function DraggableResizableTextbox({
         width: size.width,
         height: size.height,
       }}
-      className="whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg leading-none rounded"
+      className="whitespace-pre-wrap bg-transparent resize-none text-lg leading-none rounded"
     >
       <LexicalComposer initialConfig={RichTextInitialConfig}>
         <div
