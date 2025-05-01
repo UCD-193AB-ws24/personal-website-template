@@ -36,7 +36,7 @@ interface WebPageComponent {
 export default function WebPageComponent({
   id = "",
   initialPos = { x: -1, y: -1 },
-  initialSize = { width: 225, height: 125 },
+  initialSize = { width: 500, height: 300 },
   components = [],
   content = "",
   updateComponent = () => {},
