@@ -23,8 +23,8 @@ describe('GET /api/user/get-drafts', () => {
     const mockUser = { uid: 'abc123' };
     const mockDraftMappings = ['draft1', 'draft2'];
 
-    (getCurrentUser as vi.Mock).mockResolvedValue(mockUser);
-    (db.get as vi.Mock).mockResolvedValue({
+    (getCurrentUser as Mock).mockResolvedValue(mockUser);
+    (db.get as Mock).mockResolvedValue({
       exists: true,
       data: () => ({ draftMappings: mockDraftMappings }),
     });
@@ -40,7 +40,7 @@ describe('GET /api/user/get-drafts', () => {
   });
 
   it('returns 400 if user not found', async () => {
-    (getCurrentUser as vi.Mock).mockResolvedValue(null);
+    (getCurrentUser as Mock).mockResolvedValue(null);
 
     const response = await GET();
     const json = await response.json();
@@ -53,8 +53,8 @@ describe('GET /api/user/get-drafts', () => {
   it('returns 400 if user doc does not exist', async () => {
     const mockUser = { uid: 'abc123' };
 
-    (getCurrentUser as vi.Mock).mockResolvedValue(mockUser);
-    (db.get as vi.Mock).mockResolvedValue({ exists: false });
+    (getCurrentUser as Mock).mockResolvedValue(mockUser);
+    (db.get as Mock).mockResolvedValue({ exists: false });
 
     const response = await GET();
     const json = await response.json();
