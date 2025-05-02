@@ -68,11 +68,11 @@ export const renderOverlayContent = (activeType: string | null) => {
     case "video":
       return <VideoComponent />;
     case "academicEntry":
-      return <AcademicEntry />;
+      return <AcademicEntry isDragOverlay={true} />;
     case "webPage":
       return <WebPageComponent />;
     case "workEntry":
-      return <WorkEntry />;
+      return <WorkEntry isDragOverlay={true} />;
     case "horizontalLine":
       return <HorizontalLine />;
     case "verticalLine":

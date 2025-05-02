@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Rnd } from "react-rnd";
 
 import ActiveOutlineContainer from "@components/editorComponents/ActiveOutlineContainer";
@@ -36,12 +36,13 @@ interface WorkEntryProps {
   onMouseDown?: () => void;
   setIsDragging?: (dragging: boolean) => void;
   isPreview?: boolean;
+  isDragOverlay?: boolean;
 }
 
 export default function WorkEntry({
   id = "",
   initialPos = { x: -1, y: -1 },
-  initialSize = { width: 200, height: 50 },
+  initialSize = { width: 620, height: 120 },
   components = [],
   content = '{"root":{"children":[{"children":[{"detail":0,"format":1,"mode":"normal","style":"font-size: 24px;","text":"Company","type":"text","version":1},{"detail":0,"format":1,"mode":"normal","style":"","text":"                                                                  ","type":"text","version":1},{"detail":0,"format":0,"mode":"normal","style":"","text":"Jan 20XX - Dec 20XX","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":1,"textStyle":"font-size: 24px;"},{"children":[{"detail":0,"format":2,"mode":"normal","style":"","text":"Job Title","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":2,"textStyle":""},{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Work Detail 1","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"listitem","version":1,"value":1},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Work Detail 2","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"listitem","version":1,"value":2}],"direction":"ltr","format":"","indent":0,"type":"list","version":1,"listType":"bullet","start":1,"tag":"ul"}],"direction":"ltr","format":"","indent":0,"type":"root","version":1,"textStyle":"font-size: 24px;"}}',
   updateComponent = () => { },
@@ -49,6 +50,7 @@ export default function WorkEntry({
   onMouseDown: onMouseDown = () => { },
   setIsDragging = () => { },
   isPreview = false,
+  isDragOverlay = false,
 }: WorkEntryProps) {
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
@@ -110,7 +112,7 @@ export default function WorkEntry({
     </div>
   ) : (
     <LexicalComposer initialConfig={RichTextInitialConfig}>
-      {isActive && (
+      {isActive && !isDragOverlay && (
         <RichTextToolbarPlugin updateBackgroundColor={updateBackgroundColor} />
       )}
       <Rnd

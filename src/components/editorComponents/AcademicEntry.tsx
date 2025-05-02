@@ -36,12 +36,13 @@ interface AcademicEntryProps {
   onMouseDown?: () => void;
   setIsDragging?: (dragging: boolean) => void;
   isPreview?: boolean;
+  isDragOverlay?: boolean;
 }
 
 export default function AcademicEntry({
   id = "",
   initialPos = { x: -1, y: -1 },
-  initialSize = { width: 200, height: 50 },
+  initialSize = { width: 620, height: 60 },
   components = [],
   content = '{"root":{"children":[{"children":[{"detail":0,"format":1,"mode":"normal","style":"font-size: 24px;","text":"School","type":"text","version":1},{"detail":0,"format":1,"mode":"normal","style":"","text":"                                                                        ","type":"text","version":1},{"detail":0,"format":0,"mode":"normal","style":"","text":"Jan 20XX - Dec 20XX","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":1,"textStyle":"font-size: 24px;"},{"children":[{"detail":0,"format":2,"mode":"normal","style":"","text":"Degree","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""}],"direction":"ltr","format":"","indent":0,"type":"root","version":1,"textFormat":1,"textStyle":"font-size: 24px;"}}',
   updateComponent = () => { },
@@ -49,6 +50,7 @@ export default function AcademicEntry({
   onMouseDown: onMouseDown = () => { },
   setIsDragging = () => { },
   isPreview = false,
+  isDragOverlay = false,
 }: AcademicEntryProps) {
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
@@ -110,7 +112,7 @@ export default function AcademicEntry({
     </div>
   ) : (
     <LexicalComposer initialConfig={RichTextInitialConfig}>
-      {isActive && (
+      {isActive && !isDragOverlay && (
         <RichTextToolbarPlugin updateBackgroundColor={updateBackgroundColor} />
       )}
       <Rnd
