@@ -584,7 +584,7 @@ export default function Editor() {
         <PagesContextProvider pages={pages}>
           <EditorContextProvider handleSwitchPage={handleSwitchPage}>
             <DndContext
-              modifiers={[restrictToWindowEdges, snapCenterToCursor]}
+              modifiers={[snapCenterToCursor]}
               onDragStart={handleDragStart}
               onDragEnd={handleDragEnd}
               onDragMove={handleDragMove}
@@ -718,7 +718,10 @@ export default function Editor() {
                   <ArrowUpIcon size={24} />
                 </button>
               )}
-              <DragOverlay className="z-[10000]">
+              <DragOverlay
+                className="z-[10000]"
+                modifiers={[restrictToWindowEdges]}
+              >
                 {renderOverlayContent(activeComponent?.type || null)}
               </DragOverlay>
             </DndContext>
