@@ -153,7 +153,7 @@ export default function AcademicEntry({
       >
         <ActiveOutlineContainer isActive={isActive}>
           <div
-            className="w-full h-full"
+            className="w-full h-full rounded"
             style={{ backgroundColor: data.backgroundColor || "transparent" }}
           >
 

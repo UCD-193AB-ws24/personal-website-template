@@ -92,7 +92,7 @@ export default function SectionTitleTextbox({
         width: size.width,
         height: size.height,
       }}
-      className="outline outline-2 outline-blue-500"
+      className="rounded outline outline-2 outline-blue-500"
     >
     </div>
   }
@@ -109,7 +109,7 @@ export default function SectionTitleTextbox({
     >
       <LexicalComposer initialConfig={RichTextInitialConfig}>
         <div
-          className={"w-full h-full  rounded"}
+          className={"w-full h-full rounded"}
           style={{ backgroundColor: data.backgroundColor || "transparent" }}
         >
           <RichTextbox
@@ -175,7 +175,7 @@ export default function SectionTitleTextbox({
       >
         <ActiveOutlineContainer isActive={isActive}>
           <div
-            className="w-full h-full"
+            className="w-full h-full rounded"
             style={{ backgroundColor: data.backgroundColor || "transparent" }}
           >
 
