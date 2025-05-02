@@ -101,15 +101,24 @@ export default function RichTextLinks({
               if (element && dropzone) {
                 const elementRect = element.getBoundingClientRect();
                 const dropzoneRect = dropzone.getBoundingClientRect();
+
+                // When text wraps, the element.offsetLeft property doesn't return
+                // the leftmost edge
+                // The elementRect.left property does return the leftmost edge
+                const offsetParent = element.offsetParent;
+                const trueOffsetLeft =
+                  elementRect.left - offsetParent!.getBoundingClientRect().left;
+
                 if (elementRect.left + linkEditorWidth > dropzoneRect.right) {
+                  const overflowX =
+                    elementRect.left + linkEditorWidth - dropzoneRect.right;
                   setLinkEditorPosition({
-                    x:
-                      dropzoneRect.right - (elementRect.left + linkEditorWidth),
+                    x: trueOffsetLeft - overflowX,
                     y: element.offsetTop + element.offsetHeight + 4,
                   });
                 } else {
                   setLinkEditorPosition({
-                    x: element.offsetLeft,
+                    x: trueOffsetLeft,
                     y: element.offsetTop + element.offsetHeight + 4,
                   });
                 }
@@ -180,7 +189,8 @@ export default function RichTextLinks({
                     const urlFriendlyPageName = encodeURIComponent(
                       linkParentURL.replace(/ /g, "-"),
                     );
-                    const redirectPath = getPublishedRedirectPath(urlFriendlyPageName);
+                    const redirectPath =
+                      getPublishedRedirectPath(urlFriendlyPageName);
                     router.push(redirectPath);
                     return true;
                   } else {
@@ -220,15 +230,17 @@ export default function RichTextLinks({
     const pagesIdx = pathParts.indexOf("pages");
     const usernameIdx = pagesIdx + 1;
     if (pagesIdx === -1 || usernameIdx >= pathParts.length) {
-      console.error("Relative link is used in a published context that doesn't follow the /pages/username convention");
+      console.error(
+        "Relative link is used in a published context that doesn't follow the /pages/username convention",
+      );
       return "";
     }
-    
+
     const redirectPathParts = pathParts.slice(0, usernameIdx + 1);
     redirectPathParts.push(pageName);
 
     return redirectPathParts.join("/");
-  }
+  };
 
   const updateLink = () => {
     if (
@@ -257,7 +269,7 @@ export default function RichTextLinks({
         }
       });
     }
-  }
+  };
 
   return (
     <div
@@ -281,7 +293,7 @@ export default function RichTextLinks({
           }}
           onKeyUp={(e) => {
             // Enter key pressed
-            if (e.key === "Enter" || e.keyCode === 13) {
+            if (e.key === "Enter") {
               updateLink();
             }
           }}
@@ -299,7 +311,7 @@ export default function RichTextLinks({
           }}
           onKeyUp={(e) => {
             // Enter key is pressed
-            if (e.key === "Enter" || e.keyCode === 13) {
+            if (e.key === "Enter") {
               updateLink();
             }
           }}
@@ -307,7 +319,9 @@ export default function RichTextLinks({
       </div>
       <button
         className="text-sm text-blue-500 font-bold ml-[16px]"
-        onClick={() => {updateLink()}}
+        onClick={() => {
+          updateLink();
+        }}
       >
         Apply
       </button>

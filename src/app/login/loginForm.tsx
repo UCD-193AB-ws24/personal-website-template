@@ -81,6 +81,7 @@ export default function LogInForm() {
         {/* Google Sign-In Button */}
         <div className="flex flex-col items-center gap-2 mt-4">
           <button
+            data-testid="log-in-btn"
             onClick={handleSignInWithGoogle}
             className="flex items-center w-full max-w-xs px-4 py-3 bg-white border border-gray-300 rounded-md shadow-md transition duration-300 hover:bg-gray-100 focus:outline-none"
           >
@@ -106,7 +107,10 @@ export default function LogInForm() {
         </div>
 
         <Link href="/signup" className="flex justify-center">
-          <button className="relative px-6 py-3 font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#f08700] hover:text-black shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50">
+          <button
+            data-testid="log-in-btn"
+            className="relative px-6 py-3 font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#f08700] hover:text-black shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50"
+          >
             <div className="text-center">
               <div className="-mt-1 font-sans text-lg font-semibold">
                 Sign Up

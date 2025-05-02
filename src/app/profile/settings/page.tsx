@@ -7,7 +7,10 @@ import { toastError } from "@components/toasts/ErrorToast";
 import { toastSuccess } from "@components/toasts/SuccessToast";
 import { changeUsername } from "@lib/requests/changeUsername";
 import { fetchUsername } from "@lib/requests/fetchUsername";
-import { auth } from "@lib/firebase/firebaseApp";
+// import { auth } from "@lib/firebase/firebaseApp";
+import { getFirebaseAuth } from "@lib/firebase/firebaseApp";
+const auth = getFirebaseAuth();
+
 import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { ToastContainer } from "react-toastify";

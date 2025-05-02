@@ -1,7 +1,9 @@
 "use client";
-
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@lib/firebase/firebaseApp";
+// import { auth } from "@lib/firebase/firebaseApp";
+import { getFirebaseAuth } from "@lib/firebase/firebaseApp";
+const auth = getFirebaseAuth();
+
 import { signUserOut } from "@lib/firebase/auth";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -183,6 +185,7 @@ export default function SetupDraft() {
 
                 <div className="flex justify-center mt-16">
                   <button
+                    data-testid="new-draft-btn"
                     onClick={() => {
                       if (!user) {
                         router.push("/login");
@@ -215,6 +218,7 @@ export default function SetupDraft() {
 
                 <div className="flex justify-center mt-16">
                   <button
+                    data-testid="select-template-btn"
                     onClick={() => {
                       setIsModalHidden(false);
                       handleNewDraft();

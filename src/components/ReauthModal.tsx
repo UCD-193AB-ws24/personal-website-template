@@ -6,7 +6,10 @@ import {
   DialogPanel,
   DialogTitle,
 } from "@headlessui/react";
-import { auth } from "@lib/firebase/firebaseApp";
+// import { auth } from "@lib/firebase/firebaseApp";
+import { getFirebaseAuth } from "@lib/firebase/firebaseApp";
+const auth = getFirebaseAuth();
+
 import { LogIn } from "lucide-react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useEffect, useState } from "react";

@@ -1,16 +1,18 @@
 import { listAll, ref, deleteObject } from "firebase/storage";
-import { storage } from "@lib/firebase/firebaseApp";
+// import { storage } from "@lib/firebase/firebaseApp";
+import { getFirebaseStorage } from "@lib/firebase/firebaseApp";
+const storage = getFirebaseStorage();
 
 // Fetches all files stored in Firebase for the draft
 // and determines which files are still referenced in the draft's components.
 const fetchStoredAndReferencedFiles = async (
   userId: string,
   draftNumber: string,
-  pages: any[]
+  pages: any[],
 ) => {
   const draftStorageRef = ref(
     storage,
-    `users/${userId}/drafts/${draftNumber}/`
+    `users/${userId}/drafts/${draftNumber}/`,
   );
 
   const storedFiles = await listAll(draftStorageRef);
@@ -22,8 +24,8 @@ const fetchStoredAndReferencedFiles = async (
       return decodeURIComponent(
         url.pathname.replace(
           `/v0/b/${storage.app.options.storageBucket}/o/`,
-          ""
-        )
+          "",
+        ),
       );
     } catch {
       return null;
@@ -38,41 +40,40 @@ const fetchStoredAndReferencedFiles = async (
             (comp.type === "image" ||
               comp.type === "file" ||
               comp.type === "aboutMeCard" ||
-              comp.type === "projectCard"
-            ) &&
+              comp.type === "projectCard") &&
             comp.content,
         )
         .flatMap((comp: any) => {
-        try {
-          if (comp.type === "aboutMeCard") {
-            const parsed = JSON.parse(comp.content);
-            return parsed.image
-              ? [getStoragePathFromUrl(parsed.image)]
-              : [];
+          try {
+            if (comp.type === "aboutMeCard") {
+              return comp.content
+                ? [getStoragePathFromUrl(comp.content.image)]
+                : [];
+            }
+
+            if (comp.type === "projectCard") {
+              const cards = JSON.parse(comp.content);
+              return cards
+                .filter((card: any) => card.type === "image" && card.imageUrl)
+                .map((card: any) => getStoragePathFromUrl(card.imageUrl));
+            }
+
+            if (comp.type === "image") {
+              const imageUrl =
+                typeof comp.content === "string"
+                  ? comp.content
+                  : comp.content?.image;
+
+              return imageUrl ? [getStoragePathFromUrl(imageUrl)] : [];
+            }
+
+            // default for image or file: content is a string URL
+            return [getStoragePathFromUrl(comp.content)];
+          } catch {
+            return [];
           }
-
-          if (comp.type === "projectCard") {
-            const cards = JSON.parse(comp.content);
-            return cards
-              .filter((card: any) => card.type === "image" && card.imageUrl)
-              .map((card: any) => getStoragePathFromUrl(card.imageUrl));
-          }
-
-          if (comp.type === "image") {
-            const imageUrl = typeof comp.content === "string"
-              ? comp.content
-              : comp.content?.image;
-
-            return imageUrl ? [getStoragePathFromUrl(imageUrl)] : [];
-          }
-
-          // default for image or file: content is a string URL
-          return [getStoragePathFromUrl(comp.content)];
-        } catch {
-          return [];
-        }
-      })
-    )
+        }),
+    ),
   );
 
   return { storedImagePaths, activeImagePaths };
@@ -81,7 +82,7 @@ const fetchStoredAndReferencedFiles = async (
 export const deleteUnusedDraftFiles = async (
   userId: string,
   draftNumber: string,
-  updatedPages: any[]
+  updatedPages: any[],
 ) => {
   try {
     const { storedImagePaths, activeImagePaths } =
@@ -89,7 +90,7 @@ export const deleteUnusedDraftFiles = async (
 
     // Find images that are stored but NOT referenced in components
     const unusedImages = storedImagePaths.filter(
-      (path) => !activeImagePaths.has(path)
+      (path) => !activeImagePaths.has(path),
     );
 
     if (unusedImages.length === 0) return;
@@ -99,9 +100,9 @@ export const deleteUnusedDraftFiles = async (
       unusedImages.map(async (path) => {
         const imageRef = ref(storage, path);
         await deleteObject(imageRef).catch((error) =>
-          console.error("Error deleting image:", error)
+          console.error("Error deleting image:", error),
         );
-      })
+      }),
     );
   } catch (error) {
     console.error("Failed to delete unused draft images:", error);
