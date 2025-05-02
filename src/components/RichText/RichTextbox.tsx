@@ -78,9 +78,13 @@ export default function RichTextbox({
               className="h-full resize-none outline-0 bg-transparent"
               aria-placeholder={"Enter some text..."}
               placeholder={
-                <div className="absolute top-0 left-0 text-[#999999]">
-                  Enter some text...
-                </div>
+                isPreview ? (
+                  <></>
+                ) : (
+                  <div className="absolute top-0 left-0 text-[#999999] pointer-events-none">
+                    Enter some text...
+                  </div>
+                )
               }
             />
           }

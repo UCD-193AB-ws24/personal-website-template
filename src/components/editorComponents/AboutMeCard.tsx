@@ -46,7 +46,7 @@ interface AboutMeCardProps {
 export default function AboutMeCard({
   id = "",
   initialPos = { x: -1, y: -1 },
-  initialSize = { width: 250, height: 250 },
+  initialSize = { width: 630, height: 215 },
   components = [],
   content = "",
   updateComponent = () => {},
