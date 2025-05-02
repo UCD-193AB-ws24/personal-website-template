@@ -17,7 +17,11 @@ import type {
 
 import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
 import { GRID_SIZE, MAX_FILE_SIZE } from "@utils/constants";
-import { auth, storage } from "@lib/firebase/firebaseApp";
+
+// import { auth, storage } from "@lib/firebase/firebaseApp";
+import { getFirebaseAuth, getFirebaseStorage } from "@lib/firebase/firebaseApp";
+const auth = getFirebaseAuth();
+const storage = getFirebaseStorage();
 import RichTextbox from "@components/RichText/RichTextbox";
 import RichTextToolbarPlugin from "@components/RichText/Plugins/RichTextToolbar";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
@@ -35,7 +39,7 @@ interface AboutMeCardProps {
     id: string,
     newPos: Position,
     newSize: Size,
-    content?: any
+    content?: any,
   ) => void;
   isActive?: boolean;
   onMouseDown?: () => void;
@@ -145,7 +149,8 @@ export default function AboutMeCard({
     if (!file) return;
 
     if (file.size > MAX_FILE_SIZE) {
-      toastError("Image size exceeds 5MB. Please upload a smaller image.");
+      toastError(
+          "Image size exceeds 5MB. Please upload a smaller image.");
       return;
     }
 

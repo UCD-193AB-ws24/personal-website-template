@@ -1,7 +1,7 @@
 // Taken from https://github.com/facebook/lexical/blob/0ce1a9041163216385e97f31b5e510f8e8411937/packages/lexical-playground/src/utils/getSelectedNode.ts#L11C8-L27C2
 
-import {$isAtNodeEnd} from '@lexical/selection';
-import {ElementNode, RangeSelection, TextNode} from 'lexical';
+import { $isAtNodeEnd } from "@lexical/selection";
+import { ElementNode, RangeSelection, TextNode } from "lexical";
 
 export function getSelectedNode(
   selection: RangeSelection,

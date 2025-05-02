@@ -16,9 +16,7 @@ import { GRID_SIZE } from "@utils/constants";
 import RichTextbox from "@components/RichText/RichTextbox";
 import RichTextToolbarPlugin from "@components/RichText/Plugins/RichTextToolbar";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import {
-  RichTextInitialConfig,
-} from "@components/RichText/RichTextSettings";
+import { RichTextInitialConfig } from "@components/RichText/RichTextSettings";
 
 interface SectionTitleProps {
   id?: string;
@@ -45,10 +43,10 @@ export default function SectionTitleTextbox({
   initialSize = { width: 350, height: 30 },
   components = [],
   content = '{"root":{"children":[{"children":[{"detail":0,"format":1,"mode":"normal","style":"","text":"Type section title here...","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"heading","version":1,"tag":"h1"}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}',
-  updateComponent = () => { },
+  updateComponent = () => {},
   isActive = true,
-  onMouseDown: onMouseDown = () => { },
-  setIsDragging = () => { },
+  onMouseDown: onMouseDown = () => {},
+  setIsDragging = () => {},
   isPreview = false,
   isDragOverlay = false,
 }: SectionTitleProps) {
@@ -146,13 +144,13 @@ export default function SectionTitleTextbox({
         onResizeStart={() => setIsDragging(true)}
         onResizeStop={(e, d, ref, delta, newPosition) => {
           setIsDragging(false);
-          handleResizeStop(id, components, updateComponent, setSize, setPosition)(
-            e,
-            d,
-            ref,
-            delta,
-            newPosition,
-          );
+          handleResizeStop(
+            id,
+            components,
+            updateComponent,
+            setSize,
+            setPosition,
+          )(e, d, ref, delta, newPosition);
         }}
         enableResizing={{
           top: false,
@@ -178,14 +176,12 @@ export default function SectionTitleTextbox({
             className="w-full h-full rounded"
             style={{ backgroundColor: data.backgroundColor || "transparent" }}
           >
-
             {/* Overlay for enabling drag */}
             {(showOverlay || !isActive) && (
               <div
                 className="w-full h-full flex items-center justify-center absolute inset-0 z-10"
                 onMouseDown={() => setShowOverlay(true)}
-              >
-              </div>
+              ></div>
             )}
 
             <div

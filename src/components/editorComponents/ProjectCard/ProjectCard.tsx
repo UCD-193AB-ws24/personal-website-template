@@ -20,9 +20,13 @@ import { GRID_SIZE } from "@utils/constants";
 import useIsMobile from "@lib/hooks/useIsMobile";
 
 import RichTextbox from "@components/RichText/RichTextbox";
-import RichTextToolbarPlugin from '@components/RichText/Plugins/RichTextToolbar';
-import { LexicalComposer } from '@lexical/react/LexicalComposer';
-import { RichTextInitialConfig, RichTextDefaultContent, HeaderRichTextDefaultContent } from "@components/RichText/RichTextSettings";
+import RichTextToolbarPlugin from "@components/RichText/Plugins/RichTextToolbar";
+import { LexicalComposer } from "@lexical/react/LexicalComposer";
+import {
+  RichTextInitialConfig,
+  RichTextDefaultContent,
+  HeaderRichTextDefaultContent,
+} from "@components/RichText/RichTextSettings";
 
 interface ProjectCardContent {
   id: number;
@@ -62,10 +66,10 @@ export default function ProjectCard({
   initialSize = { width: 200, height: 100 },
   components = [],
   content = "",
-  updateComponent = () => { },
+  updateComponent = () => {},
   isActive = true,
-  onMouseDown: onMouseDown = () => { },
-  setIsDragging = () => { },
+  onMouseDown: onMouseDown = () => {},
+  setIsDragging = () => {},
   isPreview = false,
   isMobilePreview = false,
   isPublish = false,
@@ -80,9 +84,12 @@ export default function ProjectCard({
   const [previewSrcs, setPreviewSrcs] = useState<Record<number, string>>({});
   const isMobile = useIsMobile();
   const [showOverlay, setShowOverlay] = useState(false);
-  const [selectedTitleCardId, setSelectedTitleCardId] = useState<number | null>(null);
-  const [selectedBodyCardId, setSelectedBodyCardId] = useState<number | null>(null);
-
+  const [selectedTitleCardId, setSelectedTitleCardId] = useState<number | null>(
+    null,
+  );
+  const [selectedBodyCardId, setSelectedBodyCardId] = useState<number | null>(
+    null,
+  );
 
   const draftNumber = useSearchParams().get("draftNumber");
 
@@ -105,7 +112,9 @@ export default function ProjectCard({
     // Get all non-image card DOM nodes
     const nonImageCardHeights = Object.entries(cardRefs.current)
       .filter(([cardId]) => {
-        const matchingCard = cards.find((card) => card.id.toString() === cardId);
+        const matchingCard = cards.find(
+          (card) => card.id.toString() === cardId,
+        );
         return matchingCard && matchingCard.type !== "image";
       })
       .map(([_, ref]) => ref?.offsetHeight || 0);
@@ -116,9 +125,7 @@ export default function ProjectCard({
       setSize((prev) => ({ ...prev, height: contentHeight }));
     }
     setMinHeight(contentHeight + 32); // 32 for top and bottom padding
-
   }, [cards, size.height]);
-
 
   useEffect(() => {
     try {
@@ -252,10 +259,11 @@ export default function ProjectCard({
             {cards.map((card) => (
               <div
                 key={card.id}
-                className={`relative ${isMobilePreview
-                  ? "w-full"
-                  : "w-full sm:w-1/2 md:w-[90%] lg:w-1/3 xl:w-1/4"
-                  } flex flex-col border
+                className={`relative ${
+                  isMobilePreview
+                    ? "w-full"
+                    : "w-full sm:w-1/2 md:w-[90%] lg:w-1/3 xl:w-1/4"
+                } flex flex-col border
                   ${card.type === "image" ? "border-none" : "h-fit bg-white rounded shadow"}`}
               >
                 {card.type === "image" ? (
@@ -283,9 +291,7 @@ export default function ProjectCard({
                     </div>
                   </div>
                 ) : (
-                  <div
-                    className="p-4"
-                  >
+                  <div className="p-4">
                     {/* Section Title */}
                     <LexicalComposer initialConfig={RichTextInitialConfig}>
                       <div
@@ -372,14 +378,12 @@ export default function ProjectCard({
       enableResizing={{ top: true, right: false, bottom: true, left: false }}
     >
       <ActiveOutlineContainer isActive={isActive}>
-
         {/* Overlay for enabling drag */}
         {(showOverlay || !isActive) && (
           <div
             className="w-full h-full flex items-center justify-center absolute inset-0 z-10"
             onMouseDown={() => setShowOverlay(true)}
-          >
-          </div>
+          ></div>
         )}
 
         <div
@@ -413,10 +417,11 @@ export default function ProjectCard({
                 <div
                   key={card.id}
                   ref={(el) => void (cardRefs.current[card.id] = el)}
-                  className={`relative ${isMobilePreview
-                    ? "w-full"
-                    : "w-full sm:w-1/2 md:w-[90%] lg:w-1/3 xl:w-1/4"
-                    } flex flex-col border
+                  className={`relative ${
+                    isMobilePreview
+                      ? "w-full"
+                      : "w-full sm:w-1/2 md:w-[90%] lg:w-1/3 xl:w-1/4"
+                  } flex flex-col border
                     ${card.type === "image" && isActive ? "border-gray-300" : "border-transparent"}
                     ${card.type === "image" ? "h-full" : "h-fit bg-white rounded shadow"}`}
                 >
@@ -438,11 +443,13 @@ export default function ProjectCard({
                       previewSrc={previewSrcs[card.id]}
                       draftNumber={draftNumber}
                       onImageUpload={(id, url) => {
-                        const updated = cards.map(c => c.id === id ? { ...c, imageUrl: url } : c);
+                        const updated = cards.map((c) =>
+                          c.id === id ? { ...c, imageUrl: url } : c,
+                        );
                         updateContent(updated);
                       }}
                       setPreviewSrc={(id, url) => {
-                        setPreviewSrcs(prev => {
+                        setPreviewSrcs((prev) => {
                           if (prev[id]) URL.revokeObjectURL(prev[id]);
                           const updated = { ...prev };
                           if (url) updated[id] = url;
@@ -458,20 +465,20 @@ export default function ProjectCard({
                         if (
                           current &&
                           (current.widthPercent !== layout.widthPercent ||
-                            current.positionPercent?.x !== layout.positionPercent.x ||
-                            current.positionPercent?.y !== layout.positionPercent.y)
+                            current.positionPercent?.x !==
+                              layout.positionPercent.x ||
+                            current.positionPercent?.y !==
+                              layout.positionPercent.y)
                         ) {
                           const updated = cards.map((c) =>
-                            c.id === cardId ? { ...c, ...layout } : c
+                            c.id === cardId ? { ...c, ...layout } : c,
                           );
                           updateContent(updated);
                         }
                       }}
                     />
                   ) : (
-                    <div
-                      className="p-4"
-                    >
+                    <div className="p-4">
                       <div
                         onFocus={() => {
                           setSelectedTitleCardId(card.id);
@@ -481,7 +488,8 @@ export default function ProjectCard({
                         {/* Section Title */}
                         <LexicalComposer initialConfig={RichTextInitialConfig}>
                           {isActive && selectedTitleCardId === card.id && (
-                            <div className="fixed left-0 z-[100]"
+                            <div
+                              className="fixed left-0 z-[100]"
                               style={{
                                 top: `-${position.y}px`,
                               }}
@@ -499,7 +507,11 @@ export default function ProjectCard({
                               isPreview={isPreview}
                               textboxState={card.title?.textboxState || HeaderRichTextDefaultContent.textboxState}
                               updateTextboxState={(newState) => {
-                                handleTextCardChange(card.id, "title", newState);
+                                handleTextCardChange(
+                                  card.id,
+                                  "title",
+                                  newState,
+                                );
                               }}
                               isActive={isActive}
                             />
@@ -516,7 +528,8 @@ export default function ProjectCard({
                       >
                         <LexicalComposer initialConfig={RichTextInitialConfig}>
                           {isActive && selectedBodyCardId === card.id && (
-                            <div className="fixed left-0 z-[100]"
+                            <div
+                              className="fixed left-0 z-[100]"
                               style={{
                                 top: `-${position.y}px`,
                               }}

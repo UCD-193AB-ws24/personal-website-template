@@ -82,7 +82,7 @@ export const renderOverlayContent = (activeType: string | null) => {
     case "icon":
       return <IconComponent isDragOverlay={true} />;
     case "aboutMeCard":
-      return <AboutMeCard />
+      return <AboutMeCard />;
     case "projectCard":
       return <ProjectCard isDragOverlay={true} />;
     default:

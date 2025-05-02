@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Get the new username
-		const newUsername = reqJson["newUsername"];
+    const newUsername = reqJson["newUsername"];
 
     // Get the user who sent the request and their uid to get their user document
     const user = await getCurrentUser();
@@ -25,23 +25,25 @@ export async function POST(req: NextRequest) {
       throw new Error("No user found");
     }
 
-		// Check if there exists a user doc with `newUsername` as their username
-		const newUsernameQuery = db.collection("users").where("username", "==", newUsername);
-		const snapshot = await newUsernameQuery.get();
-		if (snapshot.docs.length > 0) {
-			// Such a doc exists, so `newUsername` can't be used
-			throw new Error("Username has been taken.")
-		}
+    // Check if there exists a user doc with `newUsername` as their username
+    const newUsernameQuery = db
+      .collection("users")
+      .where("username", "==", newUsername);
+    const snapshot = await newUsernameQuery.get();
+    if (snapshot.docs.length > 0) {
+      // Such a doc exists, so `newUsername` can't be used
+      throw new Error("Username has been taken.");
+    }
 
-		// Change the user's username
+    // Change the user's username
     const userDoc = db.collection("users").doc(user.uid);
-		userDoc.update({
-			username: newUsername
-		})
+    userDoc.update({
+      username: newUsername,
+    });
 
-		// Cache the new username in the session cookie
-		const cookieStore = await cookies();
-		cookieStore.set("username", newUsername, { secure: true });
+    // Cache the new username in the session cookie
+    const cookieStore = await cookies();
+    cookieStore.set("username", newUsername, { secure: true });
 
     return NextResponse.json<APIResponse<string>>({
       success: true,
@@ -54,4 +56,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

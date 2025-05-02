@@ -7,7 +7,11 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 import { toastError } from "@components/toasts/ErrorToast";
 
-import { auth, storage } from "@lib/firebase/firebaseApp";
+// import { auth, storage } from "@lib/firebase/firebaseApp";
+import { getFirebaseAuth, getFirebaseStorage } from "@lib/firebase/firebaseApp";
+const auth = getFirebaseAuth();
+const storage = getFirebaseStorage();
+
 import { GRID_SIZE, MAX_FILE_SIZE } from "@utils/constants";
 
 interface ImageCardProps {
@@ -20,10 +24,13 @@ interface ImageCardProps {
   isActive: boolean;
   widthPercent?: number;
   positionPercent?: { x: number; y: number };
-  onLayoutChange: (cardId: number, layout: {
-    widthPercent: number;
-    positionPercent: { x: number; y: number };
-  }) => void;
+  onLayoutChange: (
+    cardId: number,
+    layout: {
+      widthPercent: number;
+      positionPercent: { x: number; y: number };
+    },
+  ) => void;
 }
 
 export default function ImageCard({
@@ -36,7 +43,7 @@ export default function ImageCard({
   isActive = false,
   widthPercent: initialWidthPercent = 50,
   positionPercent: initialPositionPercent = { x: 0, y: 0 },
-  onLayoutChange = () => { },
+  onLayoutChange = () => {},
 }: ImageCardProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [parentSize, setParentSize] = useState({ width: 1, height: 1 });
@@ -49,9 +56,10 @@ export default function ImageCard({
     }
   }, []);
 
-
   const [widthPercent, setWidthPercent] = useState(initialWidthPercent);
-  const [positionPercent, setPositionPercent] = useState(initialPositionPercent);
+  const [positionPercent, setPositionPercent] = useState(
+    initialPositionPercent,
+  );
 
   const positionPx = {
     x: (positionPercent.x / 100) * parentSize.width,
@@ -62,7 +70,9 @@ export default function ImageCard({
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > MAX_FILE_SIZE) {
-      toastError("Image size exceeds the 5MB limit. Please upload a smaller image.");
+      toastError(
+        "Image size exceeds the 5MB limit. Please upload a smaller image.",
+      );
       return;
     }
 
@@ -86,7 +96,7 @@ export default function ImageCard({
         onImageUpload(cardId, downloadURL);
         URL.revokeObjectURL(localPreview);
         setPreviewSrc(cardId, null);
-      }
+      },
     );
   };
 

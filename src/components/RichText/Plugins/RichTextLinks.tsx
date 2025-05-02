@@ -187,7 +187,8 @@ export default function RichTextLinks({
                     const urlFriendlyPageName = encodeURIComponent(
                       linkParentURL.replace(/ /g, "-"),
                     );
-                    const redirectPath = getPublishedRedirectPath(urlFriendlyPageName);
+                    const redirectPath =
+                      getPublishedRedirectPath(urlFriendlyPageName);
                     router.push(redirectPath);
                     return true;
                   } else {
@@ -227,15 +228,17 @@ export default function RichTextLinks({
     const pagesIdx = pathParts.indexOf("pages");
     const usernameIdx = pagesIdx + 1;
     if (pagesIdx === -1 || usernameIdx >= pathParts.length) {
-      console.error("Relative link is used in a published context that doesn't follow the /pages/username convention");
+      console.error(
+        "Relative link is used in a published context that doesn't follow the /pages/username convention",
+      );
       return "";
     }
-    
+
     const redirectPathParts = pathParts.slice(0, usernameIdx + 1);
     redirectPathParts.push(pageName);
 
     return redirectPathParts.join("/");
-  }
+  };
 
   const updateLink = () => {
     if (
@@ -264,7 +267,7 @@ export default function RichTextLinks({
         }
       });
     }
-  }
+  };
 
   return (
     <div
@@ -314,7 +317,9 @@ export default function RichTextLinks({
       </div>
       <button
         className="text-sm text-blue-500 font-bold ml-[16px]"
-        onClick={() => {updateLink()}}
+        onClick={() => {
+          updateLink();
+        }}
       >
         Apply
       </button>

@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 import SidebarItem from "./SidebarItem";
-import Accordion from "./Accordion"; 
+import Accordion from "./Accordion";
 import AccordionItem from "./AccordionItem";
 
 const categorizedItems = {
@@ -66,7 +66,7 @@ const categorizedItems = {
       name: "Vertical Line",
       description: "Add a line to separate sections vertically.",
       icon: <Columns2Icon />,
-    }
+    },
   ],
   Navigation: [
     {
@@ -144,7 +144,7 @@ const categorizedItems = {
       description: "Add quotes or recommendations from colleagues.",
       icon: <QuoteIcon />,
     },
-  ]
+  ],
 };
 
 export default function Sidebar() {
@@ -181,4 +181,3 @@ export default function Sidebar() {
     </div>
   );
 }
-

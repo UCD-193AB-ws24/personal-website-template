@@ -45,7 +45,10 @@ import { useSearchParams } from "next/navigation";
 import { toastSaveSuccess } from "@components/toasts/SaveToast";
 import { saveDraft } from "@lib/requests/saveDrafts";
 import { fetchDraftName } from "@lib/requests/fetchDraftName";
-import { auth } from "@lib/firebase/firebaseApp";
+// import { auth } from "@lib/firebase/firebaseApp";
+import { getFirebaseAuth } from "@lib/firebase/firebaseApp";
+const auth = getFirebaseAuth();
+
 import { deleteUnusedDraftFiles } from "@lib/requests/deleteUnusedFiles";
 import EditorContextProvider from "@contexts/EditorContext";
 import PagesContextProvider from "@contexts/PagesContext";

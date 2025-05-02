@@ -1,6 +1,9 @@
 "use client";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@lib/firebase/firebaseApp";
+// import { auth } from "@lib/firebase/firebaseApp";
+import { getFirebaseAuth } from "@lib/firebase/firebaseApp";
+const auth = getFirebaseAuth();
+
 import { signUserOut } from "@lib/firebase/auth";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";

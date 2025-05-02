@@ -22,7 +22,10 @@ export default function Navbar({
   navLinks = [],
 }: NavbarProps) {
   return (
-    <nav className="border-[#00f2ff] bg-gray-900 overflow-hidden top-0 left-0 w-full z-50">
+    <nav
+      data-testid="nav-bar"
+      className="border-[#00f2ff] bg-gray-900 overflow-hidden top-0 left-0 w-full z-50"
+    >
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-4 py-3">
         {/* Logo */}
         <a

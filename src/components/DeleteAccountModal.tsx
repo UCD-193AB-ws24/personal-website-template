@@ -8,7 +8,10 @@ import {
 } from "@headlessui/react";
 import { deleteAccountFirebase } from "@lib/requests/deleteAccountFirebase";
 import { deleteAccountStorage } from "@lib/requests/deleteAccountStorage";
-import { auth } from "@lib/firebase/firebaseApp";
+// import { auth } from "@lib/firebase/firebaseApp";
+import { getFirebaseAuth } from "@lib/firebase/firebaseApp";
+const auth = getFirebaseAuth();
+
 import { TriangleAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuthState } from "react-firebase-hooks/auth";

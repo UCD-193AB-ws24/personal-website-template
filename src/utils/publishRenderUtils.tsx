@@ -18,7 +18,7 @@ export function getLowestY(components: ComponentItem[]): number {
 }
 
 export function splitComponentsAtFirstProjectCard(
-  components: ComponentItem[]
+  components: ComponentItem[],
 ): { beforeProjectCard: ComponentItem[]; fromProjectCardOn: ComponentItem[] } {
   const sorted = [...components].sort((a, b) => {
     if (a.position.y !== b.position.y) {
@@ -27,7 +27,7 @@ export function splitComponentsAtFirstProjectCard(
     return a.position.x - b.position.x;
   });
 
-  const projectCardIndex = sorted.findIndex(c => c.type === "projectCard");
+  const projectCardIndex = sorted.findIndex((c) => c.type === "projectCard");
 
   if (projectCardIndex !== -1) {
     return {
@@ -42,13 +42,19 @@ export function splitComponentsAtFirstProjectCard(
   };
 }
 
-function groupByRows(components: ComponentItem[], threshold = 10): ComponentItem[][] {
+function groupByRows(
+  components: ComponentItem[],
+  threshold = 10,
+): ComponentItem[][] {
   const sorted = [...components].sort((a, b) => a.position.y - b.position.y);
   const rows: ComponentItem[][] = [];
 
   for (const comp of sorted) {
     const lastRow = rows[rows.length - 1];
-    if (lastRow && Math.abs(lastRow[0].position.y - comp.position.y) <= threshold) {
+    if (
+      lastRow &&
+      Math.abs(lastRow[0].position.y - comp.position.y) <= threshold
+    ) {
       lastRow.push(comp);
     } else {
       rows.push([comp]);
@@ -58,7 +64,9 @@ function groupByRows(components: ComponentItem[], threshold = 10): ComponentItem
   return rows;
 }
 
-export function renderGroupedRows(components: ComponentItem[]): React.ReactElement[] {
+export function renderGroupedRows(
+  components: ComponentItem[],
+): React.ReactElement[] {
   const grouped = groupByRows(components);
 
   return grouped.map((row, rowIndex) => {
@@ -98,9 +106,7 @@ export function renderGroupedRows(components: ComponentItem[]): React.ReactEleme
                 initialPos={{ ...comp.position, y: 0 }}
                 initialSize={comp.size}
                 content={comp?.content}
-                {...(isProjectCard
-                  ? { isPublish: true }
-                  : { isPreview: true })}
+                {...(isProjectCard ? { isPublish: true } : { isPreview: true })}
               />
             </div>
           );
