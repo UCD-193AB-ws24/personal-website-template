@@ -49,7 +49,7 @@ export const componentSizes: Record<string, { width: number; height: number }> =
   horizontalLine: { width: 350, height: 2 },
   verticalLine: { width: 2, height: 350 },
   icon: { width: 50, height: 50 },
-  aboutMeCard: { width: 630, height: 215 },
+  aboutMeCard: { width: 740, height: 215 },
   projectCard: { width: 100000, height: 200 },
 };
 
@@ -78,7 +78,7 @@ export const renderOverlayContent = (activeType: string | null) => {
     case "verticalLine":
       return <VerticalLine />;
     case "aboutMeCard":
-      return <AboutMeCard />
+      return <AboutMeCard isDragOverlay={true} />
     case "icon":
       return <IconComponent isDragOverlay={true} />;
     case "aboutMeCard":
