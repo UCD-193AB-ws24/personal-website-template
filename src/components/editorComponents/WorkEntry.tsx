@@ -16,9 +16,7 @@ import { GRID_SIZE } from "@utils/constants";
 import RichTextbox from "@components/RichText/RichTextbox";
 import RichTextToolbarPlugin from "@components/RichText/Plugins/RichTextToolbar";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import {
-  RichTextInitialConfig,
-} from "@components/RichText/RichTextSettings";
+import { RichTextInitialConfig } from "@components/RichText/RichTextSettings";
 
 interface WorkEntryProps {
   id?: string;
@@ -45,10 +43,10 @@ export default function WorkEntry({
   initialSize = { width: 620, height: 120 },
   components = [],
   content = '{"root":{"children":[{"children":[{"detail":0,"format":1,"mode":"normal","style":"font-size: 24px;","text":"Company","type":"text","version":1},{"detail":0,"format":1,"mode":"normal","style":"","text":"                                                                  ","type":"text","version":1},{"detail":0,"format":0,"mode":"normal","style":"","text":"Jan 20XX - Dec 20XX","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":1,"textStyle":"font-size: 24px;"},{"children":[{"detail":0,"format":2,"mode":"normal","style":"","text":"Job Title","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":2,"textStyle":""},{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Work Detail 1","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"listitem","version":1,"value":1},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Work Detail 2","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"listitem","version":1,"value":2}],"direction":"ltr","format":"","indent":0,"type":"list","version":1,"listType":"bullet","start":1,"tag":"ul"}],"direction":"ltr","format":"","indent":0,"type":"root","version":1,"textStyle":"font-size: 24px;"}}',
-  updateComponent = () => { },
+  updateComponent = () => {},
   isActive = true,
-  onMouseDown: onMouseDown = () => { },
-  setIsDragging = () => { },
+  onMouseDown: onMouseDown = () => {},
+  setIsDragging = () => {},
   isPreview = false,
   isDragOverlay = false,
 }: WorkEntryProps) {
@@ -135,13 +133,13 @@ export default function WorkEntry({
         onResizeStart={() => setIsDragging(true)}
         onResizeStop={(e, d, ref, delta, newPosition) => {
           setIsDragging(false);
-          handleResizeStop(id, components, updateComponent, setSize, setPosition)(
-            e,
-            d,
-            ref,
-            delta,
-            newPosition,
-          );
+          handleResizeStop(
+            id,
+            components,
+            updateComponent,
+            setSize,
+            setPosition,
+          )(e, d, ref, delta, newPosition);
         }}
         minHeight={60}
         minWidth={300}
@@ -156,14 +154,12 @@ export default function WorkEntry({
             className="w-full h-full rounded"
             style={{ backgroundColor: data.backgroundColor || "transparent" }}
           >
-
             {/* Overlay for enabling drag */}
             {(showOverlay || !isActive) && (
               <div
                 className="w-full h-full flex items-center justify-center absolute inset-0 z-10"
                 onMouseDown={() => setShowOverlay(true)}
-              >
-              </div>
+              ></div>
             )}
 
             <div

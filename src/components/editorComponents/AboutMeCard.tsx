@@ -25,9 +25,7 @@ const storage = getFirebaseStorage();
 import RichTextbox from "@components/RichText/RichTextbox";
 import RichTextToolbarPlugin from "@components/RichText/Plugins/RichTextToolbar";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import {
-  RichTextInitialConfig,
-} from "@components/RichText/RichTextSettings";
+import { RichTextInitialConfig } from "@components/RichText/RichTextSettings";
 
 interface AboutMeCardProps {
   id?: string;
@@ -53,25 +51,138 @@ export default function AboutMeCard({
   initialPos = { x: -1, y: -1 },
   initialSize = { width: 740, height: 215 },
   components = [],
-  content = { "root": { "children": [{ "children": [{ "detail": 0, "format": 1, "mode": "normal", "style": "font-size: 24px;", "text": "First Last", "type": "text", "version": 1 }], "direction": "ltr", "format": "", "indent": 0, "type": "paragraph", "version": 1, "textFormat": 1, "textStyle": "font-size: 24px;" }, { "children": [{ "detail": 0, "format": 0, "mode": "normal", "style": "", "text": "Enter information here", "type": "text", "version": 1 }], "direction": "ltr", "format": "", "indent": 0, "type": "paragraph", "version": 1, "textFormat": 0, "textStyle": "" }, { "children": [], "direction": "ltr", "format": "", "indent": 0, "type": "paragraph", "version": 1, "textFormat": 0, "textStyle": "" }, { "children": [], "direction": "ltr", "format": "", "indent": 0, "type": "paragraph", "version": 1, "textFormat": 0, "textStyle": "" }, { "children": [{ "detail": 0, "format": 2, "mode": "normal", "style": "", "text": "example@email.com  ", "type": "text", "version": 1 }, { "detail": 0, "format": 0, "mode": "normal", "style": "", "text": "| ", "type": "text", "version": 1 }, { "detail": 0, "format": 2, "mode": "normal", "style": "", "text": "(123) - 456 - 7890", "type": "text", "version": 1 }], "direction": "ltr", "format": "", "indent": 0, "type": "paragraph", "version": 1, "textFormat": 2, "textStyle": "" }], "direction": "ltr", "format": "", "indent": 0, "type": "root", "version": 1, "textFormat": 1, "textStyle": "font-size: 24px;" } },
-  updateComponent = () => { },
+  content = {
+    root: {
+      children: [
+        {
+          children: [
+            {
+              detail: 0,
+              format: 1,
+              mode: "normal",
+              style: "font-size: 24px;",
+              text: "First Last",
+              type: "text",
+              version: 1,
+            },
+          ],
+          direction: "ltr",
+          format: "",
+          indent: 0,
+          type: "paragraph",
+          version: 1,
+          textFormat: 1,
+          textStyle: "font-size: 24px;",
+        },
+        {
+          children: [
+            {
+              detail: 0,
+              format: 0,
+              mode: "normal",
+              style: "",
+              text: "Enter information here",
+              type: "text",
+              version: 1,
+            },
+          ],
+          direction: "ltr",
+          format: "",
+          indent: 0,
+          type: "paragraph",
+          version: 1,
+          textFormat: 0,
+          textStyle: "",
+        },
+        {
+          children: [],
+          direction: "ltr",
+          format: "",
+          indent: 0,
+          type: "paragraph",
+          version: 1,
+          textFormat: 0,
+          textStyle: "",
+        },
+        {
+          children: [],
+          direction: "ltr",
+          format: "",
+          indent: 0,
+          type: "paragraph",
+          version: 1,
+          textFormat: 0,
+          textStyle: "",
+        },
+        {
+          children: [
+            {
+              detail: 0,
+              format: 2,
+              mode: "normal",
+              style: "",
+              text: "example@email.com  ",
+              type: "text",
+              version: 1,
+            },
+            {
+              detail: 0,
+              format: 0,
+              mode: "normal",
+              style: "",
+              text: "| ",
+              type: "text",
+              version: 1,
+            },
+            {
+              detail: 0,
+              format: 2,
+              mode: "normal",
+              style: "",
+              text: "(123) - 456 - 7890",
+              type: "text",
+              version: 1,
+            },
+          ],
+          direction: "ltr",
+          format: "",
+          indent: 0,
+          type: "paragraph",
+          version: 1,
+          textFormat: 2,
+          textStyle: "",
+        },
+      ],
+      direction: "ltr",
+      format: "",
+      indent: 0,
+      type: "root",
+      version: 1,
+      textFormat: 1,
+      textStyle: "font-size: 24px;",
+    },
+  },
+  updateComponent = () => {},
   isActive = true,
-  onMouseDown: onMouseDown = () => { },
-  setIsDragging = () => { },
+  onMouseDown: onMouseDown = () => {},
+  setIsDragging = () => {},
   isPreview = false,
   isDragOverlay = false,
 }: AboutMeCardProps) {
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
   const [data, setData] = useState(content);
-  const [imageUrl, setImageUrl] = useState<string | null>(content?.image ?? null);
+  const [imageUrl, setImageUrl] = useState<string | null>(
+    content?.image ?? null,
+  );
   const [previewSrc, setPreviewSrc] = useState<string | null>(null);
   const [imageWidthPercent, setImageWidthPercent] = useState<number>(
-    content?.imageLayout?.widthPercent ?? 40
+    content?.imageLayout?.widthPercent ?? 40,
   );
-  const [imagePositionPercent, setImagePositionPercent] = useState<{ x: number; y: number }>(
-    content?.imageLayout?.positionPercent ?? { x: 0, y: 0 }
-  );
+  const [imagePositionPercent, setImagePositionPercent] = useState<{
+    x: number;
+    y: number;
+  }>(content?.imageLayout?.positionPercent ?? { x: 0, y: 0 });
   const [showOverlay, setShowOverlay] = useState(false);
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const [parentSize, setParentSize] = useState({ width: 1, height: 1 });
@@ -87,7 +198,8 @@ export default function AboutMeCard({
 
   useEffect(() => {
     try {
-      const parsedContent = typeof content === "string" ? JSON.parse(content) : content;
+      const parsedContent =
+        typeof content === "string" ? JSON.parse(content) : content;
 
       setData(parsedContent);
       if (parsedContent?.image) {
@@ -96,13 +208,14 @@ export default function AboutMeCard({
 
       if (parsedContent?.imageLayout) {
         setImageWidthPercent(parsedContent.imageLayout.widthPercent ?? 40);
-        setImagePositionPercent(parsedContent.imageLayout.positionPercent ?? { x: 0, y: 0 });
+        setImagePositionPercent(
+          parsedContent.imageLayout.positionPercent ?? { x: 0, y: 0 },
+        );
       }
     } catch (err) {
       console.error("Failed to parse content for AboutMeCard:", err);
     }
   }, [content]);
-
 
   const handleMouseDown = (e: MouseEvent) => {
     e.stopPropagation();
@@ -113,11 +226,13 @@ export default function AboutMeCard({
     const isObject = typeof data === "object" && data !== null;
 
     const newData = {
-      backgroundColor: isObject ? data.backgroundColor ?? "transparent" : "transparent",
+      backgroundColor: isObject
+        ? (data.backgroundColor ?? "transparent")
+        : "transparent",
       image: imageUrl,
       imageLayout: {
         widthPercent: imageWidthPercent,
-        positionPercent: imagePositionPercent
+        positionPercent: imagePositionPercent,
       },
       textboxState: newState,
     };
@@ -131,11 +246,11 @@ export default function AboutMeCard({
 
     const newData = {
       backgroundColor: newBgColor,
-      textboxState: isObject ? data.textboxState ?? "" : data,
+      textboxState: isObject ? (data.textboxState ?? "") : data,
       image: imageUrl,
       imageLayout: {
         widthPercent: imageWidthPercent,
-        positionPercent: imagePositionPercent
+        positionPercent: imagePositionPercent,
       },
     };
 
@@ -149,8 +264,7 @@ export default function AboutMeCard({
     if (!file) return;
 
     if (file.size > MAX_FILE_SIZE) {
-      toastError(
-          "Image size exceeds 5MB. Please upload a smaller image.");
+      toastError("Image size exceeds 5MB. Please upload a smaller image.");
       return;
     }
 
@@ -180,7 +294,7 @@ export default function AboutMeCard({
             positionPercent: imagePositionPercent,
           },
         });
-      }
+      },
     );
   };
 
@@ -203,12 +317,11 @@ export default function AboutMeCard({
             className="flex w-full h-full gap-[40px] whitespace-pre-wrap bg-transparent resize-none text-lg"
             style={{ padding: `${GRID_SIZE}px` }}
           >
-            <div className="relative w-full h-full"
-            >
+            <div className="relative w-full h-full">
               <div
                 style={{
                   position: "relative",
-                  width: `${(imageWidthPercent)}%`,
+                  width: `${imageWidthPercent}%`,
                   left: `${imagePositionPercent.x}%`,
                   top: `${imagePositionPercent.y}%`,
                 }}
@@ -264,19 +377,19 @@ export default function AboutMeCard({
             size,
             components,
             updateComponent,
-            setPosition
+            setPosition,
           )(e, d);
         }}
         onResizeStart={() => setIsDragging(true)}
         onResizeStop={(e, d, ref, delta, newPosition) => {
           setIsDragging(false);
-          handleResizeStop(id, components, updateComponent, setSize, setPosition)(
-            e,
-            d,
-            ref,
-            delta,
-            newPosition
-          );
+          handleResizeStop(
+            id,
+            components,
+            updateComponent,
+            setSize,
+            setPosition,
+          )(e, d, ref, delta, newPosition);
         }}
         minHeight={215}
         minWidth={630}
@@ -291,14 +404,12 @@ export default function AboutMeCard({
             className="w-full h-full rounded"
             style={{ backgroundColor: data.backgroundColor || "transparent" }}
           >
-
             {/* Overlay for enabling drag */}
             {(showOverlay || !isActive) && (
               <div
                 className="w-full h-full flex items-center justify-center absolute inset-0 z-10"
                 onMouseDown={() => setShowOverlay(true)}
-              >
-              </div>
+              ></div>
             )}
 
             <div
@@ -310,8 +421,11 @@ export default function AboutMeCard({
                 className="flex w-full h-full gap-[40px] whitespace-pre-wrap bg-transparent resize-none text-lg"
                 style={{ padding: `${GRID_SIZE}px` }}
               >
-                <div ref={imageContainerRef} className="relative w-full h-full border border-gray-300">
-                  {(previewSrc || imageUrl) ? (
+                <div
+                  ref={imageContainerRef}
+                  className="relative w-full h-full border border-gray-300"
+                >
+                  {previewSrc || imageUrl ? (
                     <Rnd
                       bounds="parent"
                       size={{ width: `${imageWidthPercent}%`, height: "auto" }}
@@ -335,11 +449,14 @@ export default function AboutMeCard({
                             positionPercent: newPos,
                           },
                           textboxState: data.textboxState ?? "",
-                          backgroundColor: data.backgroundColor ?? "transparent",
+                          backgroundColor:
+                            data.backgroundColor ?? "transparent",
                         });
                       }}
                       onResizeStop={(_, __, ref, ____, newPosition) => {
-                        const newWidth = Number(ref.style.width.replace("%", ""));
+                        const newWidth = Number(
+                          ref.style.width.replace("%", ""),
+                        );
                         const newPos = {
                           x: (newPosition.x / parentSize.width) * 100,
                           y: (newPosition.y / parentSize.height) * 100,
@@ -354,7 +471,8 @@ export default function AboutMeCard({
                             positionPercent: newPos,
                           },
                           textboxState: data.textboxState ?? "",
-                          backgroundColor: data.backgroundColor ?? "transparent",
+                          backgroundColor:
+                            data.backgroundColor ?? "transparent",
                         });
                       }}
                       lockAspectRatio
@@ -379,18 +497,18 @@ export default function AboutMeCard({
                           />
                         ) : null}
                       </div>
-                    </Rnd>)
-                    : (
-                      <label className="w-full h-full flex items-center justify-center cursor-pointer bg-gray-200">
-                        Click to Upload Image
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                          className="hidden"
-                        />
-                      </label>
-                    )}
+                    </Rnd>
+                  ) : (
+                    <label className="w-full h-full flex items-center justify-center cursor-pointer bg-gray-200">
+                      Click to Upload Image
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                    </label>
+                  )}
                 </div>
 
                 <div className="w-full h-full flex flex-col gap-[60px]">
@@ -406,6 +524,6 @@ export default function AboutMeCard({
           </div>
         </ActiveOutlineContainer>
       </Rnd>
-    </LexicalComposer >
+    </LexicalComposer>
   );
 }

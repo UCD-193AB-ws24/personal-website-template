@@ -85,14 +85,15 @@ export default function SectionTitleTextbox({
   };
 
   if (isDragOverlay) {
-    return <div
-      style={{
-        width: size.width,
-        height: size.height,
-      }}
-      className="rounded outline outline-2 outline-blue-500"
-    >
-    </div>
+    return (
+      <div
+        style={{
+          width: size.width,
+          height: size.height,
+        }}
+        className="rounded outline outline-2 outline-blue-500"
+      ></div>
+    );
   }
 
   return isPreview ? (

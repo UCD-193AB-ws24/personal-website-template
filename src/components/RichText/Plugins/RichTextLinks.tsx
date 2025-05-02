@@ -105,11 +105,13 @@ export default function RichTextLinks({
                 // When text wraps, the element.offsetLeft property doesn't return
                 // the leftmost edge
                 // The elementRect.left property does return the leftmost edge
-                const offsetParent = element.offsetParent
-                const trueOffsetLeft = elementRect.left - offsetParent!.getBoundingClientRect().left;
+                const offsetParent = element.offsetParent;
+                const trueOffsetLeft =
+                  elementRect.left - offsetParent!.getBoundingClientRect().left;
 
                 if (elementRect.left + linkEditorWidth > dropzoneRect.right) {
-                  const overflowX = (elementRect.left + linkEditorWidth) - dropzoneRect.right;
+                  const overflowX =
+                    elementRect.left + linkEditorWidth - dropzoneRect.right;
                   setLinkEditorPosition({
                     x: trueOffsetLeft - overflowX,
                     y: element.offsetTop + element.offsetHeight + 4,

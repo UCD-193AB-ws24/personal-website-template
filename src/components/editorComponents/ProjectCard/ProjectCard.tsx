@@ -146,7 +146,7 @@ export default function ProjectCard({
   const updateCardBackgroundColor = (
     cardId: number,
     field: "title" | "body",
-    newColor: string
+    newColor: string,
   ) => {
     const updatedCards = cards.map((card) => {
       if (card.id !== cardId) return card;
@@ -170,18 +170,19 @@ export default function ProjectCard({
         id: Date.now(),
         type: "text",
         title: {
-          textboxState: '{"root":{"children":[{"children":[{"detail":0,"format":1,"mode":"normal","style":"","text":"Section Title","type":"text","version":1}],"direction":"ltr","format":"center","indent":0,"type":"heading","version":1,"tag":"h1"}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}',
-          backgroundColor: "transparent"
+          textboxState:
+            '{"root":{"children":[{"children":[{"detail":0,"format":1,"mode":"normal","style":"","text":"Section Title","type":"text","version":1}],"direction":"ltr","format":"center","indent":0,"type":"heading","version":1,"tag":"h1"}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}',
+          backgroundColor: "transparent",
         },
         body: {
-          textboxState: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Body Text","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}',
-          backgroundColor: "transparent"
-        }
+          textboxState:
+            '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Body Text","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}',
+          backgroundColor: "transparent",
+        },
       };
       updateContent([...cards, newCard]);
     }
   };
-
 
   const addImageCard = () => {
     if (cards.length < 3) {
@@ -207,14 +208,14 @@ export default function ProjectCard({
     const updatedCards = cards.map((card) =>
       card.id === cardId
         ? {
-          ...card,
-          [field]: {
-            ...(typeof card[field] === "string"
-              ? { textboxState: value }
-              : { ...card[field], textboxState: value }),
-          },
-        }
-        : card
+            ...card,
+            [field]: {
+              ...(typeof card[field] === "string"
+                ? { textboxState: value }
+                : { ...card[field], textboxState: value }),
+            },
+          }
+        : card,
     );
     updateContent(updatedCards);
   };
@@ -225,18 +226,20 @@ export default function ProjectCard({
   };
 
   if (isDragOverlay) {
-    return <div className="w-[400px] h-[200px] flex justify-between items-center gap-2">
-      <ArrowLeftToLine size={24} color="gray" />
-      <div className="relative w-full h-full bg-gray-100 flex justify-end items-center p-1 outline outline-2 outline-blue-500">
-        <div className="absolute top-2 right-4 px-3 py-1 bg-blue-600 text-white text-sm rounded shadow">
-          Add Text Card
+    return (
+      <div className="w-[400px] h-[200px] flex justify-between items-center gap-2">
+        <ArrowLeftToLine size={24} color="gray" />
+        <div className="relative w-full h-full bg-gray-100 flex justify-end items-center p-1 outline outline-2 outline-blue-500">
+          <div className="absolute top-2 right-4 px-3 py-1 bg-blue-600 text-white text-sm rounded shadow">
+            Add Text Card
+          </div>
+          <div className="absolute top-10 right-4 px-3 py-1 bg-green-600 text-white text-sm rounded shadow">
+            Add Image Card
+          </div>
         </div>
-        <div className="absolute top-10 right-4 px-3 py-1 bg-green-600 text-white text-sm rounded shadow">
-          Add Image Card
-        </div>
+        <ArrowRightToLine size={24} color="gray" />
       </div>
-      <ArrowRightToLine size={24} color="gray" />
-    </div>
+    );
   }
 
   if (isPreview || isPublish) {
@@ -296,11 +299,17 @@ export default function ProjectCard({
                     <LexicalComposer initialConfig={RichTextInitialConfig}>
                       <div
                         className="mt-2 rounded"
-                        style={{ backgroundColor: card.title?.backgroundColor || "transparent" }}
+                        style={{
+                          backgroundColor:
+                            card.title?.backgroundColor || "transparent",
+                        }}
                       >
                         <RichTextbox
                           isPreview={isPreview || isPublish}
-                          textboxState={card.title?.textboxState || HeaderRichTextDefaultContent.textboxState}
+                          textboxState={
+                            card.title?.textboxState ||
+                            HeaderRichTextDefaultContent.textboxState
+                          }
                           updateTextboxState={(newState) => {
                             handleTextCardChange(card.id, "title", newState);
                           }}
@@ -313,11 +322,17 @@ export default function ProjectCard({
                     <LexicalComposer initialConfig={RichTextInitialConfig}>
                       <div
                         className="mt-2 rounded"
-                        style={{ backgroundColor: card.body?.backgroundColor || "transparent" }}
+                        style={{
+                          backgroundColor:
+                            card.body?.backgroundColor || "transparent",
+                        }}
                       >
                         <RichTextbox
                           isPreview={isPreview || isPublish}
-                          textboxState={card.body?.textboxState || RichTextDefaultContent.textboxState}
+                          textboxState={
+                            card.body?.textboxState ||
+                            RichTextDefaultContent.textboxState
+                          }
                           updateTextboxState={(newState) => {
                             handleTextCardChange(card.id, "body", newState);
                           }}
@@ -495,17 +510,29 @@ export default function ProjectCard({
                               }}
                             >
                               <RichTextToolbarPlugin
-                                updateBackgroundColor={(newColor) => updateCardBackgroundColor(card.id, "title", newColor)}
+                                updateBackgroundColor={(newColor) =>
+                                  updateCardBackgroundColor(
+                                    card.id,
+                                    "title",
+                                    newColor,
+                                  )
+                                }
                               />
                             </div>
                           )}
                           <div
                             className="focus:outline focus:outline-2 focus:outline-blue-500 hover:outline hover:outline-2 hover:outline-gray-300 rounded"
-                            style={{ backgroundColor: card.title?.backgroundColor || "transparent" }}
+                            style={{
+                              backgroundColor:
+                                card.title?.backgroundColor || "transparent",
+                            }}
                           >
                             <RichTextbox
                               isPreview={isPreview}
-                              textboxState={card.title?.textboxState || HeaderRichTextDefaultContent.textboxState}
+                              textboxState={
+                                card.title?.textboxState ||
+                                HeaderRichTextDefaultContent.textboxState
+                              }
                               updateTextboxState={(newState) => {
                                 handleTextCardChange(
                                   card.id,
@@ -535,17 +562,29 @@ export default function ProjectCard({
                               }}
                             >
                               <RichTextToolbarPlugin
-                                updateBackgroundColor={(newColor) => updateCardBackgroundColor(card.id, "body", newColor)}
+                                updateBackgroundColor={(newColor) =>
+                                  updateCardBackgroundColor(
+                                    card.id,
+                                    "body",
+                                    newColor,
+                                  )
+                                }
                               />
                             </div>
                           )}
                           <div
                             className="mt-2 focus:outline focus:outline-2 focus:outline-blue-500 hover:outline hover:outline-2 hover:outline-gray-300 rounded"
-                            style={{ backgroundColor: card.body?.backgroundColor || "transparent" }}
+                            style={{
+                              backgroundColor:
+                                card.body?.backgroundColor || "transparent",
+                            }}
                           >
                             <RichTextbox
                               isPreview={isPreview}
-                              textboxState={card.body?.textboxState || RichTextDefaultContent.textboxState}
+                              textboxState={
+                                card.body?.textboxState ||
+                                RichTextDefaultContent.textboxState
+                              }
                               updateTextboxState={(newState) => {
                                 handleTextCardChange(card.id, "body", newState);
                               }}

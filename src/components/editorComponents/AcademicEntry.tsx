@@ -16,9 +16,7 @@ import { GRID_SIZE } from "@utils/constants";
 import RichTextbox from "@components/RichText/RichTextbox";
 import RichTextToolbarPlugin from "@components/RichText/Plugins/RichTextToolbar";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import {
-  RichTextInitialConfig,
-} from "@components/RichText/RichTextSettings";
+import { RichTextInitialConfig } from "@components/RichText/RichTextSettings";
 
 interface AcademicEntryProps {
   id?: string;
@@ -45,10 +43,10 @@ export default function AcademicEntry({
   initialSize = { width: 620, height: 60 },
   components = [],
   content = '{"root":{"children":[{"children":[{"detail":0,"format":1,"mode":"normal","style":"font-size: 24px;","text":"School","type":"text","version":1},{"detail":0,"format":1,"mode":"normal","style":"","text":"                                                                        ","type":"text","version":1},{"detail":0,"format":0,"mode":"normal","style":"","text":"Jan 20XX - Dec 20XX","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":1,"textStyle":"font-size: 24px;"},{"children":[{"detail":0,"format":2,"mode":"normal","style":"","text":"Degree","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""}],"direction":"ltr","format":"","indent":0,"type":"root","version":1,"textFormat":1,"textStyle":"font-size: 24px;"}}',
-  updateComponent = () => { },
+  updateComponent = () => {},
   isActive = true,
-  onMouseDown: onMouseDown = () => { },
-  setIsDragging = () => { },
+  onMouseDown: onMouseDown = () => {},
+  setIsDragging = () => {},
   isPreview = false,
   isDragOverlay = false,
 }: AcademicEntryProps) {
@@ -135,13 +133,13 @@ export default function AcademicEntry({
         onResizeStart={() => setIsDragging(true)}
         onResizeStop={(e, d, ref, delta, newPosition) => {
           setIsDragging(false);
-          handleResizeStop(id, components, updateComponent, setSize, setPosition)(
-            e,
-            d,
-            ref,
-            delta,
-            newPosition,
-          );
+          handleResizeStop(
+            id,
+            components,
+            updateComponent,
+            setSize,
+            setPosition,
+          )(e, d, ref, delta, newPosition);
         }}
         minHeight={60}
         minWidth={300}
@@ -156,14 +154,12 @@ export default function AcademicEntry({
             className="w-full h-full rounded"
             style={{ backgroundColor: data.backgroundColor || "transparent" }}
           >
-
             {/* Overlay for enabling drag */}
             {(showOverlay || !isActive) && (
               <div
                 className="w-full h-full flex items-center justify-center absolute inset-0 z-10"
                 onMouseDown={() => setShowOverlay(true)}
-              >
-              </div>
+              ></div>
             )}
 
             <div
