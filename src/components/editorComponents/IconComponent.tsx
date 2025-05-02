@@ -31,6 +31,7 @@ interface IconComponentProps {
   setIsDragging?: (dragging: boolean) => void;
   isPreview?: boolean;
   content?: string;
+  isDragOverlay?: boolean;
 }
 
 export default function IconComponent({
@@ -44,6 +45,7 @@ export default function IconComponent({
   setIsDragging = () => {},
   isPreview = false,
   content = "Star",
+  isDragOverlay = false,
 }: IconComponentProps) {
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
@@ -64,7 +66,19 @@ export default function IconComponent({
     updateComponent(id, position, size, newIcon);
   };
 
-  if (isPreview) {
+  if (isDragOverlay) {
+    return (
+      <div
+        style={{
+          width: size.width,
+          height: size.height,
+        }}
+        className="outline outline-2 outline-blue-500"
+      >
+        <Icon className="w-full h-full text-black" />
+      </div>
+    );
+  } else if (isPreview) {
     return (
       <div
         style={{

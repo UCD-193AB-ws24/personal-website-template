@@ -35,12 +35,13 @@ interface DraggableResizableTextboxProps {
   onMouseDown?: () => void;
   setIsDragging?: (dragging: boolean) => void;
   isPreview?: boolean;
+  isDragOverlay?: boolean;
 }
 
 export default function DraggableResizableTextbox({
   id = "",
   initialPos = { x: -1, y: -1 },
-  initialSize = { width: 200, height: 50 },
+  initialSize = { width: 200, height: 150 },
   components = [],
   content = RichTextDefaultContent,
   updateComponent = () => {},
@@ -48,6 +49,7 @@ export default function DraggableResizableTextbox({
   onMouseDown: onMouseDown = () => {},
   setIsDragging = () => {},
   isPreview = false,
+  isDragOverlay = false,
 }: DraggableResizableTextboxProps) {
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
@@ -85,6 +87,18 @@ export default function DraggableResizableTextbox({
     updateComponent(id, position, size, newData);
   };
 
+  if (isDragOverlay) {
+    return (
+      <div
+        style={{
+          width: size.width,
+          height: size.height,
+        }}
+        className="whitespace-pre-wrap resize-none text-lg leading-none rounded outline outline-2 outline-blue-500 bg-transparent"
+      ></div>
+    );
+  }
+
   return isPreview ? (
     <div
       style={{
@@ -94,7 +108,7 @@ export default function DraggableResizableTextbox({
         width: size.width,
         height: size.height,
       }}
-      className="whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg leading-none rounded"
+      className="whitespace-pre-wrap bg-transparent resize-none text-lg leading-none rounded"
     >
       <LexicalComposer initialConfig={RichTextInitialConfig}>
         <div

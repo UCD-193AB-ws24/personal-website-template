@@ -36,7 +36,7 @@ interface VideoComponentProps {
 export default function VideoComponent({
   id = "",
   initialPos = { x: -1, y: -1 },
-  initialSize = { width: 225, height: 125 },
+  initialSize = { width: 450, height: 250 },
   components = [],
   content = "",
   updateComponent = () => {},
