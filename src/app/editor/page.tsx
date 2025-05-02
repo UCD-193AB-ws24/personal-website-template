@@ -7,8 +7,9 @@ import {
   DragStartEvent,
   DragEndEvent,
   DragMoveEvent,
+  pointerWithin,
 } from "@dnd-kit/core";
-import { restrictToWindowEdges } from "@dnd-kit/modifiers";
+import { restrictToWindowEdges, snapCenterToCursor } from "@dnd-kit/modifiers";
 import { ArrowUpIcon, XIcon } from "lucide-react";
 import { ToastContainer } from "react-toastify";
 
@@ -583,10 +584,12 @@ export default function Editor() {
         <PagesContextProvider pages={pages}>
           <EditorContextProvider handleSwitchPage={handleSwitchPage}>
             <DndContext
-              modifiers={[restrictToWindowEdges]}
+              modifiers={[restrictToWindowEdges, snapCenterToCursor]}
               onDragStart={handleDragStart}
               onDragEnd={handleDragEnd}
               onDragMove={handleDragMove}
+              collisionDetection={pointerWithin}
+              cancelDrop={({over}) => {return over === null}}
             >
               <div
                 className={`flex ${isPreview ? "justify-center items-center h-screen bg-gray-200" : ""} text-black relative bg-white`}
@@ -637,9 +640,9 @@ export default function Editor() {
                   ref={scrollContainerRef}
                   style={{
                     marginTop: "64px",
-                    marginLeft: "256px",
+                    marginLeft: "16rem",
                     height: `calc(100vh - 64px)`, // full height minus top bar
-                    width: `calc(100vw - 256px)`, // full width minus sidebar
+                    width: `calc(100vw - 16rem)`, // full width minus sidebar
                   }}
                 >
                   <EditorDropZone
@@ -713,7 +716,7 @@ export default function Editor() {
                   <ArrowUpIcon size={24} />
                 </button>
               )}
-              <DragOverlay>
+              <DragOverlay className="z-[10000]">
                 {renderOverlayContent(activeComponent?.type || null)}
               </DragOverlay>
             </DndContext>

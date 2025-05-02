@@ -19,7 +19,7 @@ export default function EditorTopBar({
   handlePublish,
 }: EditorTopBarProps) {
   return (
-    <div className="fixed top-0 left-[256px] w-[calc(100vw-256px)] z-50 bg-gray-100 flex justify-between items-center px-6 py-3 h-[64px]">
+    <div className="fixed top-0 left-[16rem] w-[calc(100vw-16rem)] z-50 bg-gray-100 flex justify-between items-center px-6 py-3 h-[64px]">
       <div className="flex items-center gap-10">
         <Link
           href="/saveddrafts"

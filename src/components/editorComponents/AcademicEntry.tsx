@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Rnd } from "react-rnd";
 
 import ActiveOutlineContainer from "@components/editorComponents/ActiveOutlineContainer";
@@ -13,12 +13,12 @@ import type {
 
 import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
 import { GRID_SIZE } from "@utils/constants";
-
-interface AcademicEntryContent {
-  schoolName: string;
-  subtext: string;
-  duration: string;
-}
+import RichTextbox from "@components/RichText/RichTextbox";
+import RichTextToolbarPlugin from "@components/RichText/Plugins/RichTextToolbar";
+import { LexicalComposer } from "@lexical/react/LexicalComposer";
+import {
+  RichTextInitialConfig,
+} from "@components/RichText/RichTextSettings";
 
 interface AcademicEntryProps {
   id?: string;
@@ -36,45 +36,54 @@ interface AcademicEntryProps {
   onMouseDown?: () => void;
   setIsDragging?: (dragging: boolean) => void;
   isPreview?: boolean;
+  isDragOverlay?: boolean;
 }
 
 export default function AcademicEntry({
   id = "",
   initialPos = { x: -1, y: -1 },
-  initialSize = { width: 200, height: 50 },
+  initialSize = { width: 620, height: 60 },
   components = [],
-  content = "",
-  updateComponent = () => {},
+  content = '{"root":{"children":[{"children":[{"detail":0,"format":1,"mode":"normal","style":"font-size: 24px;","text":"School","type":"text","version":1},{"detail":0,"format":1,"mode":"normal","style":"","text":"                                                                        ","type":"text","version":1},{"detail":0,"format":0,"mode":"normal","style":"","text":"Jan 20XX - Dec 20XX","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":1,"textStyle":"font-size: 24px;"},{"children":[{"detail":0,"format":2,"mode":"normal","style":"","text":"Degree","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""}],"direction":"ltr","format":"","indent":0,"type":"root","version":1,"textFormat":1,"textStyle":"font-size: 24px;"}}',
+  updateComponent = () => { },
   isActive = true,
-  onMouseDown: onMouseDown = () => {},
-  setIsDragging = () => {},
+  onMouseDown: onMouseDown = () => { },
+  setIsDragging = () => { },
   isPreview = false,
+  isDragOverlay = false,
 }: AcademicEntryProps) {
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
-  const [curContent, setCurContent] = useState({
-    schoolName: "School",
-    subtext: "Degree",
-    duration: "Jan 20XX - Dec 20XX",
-  });
+  const [data, setData] = useState(content);
   const [showOverlay, setShowOverlay] = useState(false);
-
-  useEffect(() => {
-    try {
-      const jsonContent = JSON.parse(content);
-      setCurContent(jsonContent);
-    } catch {
-      setCurContent({
-        schoolName: "School",
-        subtext: "Degree",
-        duration: "Jan 20XX - Dec 20XX",
-      });
-    }
-  }, [content]);
 
   const handleMouseDown = (e: MouseEvent) => {
     e.stopPropagation();
     onMouseDown();
+  };
+
+  const updateTextboxState = (newState: string) => {
+    // For backwards compatibility with older textboxes
+    let newData: any = newState;
+    if (!data.hasOwnProperty("textboxState")) {
+      newData = { backgroundColor: "transparent", textboxState: newState };
+    } else {
+      newData = { ...data, textboxState: newState };
+    }
+    setData(newData);
+    updateComponent(id, position, size, newData);
+  };
+
+  const updateBackgroundColor = (newBgColor: string) => {
+    // For backwards compatibility with older textboxes
+    let newData: any = newBgColor;
+    if (!data.hasOwnProperty("backgroundColor")) {
+      newData = { textboxState: data, backgroundColor: newBgColor };
+    } else {
+      newData = { ...data, backgroundColor: newBgColor };
+    }
+    setData(newData);
+    updateComponent(id, position, size, newData);
   };
 
   return isPreview ? (
@@ -85,171 +94,93 @@ export default function AcademicEntry({
         top: position.y,
         width: size.width,
         height: size.height,
-        padding: `${GRID_SIZE}px`,
       }}
-      className="flex w-full h-full justify-between whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg"
     >
-      <div className="flex flex-col justify-between">
-        <h1
-          draggable="false"
-          className="overflow-hidden min-w-[300px] max-w-[300px] min-h-[26px] max-h-[30px] text-black text-2xl font-bold cursor-text p-0 m-0 leading-none"
+      <LexicalComposer initialConfig={RichTextInitialConfig}>
+        <div
+          className={"w-full h-full rounded"}
+          style={{ backgroundColor: data.backgroundColor || "transparent" }}
         >
-          {curContent.schoolName}
-        </h1>
-        <p
-          draggable="false"
-          className="overflow-hidden min-h-[24px] max-h-[24px] min-w-[300px] max-w-[300px]"
-        >
-          {curContent.subtext}
-        </p>
-      </div>
-
-      <p
-        draggable="false"
-        className="overflow-hidden min-w-[300px] max-w-[300px] resize-none bg-transparent text-lg leading-none"
-      >
-        {curContent.duration}
-      </p>
+          <RichTextbox
+            isPreview={isPreview}
+            textboxState={data.textboxState || data}
+            updateTextboxState={updateTextboxState}
+            isActive={false}
+          />
+        </div>
+      </LexicalComposer>
     </div>
   ) : (
-    <Rnd
-      size={{ width: size.width, height: size.height }}
-      position={{ x: position.x, y: position.y }}
-      onDragStart={() => {
-        setIsDragging(true);
-        setShowOverlay(false);
-      }}
-      onDragStop={(e, d) => {
-        setIsDragging(false);
-        handleDragStop(
-          id,
-          size,
-          components,
-          updateComponent,
-          setPosition,
-        )(e, d);
-      }}
-      onResizeStart={() => setIsDragging(true)}
-      onResizeStop={(e, d, ref, delta, newPosition) => {
-        setIsDragging(false);
-        handleResizeStop(id, components, updateComponent, setSize, setPosition)(
-          e,
-          d,
-          ref,
-          delta,
-          newPosition,
-        );
-      }}
-      minHeight={70}
-      minWidth={620}
-      bounds="parent"
-      onMouseDown={handleMouseDown}
-      style={{ pointerEvents: "auto" }}
-      dragGrid={[GRID_SIZE, GRID_SIZE]}
-      resizeGrid={[GRID_SIZE, GRID_SIZE]}
-    >
-      <ActiveOutlineContainer isActive={isActive}>
-        {/* Overlay for enabling drag */}
-        {(showOverlay || !isActive) && (
+    <LexicalComposer initialConfig={RichTextInitialConfig}>
+      {isActive && !isDragOverlay && (
+        <RichTextToolbarPlugin updateBackgroundColor={updateBackgroundColor} />
+      )}
+      <Rnd
+        size={{ width: size.width, height: size.height }}
+        position={{ x: position.x, y: position.y }}
+        onDragStart={() => {
+          setIsDragging(true);
+          setShowOverlay(false);
+        }}
+        onDragStop={(e, d) => {
+          setIsDragging(false);
+          handleDragStop(
+            id,
+            size,
+            components,
+            updateComponent,
+            setPosition,
+          )(e, d);
+        }}
+        onResizeStart={() => setIsDragging(true)}
+        onResizeStop={(e, d, ref, delta, newPosition) => {
+          setIsDragging(false);
+          handleResizeStop(id, components, updateComponent, setSize, setPosition)(
+            e,
+            d,
+            ref,
+            delta,
+            newPosition,
+          );
+        }}
+        minHeight={60}
+        minWidth={300}
+        bounds="parent"
+        onMouseDown={handleMouseDown}
+        style={{ pointerEvents: "auto" }}
+        dragGrid={[GRID_SIZE, GRID_SIZE]}
+        resizeGrid={[GRID_SIZE, GRID_SIZE]}
+      >
+        <ActiveOutlineContainer isActive={isActive}>
           <div
-            className="w-full h-full flex items-center justify-center absolute inset-0 z-10"
-            onMouseDown={() => setShowOverlay(true)}
-          ></div>
-        )}
-
-        <div
-          onMouseEnter={() => setShowOverlay(false)} // remove overlay when interacting with iframe
-          onMouseDown={(e) => e.stopPropagation()} // capture mouse movements
-          className="cursor-default"
-        >
-          <div
-            className="flex w-full h-full justify-between whitespace-pre-wrap bg-transparent overflow-hidden resize-none text-lg"
-            style={{ padding: `${GRID_SIZE}px` }}
+            className="w-full h-full rounded"
+            style={{ backgroundColor: data.backgroundColor || "transparent" }}
           >
-            <div className="flex flex-col justify-between">
-              <h1
-                contentEditable
-                suppressContentEditableWarning
-                draggable="false"
-                className="overflow-hidden min-w-[300px] max-w-[300px] min-h-[26px] max-h-[30px] text-black text-2xl font-bold cursor-text p-0 m-0 leading-none outline outline-gray-300 rounded-sm"
-                style={{
-                  outline: `${!isActive ? "none" : ""}`,
-                }}
-                onBlur={(e) => {
-                  setCurContent((prevContent: AcademicEntryContent) => ({
-                    ...prevContent,
-                    schoolName: e.target.innerText,
-                  }));
-                  updateComponent(
-                    id,
-                    position,
-                    size,
-                    JSON.stringify({
-                      ...curContent,
-                      schoolName: e.target.innerText,
-                    }),
-                  );
-                }}
-              >
-                {curContent.schoolName}
-              </h1>
-              <p
-                contentEditable
-                suppressContentEditableWarning
-                draggable="false"
-                className="overflow-hidden min-h-[24px] max-h-[24px] min-w-[300px] max-w-[300px] outline outline-gray-300 rounded-sm"
-                style={{
-                  outline: `${!isActive ? "none" : ""}`,
-                }}
-                onBlur={(e) => {
-                  setCurContent((prevContent: AcademicEntryContent) => ({
-                    ...prevContent,
-                    subtext: e.target.innerText,
-                  }));
-                  updateComponent(
-                    id,
-                    position,
-                    size,
-                    JSON.stringify({
-                      ...curContent,
-                      subtext: e.target.innerText,
-                    }),
-                  );
-                }}
-              >
-                {curContent.subtext}
-              </p>
-            </div>
 
-            <p
-              contentEditable
-              suppressContentEditableWarning
-              draggable="false"
-              className="overflow-hidden min-w-[300px] max-w-[300px] resize-none bg-transparent text-lg leading-none outline outline-gray-300 rounded-sm"
-              style={{
-                outline: `${!isActive ? "none" : ""}`,
-              }}
-              onBlur={(e) => {
-                setCurContent((prevContent: AcademicEntryContent) => ({
-                  ...prevContent,
-                  duration: e.target.innerText,
-                }));
-                updateComponent(
-                  id,
-                  position,
-                  size,
-                  JSON.stringify({
-                    ...curContent,
-                    duration: e.target.innerText,
-                  }),
-                );
-              }}
+            {/* Overlay for enabling drag */}
+            {(showOverlay || !isActive) && (
+              <div
+                className="w-full h-full flex items-center justify-center absolute inset-0 z-10"
+                onMouseDown={() => setShowOverlay(true)}
+              >
+              </div>
+            )}
+
+            <div
+              onMouseEnter={() => setShowOverlay(false)} // remove overlay when interacting with iframe
+              onMouseDown={(e) => e.stopPropagation()} // capture mouse movements
+              className="w-full h-full cursor-default"
             >
-              {curContent.duration}
-            </p>
+              <RichTextbox
+                isPreview={isPreview}
+                textboxState={data.textboxState || data}
+                updateTextboxState={updateTextboxState}
+                isActive={isActive}
+              />
+            </div>
           </div>
-        </div>
-      </ActiveOutlineContainer>
-    </Rnd>
+        </ActiveOutlineContainer>
+      </Rnd>
+    </LexicalComposer>
   );
 }

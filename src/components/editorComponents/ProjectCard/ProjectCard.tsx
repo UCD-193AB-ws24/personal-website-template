@@ -4,7 +4,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Rnd } from "react-rnd";
 import { useSearchParams } from "next/navigation";
-import { XIcon } from "lucide-react";
+import { ArrowLeftToLine, ArrowRightToLine, XIcon } from "lucide-react";
 
 import ActiveOutlineContainer from "@components/editorComponents/ActiveOutlineContainer";
 import ImageCard from "./ImageCard";
@@ -31,11 +31,12 @@ import {
 interface ProjectCardContent {
   id: number;
   type: "text" | "image";
-  title?: string;
-  body?: string;
+  title?: any;
+  body?: any;
   imageUrl?: string;
   widthPercent?: number;
   positionPercent?: { x: number; y: number };
+  backgroundColor?: string;
 }
 
 interface ProjectCardProps {
@@ -56,6 +57,7 @@ interface ProjectCardProps {
   isPreview?: boolean;
   isMobilePreview?: boolean;
   isPublish?: boolean;
+  isDragOverlay?: boolean;
 }
 
 export default function ProjectCard({
@@ -71,6 +73,7 @@ export default function ProjectCard({
   isPreview = false,
   isMobilePreview = false,
   isPublish = false,
+  isDragOverlay = false,
 }: ProjectCardProps) {
   const [position, setPosition] = useState(initialPos);
   const [size, setSize] = useState(initialSize);
@@ -140,18 +143,45 @@ export default function ProjectCard({
     updateComponent(id, position, size, JSON.stringify(newCards));
   };
 
+  const updateCardBackgroundColor = (
+    cardId: number,
+    field: "title" | "body",
+    newColor: string
+  ) => {
+    const updatedCards = cards.map((card) => {
+      if (card.id !== cardId) return card;
+      const targetField = card[field];
+      return {
+        ...card,
+        [field]: {
+          ...(typeof targetField === "string"
+            ? { textboxState: targetField }
+            : targetField),
+          backgroundColor: newColor,
+        },
+      };
+    });
+    updateContent(updatedCards);
+  };
+
   const addTextCard = () => {
     if (cards.length < 3) {
       const newCard: ProjectCardContent = {
         id: Date.now(),
         type: "text",
-        title:
-          '{"root":{"children":[{"children":[{"detail":0,"format":1,"mode":"normal","style":"","text":"Section Title","type":"text","version":1}],"direction":"ltr","format":"center","indent":0,"type":"heading","version":1,"tag":"h1"}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}',
-        body: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Body Text","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0, "textStyle":""}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}',
+        title: {
+          textboxState: '{"root":{"children":[{"children":[{"detail":0,"format":1,"mode":"normal","style":"","text":"Section Title","type":"text","version":1}],"direction":"ltr","format":"center","indent":0,"type":"heading","version":1,"tag":"h1"}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}',
+          backgroundColor: "transparent"
+        },
+        body: {
+          textboxState: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Body Text","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}',
+          backgroundColor: "transparent"
+        }
       };
       updateContent([...cards, newCard]);
     }
   };
+
 
   const addImageCard = () => {
     if (cards.length < 3) {
@@ -175,7 +205,16 @@ export default function ProjectCard({
     value: string,
   ) => {
     const updatedCards = cards.map((card) =>
-      card.id === cardId ? { ...card, [field]: value } : card,
+      card.id === cardId
+        ? {
+          ...card,
+          [field]: {
+            ...(typeof card[field] === "string"
+              ? { textboxState: value }
+              : { ...card[field], textboxState: value }),
+          },
+        }
+        : card
     );
     updateContent(updatedCards);
   };
@@ -184,6 +223,21 @@ export default function ProjectCard({
     e.stopPropagation();
     onMouseDown?.();
   };
+
+  if (isDragOverlay) {
+    return <div className="w-[400px] h-[200px] flex justify-between items-center gap-2">
+      <ArrowLeftToLine size={24} color="gray" />
+      <div className="relative w-full h-full bg-gray-100 flex justify-end items-center p-1 outline outline-2 outline-blue-500">
+        <div className="absolute top-2 right-4 px-3 py-1 bg-blue-600 text-white text-sm rounded shadow">
+          Add Text Card
+        </div>
+        <div className="absolute top-10 right-4 px-3 py-1 bg-green-600 text-white text-sm rounded shadow">
+          Add Image Card
+        </div>
+      </div>
+      <ArrowRightToLine size={24} color="gray" />
+    </div>
+  }
 
   if (isPreview || isPublish) {
     return (
@@ -240,13 +294,13 @@ export default function ProjectCard({
                   <div className="p-4">
                     {/* Section Title */}
                     <LexicalComposer initialConfig={RichTextInitialConfig}>
-                      <div className="mt-2 rounded">
+                      <div
+                        className="mt-2 rounded"
+                        style={{ backgroundColor: card.title?.backgroundColor || "transparent" }}
+                      >
                         <RichTextbox
                           isPreview={isPreview || isPublish}
-                          textboxState={
-                            card.title ||
-                            HeaderRichTextDefaultContent.textboxState
-                          }
+                          textboxState={card.title?.textboxState || HeaderRichTextDefaultContent.textboxState}
                           updateTextboxState={(newState) => {
                             handleTextCardChange(card.id, "title", newState);
                           }}
@@ -257,12 +311,13 @@ export default function ProjectCard({
 
                     {/* Body */}
                     <LexicalComposer initialConfig={RichTextInitialConfig}>
-                      <div className="mt-2 rounded">
+                      <div
+                        className="mt-2 rounded"
+                        style={{ backgroundColor: card.body?.backgroundColor || "transparent" }}
+                      >
                         <RichTextbox
                           isPreview={isPreview || isPublish}
-                          textboxState={
-                            card.body || RichTextDefaultContent.textboxState
-                          }
+                          textboxState={card.body?.textboxState || RichTextDefaultContent.textboxState}
                           updateTextboxState={(newState) => {
                             handleTextCardChange(card.id, "body", newState);
                           }}
@@ -440,17 +495,17 @@ export default function ProjectCard({
                               }}
                             >
                               <RichTextToolbarPlugin
-                                updateBackgroundColor={() => {}}
+                                updateBackgroundColor={(newColor) => updateCardBackgroundColor(card.id, "title", newColor)}
                               />
                             </div>
                           )}
-                          <div className="focus:outline focus:outline-2 focus:outline-blue-500 hover:outline hover:outline-2 hover:outline-gray-300 rounded">
+                          <div
+                            className="focus:outline focus:outline-2 focus:outline-blue-500 hover:outline hover:outline-2 hover:outline-gray-300 rounded"
+                            style={{ backgroundColor: card.title?.backgroundColor || "transparent" }}
+                          >
                             <RichTextbox
                               isPreview={isPreview}
-                              textboxState={
-                                card.title ||
-                                HeaderRichTextDefaultContent.textboxState
-                              }
+                              textboxState={card.title?.textboxState || HeaderRichTextDefaultContent.textboxState}
                               updateTextboxState={(newState) => {
                                 handleTextCardChange(
                                   card.id,
@@ -480,16 +535,17 @@ export default function ProjectCard({
                               }}
                             >
                               <RichTextToolbarPlugin
-                                updateBackgroundColor={() => {}}
+                                updateBackgroundColor={(newColor) => updateCardBackgroundColor(card.id, "body", newColor)}
                               />
                             </div>
                           )}
-                          <div className="mt-2 focus:outline focus:outline-2 focus:outline-blue-500 hover:outline hover:outline-2 hover:outline-gray-300 rounded">
+                          <div
+                            className="mt-2 focus:outline focus:outline-2 focus:outline-blue-500 hover:outline hover:outline-2 hover:outline-gray-300 rounded"
+                            style={{ backgroundColor: card.body?.backgroundColor || "transparent" }}
+                          >
                             <RichTextbox
                               isPreview={isPreview}
-                              textboxState={
-                                card.body || RichTextDefaultContent.textboxState
-                              }
+                              textboxState={card.body?.textboxState || RichTextDefaultContent.textboxState}
                               updateTextboxState={(newState) => {
                                 handleTextCardChange(card.id, "body", newState);
                               }}

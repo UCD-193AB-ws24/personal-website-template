@@ -44,11 +44,12 @@ const fetchStoredAndReferencedFiles = async (
             comp.content,
         )
         .flatMap((comp: any) => {
-          try {
-            if (comp.type === "aboutMeCard") {
-              const parsed = JSON.parse(comp.content);
-              return parsed.image ? [getStoragePathFromUrl(parsed.image)] : [];
-            }
+        try {
+          if (comp.type === "aboutMeCard") {
+            return comp.content
+              ? [getStoragePathFromUrl(comp.content.image)]
+              : [];
+          }
 
             if (comp.type === "projectCard") {
               const cards = JSON.parse(comp.content);
