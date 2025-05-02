@@ -36,22 +36,22 @@ export const componentMap: Record<
 };
 
 export const componentSizes: Record<string, { width: number; height: number }> =
-{
-  textBlock: { width: 200, height: 150 },
-  sectionTitle: { width: 350, height: 30 },
-  image: { width: 200, height: 150 },
-  file: { width: 200, height: 300 },
-  video: { width: 450, height: 250 },
-  navBar: { width: 100000, height: 48 },
-  academicEntry: { width: 620, height: 60 },
-  webPage: { width: 500, height: 300 },
-  workEntry: { width: 620, height: 120 },
-  horizontalLine: { width: 350, height: 2 },
-  verticalLine: { width: 2, height: 350 },
-  icon: { width: 50, height: 50 },
-  aboutMeCard: { width: 740, height: 215 },
-  projectCard: { width: 100000, height: 200 },
-};
+  {
+    textBlock: { width: 200, height: 150 },
+    sectionTitle: { width: 350, height: 30 },
+    image: { width: 200, height: 150 },
+    file: { width: 200, height: 300 },
+    video: { width: 450, height: 250 },
+    navBar: { width: 100000, height: 48 },
+    academicEntry: { width: 620, height: 60 },
+    webPage: { width: 500, height: 300 },
+    workEntry: { width: 620, height: 120 },
+    horizontalLine: { width: 350, height: 2 },
+    verticalLine: { width: 2, height: 350 },
+    icon: { width: 50, height: 50 },
+    aboutMeCard: { width: 740, height: 215 },
+    projectCard: { width: 100000, height: 200 },
+  };
 
 export const renderOverlayContent = (activeType: string | null) => {
   switch (activeType) {
@@ -78,7 +78,7 @@ export const renderOverlayContent = (activeType: string | null) => {
     case "verticalLine":
       return <VerticalLine />;
     case "aboutMeCard":
-      return <AboutMeCard isDragOverlay={true} />
+      return <AboutMeCard isDragOverlay={true} />;
     case "icon":
       return <IconComponent isDragOverlay={true} />;
     case "aboutMeCard":

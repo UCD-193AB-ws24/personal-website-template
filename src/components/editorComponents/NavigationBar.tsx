@@ -4,7 +4,13 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { PlusIcon, MenuIcon, XIcon, ArrowLeftToLine, ArrowRightToLine } from "lucide-react";
+import {
+  PlusIcon,
+  MenuIcon,
+  XIcon,
+  ArrowLeftToLine,
+  ArrowRightToLine,
+} from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -148,13 +154,15 @@ export default function NavigationBar({
   };
 
   if (isDragOverlay) {
-    return <div className="flex w-[256px] h-[48px] justify-between items-center">
-      <ArrowLeftToLine size={24} color="gray" />
-      <div className="bg-gray-800 min-w-[200px] min-h-[48px] flex justify-end items-center p-1">
-        <MenuIcon color="white" size={32} />
+    return (
+      <div className="flex w-[256px] h-[48px] justify-between items-center">
+        <ArrowLeftToLine size={24} color="gray" />
+        <div className="bg-gray-800 min-w-[200px] min-h-[48px] flex justify-end items-center p-1">
+          <MenuIcon color="white" size={32} />
+        </div>
+        <ArrowRightToLine size={24} color="gray" />
       </div>
-      <ArrowRightToLine size={24} color="gray" />
-    </div>
+    );
   }
 
   // Mobile nav bar (with hamburger menu)

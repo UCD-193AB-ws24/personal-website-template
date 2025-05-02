@@ -589,7 +589,9 @@ export default function Editor() {
               onDragEnd={handleDragEnd}
               onDragMove={handleDragMove}
               collisionDetection={pointerWithin}
-              cancelDrop={({over}) => {return over === null}}
+              cancelDrop={({ over }) => {
+                return over === null;
+              }}
             >
               <div
                 className={`flex ${isPreview ? "justify-center items-center h-screen bg-gray-200" : ""} text-black relative bg-white`}
