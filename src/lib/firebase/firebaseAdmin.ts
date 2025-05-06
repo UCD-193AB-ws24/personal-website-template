@@ -34,6 +34,7 @@ export async function isUserAuthenticated(
       reqCookies.delete(cookieKey);
     });
 
+    console.log(error);
     return false;
   }
 }
