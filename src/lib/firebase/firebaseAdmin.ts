@@ -28,7 +28,12 @@ export async function isUserAuthenticated(
     const isRevoked = !(await auth.verifySessionCookie(_session, true));
     return !isRevoked;
   } catch (error) {
-    console.error(error);
+    // Delete cookies if the session can't be validated
+    const reqCookies = await cookies();
+    reqCookies.getAll().map((cookieKey) => {
+      reqCookies.delete(cookieKey);
+    });
+
     return false;
   }
 }
