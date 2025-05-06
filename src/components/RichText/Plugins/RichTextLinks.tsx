@@ -243,10 +243,8 @@ export default function RichTextLinks({
   };
 
   const updateLink = () => {
-    if (
-      getPageIdx(linkEditorURLField) !== -1 ||
-      isValidURL(linkEditorURLField)
-    ) {
+    const validatedURL = isValidURL(linkEditorURLField);
+    if (getPageIdx(linkEditorURLField) !== -1 || validatedURL) {
       setIsLinkEditorVisible(false);
       setEscapePressed(true);
 
@@ -260,7 +258,7 @@ export default function RichTextLinks({
             setLastActiveLinkNodeKey(linkParent.getKey());
 
             // Replace the old link with a new link node containing the entered fields
-            const newLink = $createLinkNode(linkEditorURLField);
+            const newLink = $createLinkNode(validatedURL);
             newLink.append($createTextNode(linkEditorTextField));
 
             linkParent.replace(newLink);
