@@ -14,14 +14,17 @@ export default function isValidURL(url: string): string {
     const parsedURL = new URL(url);
     if (!SUPPORTED_URL_PROTOCOLS.has(parsedURL.protocol)) {
       toastError(
-        "Selected text must include one of the following protocols: http, https, mailto, sms, tel.",
+        "Unsupported URL protocol. Only http, https, mailto, sms, and tel are allowed when a protocol is included.",
       );
       return "";
     }
   } catch {
-    toastError(
-      "Selected text is not a valid URL. Ensure that a protocol is provided. Example: https://example.com",
-    );
+    // Fallback: allow domain only URLs with optional path and query
+    const domainOnlyRegExp = /^[a-z0-9.-]+\.[a-z]{2,}(?::\d+)?(\/[^\s]*)?$/i;
+    if (domainOnlyRegExp.test(url)) {
+      return `https://${url}`;
+    }
+    toastError("Selected text is not a valid URL.");
     return "";
   }
 
