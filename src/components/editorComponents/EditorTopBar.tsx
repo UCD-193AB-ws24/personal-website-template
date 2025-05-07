@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { GridIcon } from "lucide-react";
+import { GridIcon, CircleHelpIcon } from "lucide-react";
 
 interface EditorTopBarProps {
   draftName: string;
@@ -30,6 +30,14 @@ export default function EditorTopBar({
         <p className="font-bold">{draftName}</p>
       </div>
       <div className="flex">
+        <a
+          href="/help"
+          target="_blank"
+          className="text-large font-semibold flex items-center gap-2 px-3 py-1 mr-4 border border-gray-500 hover:bg-gray-500 hover:text-white rounded-md shadow-md transition-all"
+        >
+          <CircleHelpIcon size={18} />
+          Help
+        </a>
         <button
           onClick={() => setIsGridVisible((prev) => !prev)}
           className="text-large font-semibold flex items-center gap-2 px-3 py-1 mr-4 border border-gray-500 hover:bg-gray-500 hover:text-white rounded-md shadow-md transition-all"
