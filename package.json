@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "vitest",
+    "test:playwright": "npx playwright test",
     "prepare": "husky",
     "format": "npx prettier src/ --write"
   },

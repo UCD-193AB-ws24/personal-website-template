@@ -37,6 +37,9 @@ jobs:
       - name: Run tests
         run: npm run test
       
+      - name: Run playwright
+        run: npm run test:playwright
+      
       - name: Run formatter
         run: npm run format
 

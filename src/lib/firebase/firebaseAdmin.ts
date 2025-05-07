@@ -1,4 +1,4 @@
-import "server-only";
+// import "server-only";
 
 import { initializeApp, getApp, getApps, cert } from "firebase-admin/app";
 import { cookies } from "next/headers";
