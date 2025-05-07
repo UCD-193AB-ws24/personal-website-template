@@ -46,7 +46,8 @@ jobs:
         run: | 
           npm install @playwright/test
           npm install dotenv
-          npx playwright install 
+          npx playwright install
+          continue-on-error: true
       
       - name: Run playwright
         run: npm run test:playwright
