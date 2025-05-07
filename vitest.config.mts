@@ -8,7 +8,8 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
-    include: ['**/__tests__/**/*.{test,spec}.{ts,tsx}']
+    include: ['__tests__/**/*.{test,spec}.{ts,tsx}'],
+    exclude: ['__tests__/playwright/**']
   },
   esbuild: {
     jsx: 'automatic'
