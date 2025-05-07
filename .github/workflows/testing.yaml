@@ -43,7 +43,9 @@ jobs:
         run: npm run test
       
       - name: Install Playwright Browsers
-        run: npm install @playwright/test
+        run: | 
+          npm install @playwright/test
+          npm install dotenv
       
       - name: Run playwright
         run: npm run test:playwright
