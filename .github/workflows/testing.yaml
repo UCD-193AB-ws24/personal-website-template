@@ -15,6 +15,11 @@ concurrency:
 jobs:  
   test:
     runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+      NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
+      FIREBASE_SERVICE_ACCOUNT_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
+      NEXT_PUBLIC_URL: ${{ secrets.NEXT_PUBLIC_URL }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -36,6 +41,16 @@ jobs:
 
       - name: Run tests
         run: npm run test
+      
+      - name: Install Playwright Browsers
+        run: | 
+          npm install @playwright/test
+          npm install dotenv
+          npx playwright install
+      
+      - name: Run playwright
+        run: npm run test:playwright
+        continue-on-error: true
       
       - name: Run formatter
         run: npm run format

@@ -10,6 +10,7 @@ export async function middleware(request: NextRequest) {
     pathname !== "/" &&
     pathname !== "/login" &&
     pathname !== "/signup" &&
+    pathname !== "/help" &&
     session === undefined
   ) {
     return NextResponse.redirect(new URL("/login", request.url));
@@ -60,5 +61,6 @@ export const config = {
     "/login/:path*",
     "/signup/:path*",
     "/setusername/:path*",
+    "/help/:path*",
   ],
 };
