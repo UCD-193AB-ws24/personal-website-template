@@ -47,10 +47,10 @@ jobs:
           npm install @playwright/test
           npm install dotenv
           npx playwright install
-          continue-on-error: true
       
       - name: Run playwright
         run: npm run test:playwright
+        continue-on-error: true
       
       - name: Run formatter
         run: npm run format
