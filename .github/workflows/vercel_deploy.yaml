@@ -27,6 +27,12 @@ jobs:
         run: |
           npm ci
 
+      - name: Install Playwright Browsers
+        run: |
+          npm install @playwright/test
+          npm install dotenv
+          npx playwright install
+
       - name: Build project
         run: npm run build
         env:
