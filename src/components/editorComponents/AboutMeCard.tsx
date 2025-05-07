@@ -215,7 +215,8 @@ export default function AboutMeCard({
     } catch (err) {
       console.error("Failed to parse content for AboutMeCard:", err);
     }
-  }, [content]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleMouseDown = (e: MouseEvent) => {
     e.stopPropagation();
@@ -491,6 +492,7 @@ export default function AboutMeCard({
                           />
                         ) : imageUrl ? (
                           <img
+                            draggable={false}
                             src={imageUrl}
                             alt="Uploaded"
                             className="w-full h-full object-cover"
