@@ -3,7 +3,6 @@ import Image from "next/image";
 import {
   BaselineIcon,
   BriefcaseIcon,
-  CircleArrowRightIcon,
   ContactIcon,
   FileUserIcon,
   ImagesIcon,
@@ -74,13 +73,6 @@ const categorizedItems = {
       name: "Navigation Bar",
       description: "Add a customizable menu for easy site navigation.",
       icon: <RectangleEllipsisIcon />,
-    },
-    {
-      id: 11,
-      type: "navButton",
-      name: "Navigation Button",
-      description: "Add a button to link to other pages or sections.",
-      icon: <CircleArrowRightIcon />,
     },
   ],
   Media: [
