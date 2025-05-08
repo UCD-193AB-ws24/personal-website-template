@@ -7,7 +7,6 @@ import {
   ContactIcon,
   FileUserIcon,
   ImagesIcon,
-  QuoteIcon,
   SchoolIcon,
   RectangleEllipsisIcon,
   TextIcon,
@@ -136,13 +135,6 @@ const categorizedItems = {
       name: "Work Entry",
       description: "Describe a job role, company, and time period.",
       icon: <BriefcaseIcon />,
-    },
-    {
-      id: 16,
-      type: "endoresment",
-      name: "Endoresment",
-      description: "Add quotes or recommendations from colleagues.",
-      icon: <QuoteIcon />,
     },
   ],
 };
