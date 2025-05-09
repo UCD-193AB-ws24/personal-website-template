@@ -30,6 +30,7 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install
 
+
       - name: Build project
         run: npm run build
         env:
@@ -51,6 +52,7 @@ jobs:
 
       - name: Install Playwright Browsers
         run: npx playwright install
+
 
       - name: Deploy to Vercel
         run: |
