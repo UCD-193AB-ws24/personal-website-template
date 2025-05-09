@@ -162,6 +162,12 @@ export default function ImageComponent({
     }
   };
 
+  const dropdownWidth = 323;
+  const parentWidth =
+    document.getElementById("editor-drop-zone")?.clientWidth || 500;
+
+  const isButtonOnLeft = position.x + dropdownWidth > parentWidth;
+
   return isPreview ? (
     <div
       style={{
@@ -337,7 +343,7 @@ export default function ImageComponent({
           style={{
             position: "absolute",
             top: `${position.y + size.height + 10}px`,
-            left: `${position.x}px`,
+            left: `${isLinkEditing && isButtonOnLeft ? position.x - dropdownWidth + size.width : position.x}px`,
             zIndex: 10,
             pointerEvents: "auto",
             transition: "opacity 0.2s ease-in-out, transform 0.1s",
