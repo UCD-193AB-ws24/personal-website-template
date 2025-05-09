@@ -19,7 +19,10 @@ export async function GET() {
   try {
     const user = await getCurrentUser();
     if (user === null) {
-      throw new Error("User not found");
+      return NextResponse.json<APIResponse<string>>(
+        { success: false, error: "User not found" },
+        { status: 401 },
+      );
     }
 
     const userDoc = await db.collection("users").doc(user.uid).get();
