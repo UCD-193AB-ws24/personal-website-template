@@ -149,17 +149,17 @@ const categorizedItems = {
 
 export default function Sidebar() {
   return (
-    <div className="flex w-64 bg-gray-100 max-h-screen fixed left-0 top-0 transition-width duration-300">
-      <div className="overflow-y-auto w-64 bg-gray-100 px-4 pt-3 pb-4 border-r h-screen">
-        <Link href="/" className="flex items-center gap-x-3 mb-4">
+    <div className="flex flex-col w-64 bg-gray-100 max-h-screen fixed left-0 top-0 transition-width duration-300">
+      <div className="sticky flex justify-center items-center min-h-[64px]">
+        <Link href="/" className="flex gap-x-3 items-center">
           <Image src="/logo.png" width={32} height={32} alt="Profesite Logo" />
           <span className="self-center text-4xl font-light tracking-wide whitespace-nowrap iceland-font">
             PROFESITE
           </span>
         </Link>
-
+      </div>
+      <div className="overflow-y-auto w-64 bg-gray-100 px-4 pt-3 pb-4 border-r h-screen">
         <h1 className="text-lg font-bold mb-4">Components</h1>
-
         <Accordion>
           {Object.entries(categorizedItems).map(([category, items]) => (
             <AccordionItem key={category} title={category}>
