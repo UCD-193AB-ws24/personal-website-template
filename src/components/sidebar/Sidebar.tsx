@@ -3,11 +3,9 @@ import Image from "next/image";
 import {
   BaselineIcon,
   BriefcaseIcon,
-  CircleArrowRightIcon,
   ContactIcon,
   FileUserIcon,
   ImagesIcon,
-  QuoteIcon,
   SchoolIcon,
   RectangleEllipsisIcon,
   TextIcon,
@@ -76,13 +74,6 @@ const categorizedItems = {
       description: "Add a customizable menu for easy site navigation.",
       icon: <RectangleEllipsisIcon />,
     },
-    {
-      id: 11,
-      type: "navButton",
-      name: "Navigation Button",
-      description: "Add a button to link to other pages or sections.",
-      icon: <CircleArrowRightIcon />,
-    },
   ],
   Media: [
     {
@@ -136,13 +127,6 @@ const categorizedItems = {
       name: "Work Entry",
       description: "Describe a job role, company, and time period.",
       icon: <BriefcaseIcon />,
-    },
-    {
-      id: 16,
-      type: "endoresment",
-      name: "Endoresment",
-      description: "Add quotes or recommendations from colleagues.",
-      icon: <QuoteIcon />,
     },
   ],
 };
