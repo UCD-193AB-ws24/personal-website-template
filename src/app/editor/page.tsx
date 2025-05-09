@@ -19,6 +19,7 @@ import Sidebar from "@components/sidebar/Sidebar";
 import NavigationBar from "@components/editorComponents/NavigationBar";
 import LoadingSpinner from "@components/LoadingSpinner";
 import { toastPublish } from "@components/toasts/PublishToast";
+import { toastError } from "@components/toasts/ErrorToast";
 import FullWindow from "@components/FullWindow";
 
 import type {
@@ -258,6 +259,9 @@ export default function Editor() {
       throw new Error("Bad request");
     } catch (error: any) {
       console.log("error:", error.message);
+      toastError(
+        "Draft is too large to save. Please shorten some content and try again.",
+      );
       setIsLoading(false);
     }
   };
@@ -302,6 +306,9 @@ export default function Editor() {
       throw new Error(resBody.error);
     } catch (error: any) {
       console.log("Error:", error.message);
+      toastError(
+        "Draft is too large to publish and save. Please shorten some content and try again.",
+      );
       setIsLoading(false);
     }
   };
@@ -423,13 +430,8 @@ export default function Editor() {
           editorBounds.width - draggedRect.width,
         ),
       );
-      const dropY = Math.max(
-        0,
-        Math.min(
-          draggedRect.top - editorBounds.top,
-          editorBounds.height - draggedRect.height,
-        ),
-      );
+
+      const dropY = Math.max(0, draggedRect.top - editorBounds.top);
 
       let roundedX = Math.round(dropX / GRID_SIZE) * GRID_SIZE;
       const roundedY = Math.round(dropY / GRID_SIZE) * GRID_SIZE;
@@ -458,6 +460,7 @@ export default function Editor() {
         ...components.map((comp) => comp.position.y + comp.size.height),
         newPos.y + newSize.height,
       );
+
       setEditorHeight(Math.max(lowestY + 100, window.innerHeight - 64));
     }
   };
@@ -466,9 +469,9 @@ export default function Editor() {
     if (!editorRef.current) return;
 
     const editorRect = editorRef.current.getBoundingClientRect();
-    const cursorY = active.rect.current.translated?.top ?? 0;
+    const cursorY = active.rect.current.translated?.bottom ?? 0;
 
-    if (cursorY > editorRect.bottom - 100) {
+    if (cursorY >= editorRect.bottom - 10) {
       setEditorHeight((prevHeight) => prevHeight + 50);
     }
   };

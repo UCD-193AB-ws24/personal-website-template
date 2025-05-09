@@ -1,4 +1,5 @@
 import { APIResponse } from "@customTypes/apiResponse";
+import { getFirebaseAuth } from "@lib/firebase/firebaseApp";
 
 // Request memoization: https://nextjs.org/docs/app/building-your-application/caching#request-memoization
 export async function fetchUsername() {
@@ -7,7 +8,14 @@ export async function fetchUsername() {
       "Content-Type": "application/json",
     },
   })
-    .then((res) => res.json())
+    .then((res) => {
+      if (res.status === 401) {
+        // Sign user out in the client side
+        const auth = getFirebaseAuth();
+        auth.signOut();
+      }
+      return res.json();
+    })
     .then((res: APIResponse<string>) => {
       if (!res.success) {
         throw new Error(res.error);
@@ -19,25 +27,4 @@ export async function fetchUsername() {
       console.log(error.message);
       return "";
     });
-
-  // try {
-  // 	const response = await fetch('/api/user/username', {
-  // 		headers: {
-  // 			'Content-Type': 'application/json',
-  // 		},
-  // 	});
-
-  // 	const resBody = (await response.json()) as APIResponse<string>;
-
-  // 	if (!response.ok) {
-  // 		throw new Error('Bad request');
-  // 	} else if (!resBody.success) {
-  // 		throw new Error(resBody.error);
-  // 	} else {
-  // 		return resBody.data;
-  // 	}
-  // } catch (error: any) {
-  // 	console.log(error.message);
-  // 	return '';
-  // }
 }
