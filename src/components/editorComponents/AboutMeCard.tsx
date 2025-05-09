@@ -186,6 +186,7 @@ export default function AboutMeCard({
   const [showOverlay, setShowOverlay] = useState(false);
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const [parentSize, setParentSize] = useState({ width: 1, height: 1 });
+  const imgRef = useRef(null);
 
   const draftNumber = useSearchParams().get("draftNumber");
 
@@ -215,7 +216,8 @@ export default function AboutMeCard({
     } catch (err) {
       console.error("Failed to parse content for AboutMeCard:", err);
     }
-  }, [content]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleMouseDown = (e: MouseEvent) => {
     e.stopPropagation();
@@ -296,6 +298,54 @@ export default function AboutMeCard({
         });
       },
     );
+  };
+
+  const updateImagePercents = () => {
+    const imgContainer = imageContainerRef.current! as HTMLElement;
+    const imgContainerRect = imgContainer.getBoundingClientRect();
+
+    const img = imgRef.current! as HTMLElement;
+    const imgRect = img.getBoundingClientRect();
+
+    const imgOffsetXFromParent = imgRect.left - imgContainerRect.left;
+    const imgOffsetYFromParent = imgRect.top - imgContainerRect.top;
+
+    const distToContainerRightEdge =
+      imgContainerRect.width - imgOffsetXFromParent;
+
+    // Max %width image can be before it overflows horizontally
+    const maxPercentWidthForHoriz =
+      distToContainerRightEdge / imgContainerRect.width;
+
+    // Max %width image can be before it overflows vertically
+    const maxPercentWidthForVert =
+      (imgRect.width * (imgContainerRect.height - imgOffsetYFromParent)) /
+      (imgContainerRect.width * imgRect.height);
+
+    // Multiplied by 100 for unit conversion, i.e. 10% ==> 10.0
+    const maxPercentWidth =
+      Math.min(maxPercentWidthForHoriz, maxPercentWidthForVert) * 100;
+
+    // Min width is 100px
+    // Multiplied by 100 for unit conversion, i.e. 10% ==> 10.0
+    const minPercentWidth = (100 / imgContainerRect.width) * 100;
+
+    // New width is bounded between [minPercentWidth, maxPercentWidth]
+    const newWidthPercent = Math.max(
+      minPercentWidth,
+      Math.min(imageWidthPercent, maxPercentWidth),
+    );
+    setImageWidthPercent(newWidthPercent);
+
+    // Overflow right
+    if (distToContainerRightEdge < imgRect.width) {
+      const newWidth = (newWidthPercent / 100) * imgContainerRect.width;
+      const newOffsetXFromParent = imgContainerRect.width - newWidth;
+      const newPosXPercent = newOffsetXFromParent / imgContainerRect.width;
+      setImagePositionPercent((prev) => {
+        return { ...prev, x: newPosXPercent * 100 };
+      });
+    }
   };
 
   return isPreview ? (
@@ -380,7 +430,17 @@ export default function AboutMeCard({
             setPosition,
           )(e, d);
         }}
-        onResizeStart={() => setIsDragging(true)}
+        onResize={(_, __, ref, ___, ____) => {
+          // Force children to update/re-render: this prevents the image from snapping
+          // into position after the resize event stops
+          const rect = ref.getBoundingClientRect();
+          setSize({ width: rect.width, height: rect.height });
+
+          updateImagePercents();
+        }}
+        onResizeStart={() => {
+          setIsDragging(true);
+        }}
         onResizeStop={(e, d, ref, delta, newPosition) => {
           setIsDragging(false);
           handleResizeStop(
@@ -482,7 +542,10 @@ export default function AboutMeCard({
                       enableResizing={isActive}
                       onMouseDown={(e) => e.stopPropagation()}
                     >
-                      <div className="w-full h-full flex items-center justify-center bg-gray-200 cursor-pointer">
+                      <div
+                        ref={imgRef}
+                        className="w-full h-full flex items-center justify-center bg-gray-200 cursor-pointer"
+                      >
                         {previewSrc ? (
                           <img
                             src={previewSrc}
@@ -491,6 +554,7 @@ export default function AboutMeCard({
                           />
                         ) : imageUrl ? (
                           <img
+                            draggable={false}
                             src={imageUrl}
                             alt="Uploaded"
                             className="w-full h-full object-cover"
