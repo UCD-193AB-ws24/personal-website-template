@@ -19,6 +19,7 @@ import Sidebar from "@components/sidebar/Sidebar";
 import NavigationBar from "@components/editorComponents/NavigationBar";
 import LoadingSpinner from "@components/LoadingSpinner";
 import { toastPublish } from "@components/toasts/PublishToast";
+import { toastError } from "@components/toasts/ErrorToast";
 import FullWindow from "@components/FullWindow";
 
 import type {
@@ -258,6 +259,9 @@ export default function Editor() {
       throw new Error("Bad request");
     } catch (error: any) {
       console.log("error:", error.message);
+      toastError(
+        "Draft is too large to save. Please shorten some content and try again.",
+      );
       setIsLoading(false);
     }
   };
@@ -302,6 +306,9 @@ export default function Editor() {
       throw new Error(resBody.error);
     } catch (error: any) {
       console.log("Error:", error.message);
+      toastError(
+        "Draft is too large to publish and save. Please shorten some content and try again.",
+      );
       setIsLoading(false);
     }
   };
