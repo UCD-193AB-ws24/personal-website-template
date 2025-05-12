@@ -2,51 +2,41 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import Profile from '../../src/app/profile/page';
 import Settings from '../../src/app/profile/settings/page';
 import { mockRouter } from '../../vitest.setup';
-import { expect, test } from 'vitest';
+import { expect, test, afterEach, vi } from 'vitest';
 
-let calls = 0
-let index = 0
+afterEach(() => {
+  vi.restoreAllMocks();
+  mockRouter.push.mockClear(); // clear previous calls to push
+});
 
-test('testing new draft buttons', () => {
-    render(<Profile />)
+test('testing new draft button navigates to /setupdraft', () => {
+  render(<Profile />);
 
-    const button = screen.getByTestId('new-draft-button');
+  const button = screen.getByTestId('new-draft-button');
+  fireEvent.click(button);
 
-    fireEvent.click(button);
-    calls += 1;
-
-    expect(mockRouter.push).toHaveBeenCalledTimes(calls);
-
-    const expectedPath = "/setupdraft";
-    expect(mockRouter.push.mock.calls[index][0]).toBe(expectedPath);
-    index += 1;
-
+  expect(mockRouter.push).toHaveBeenCalledTimes(1);
+  expect(mockRouter.push).toHaveBeenCalledWith("/setupdraft");
 });
 
 test('ensuring nav bar is there', () => {
-    render(<Profile />)
-
-    const navBar = screen.getByTestId('nav-bar');
-    expect(navBar).toBeInTheDocument();
+  render(<Profile />);
+  const navBar = screen.getByTestId('nav-bar');
+  expect(navBar).toBeInTheDocument();
 });
 
+test('settings button navigates to /profile/settings', () => {
+  render(<Profile />);
 
-test('linked to settings', () => {
-    render(<Profile />)
+  const button = screen.getByTestId('setting-btn');
+  fireEvent.click(button);
 
-    const button = screen.getByTestId('setting-btn');
-    fireEvent.click(button);
-    calls += 1;;
+  expect(mockRouter.push).toHaveBeenCalledTimes(1);
+  expect(mockRouter.push).toHaveBeenCalledWith("/profile/settings");
+});
 
-    expect(mockRouter.push).toHaveBeenCalledTimes(calls);
-
-    expect(mockRouter.push.mock.calls[index][0]).toBe("/profile/settings");
-    index += 1;
-})
-
-test('ensuring nav bar is there (settings)', () => {
-    render(<Settings />)
-
-    const navBar = screen.getByTestId('nav-bar');
-    expect(navBar).toBeInTheDocument();
+test('ensuring nav bar is there (settings page)', () => {
+  render(<Settings />);
+  const navBar = screen.getByTestId('nav-bar');
+  expect(navBar).toBeInTheDocument();
 });
