@@ -7,7 +7,6 @@ import { toastError } from "@components/toasts/ErrorToast";
 import { toastSuccess } from "@components/toasts/SuccessToast";
 import { changeUsername } from "@lib/requests/changeUsername";
 import { fetchUsername } from "@lib/requests/fetchUsername";
-// import { auth } from "@lib/firebase/firebaseApp";
 import { getFirebaseAuth } from "@lib/firebase/firebaseApp";
 const auth = getFirebaseAuth();
 
@@ -104,9 +103,9 @@ export default function Settings() {
           />
         )}
       </header>
-      <main className="mx-auto max-w-screen-xl p-8">
+      <main className="mx-auto max-w-screen-xl py-8 px-2 md:px-8">
         <div className="flex justify-center">
-          <div className="flex flex-col p-2 w-[60%] bg-white rounded shadow-lg">
+          <div className="flex flex-col p-2 w-full md:w-[60%] bg-white rounded shadow-lg">
             <h1 className="text-xl p-2 font-bold border-b border-gray-100">
               Settings
             </h1>
