@@ -2,7 +2,6 @@
 
 import "../homePage.css";
 import { useAuthState } from "react-firebase-hooks/auth";
-// import { auth } from "@lib/firebase/firebaseApp";
 import { getFirebaseAuth } from "@lib/firebase/firebaseApp";
 const auth = getFirebaseAuth();
 
@@ -133,8 +132,8 @@ export default function Profile() {
           </h1>
         </div>
 
-        <div className="grid sm:grid-cols-1 md:grid-cols-2 justify-evenly gap-7 mt-20">
-          <div className="mt-16 p-6 text-center bg-gray-900 sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0 flex flex-col justify-between w-[275px] sm:w-full h-[285px]">
+        <div className="grid grid-cols-1 md:grid-cols-2 justify-evenly gap-7 mt-20">
+          <div className="mt-16 p-6 text-center bg-gray-900 sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0 flex flex-col justify-between w-[275px] w-full h-[285px]">
             <div className="flex justify-center mt-5 mb-4 text-3xl sm:text-1xl md:text-2xl lg:text-3xl xl:text-3xl font-bold text-white">
               <h2>
                 Your website is:{" "}
@@ -169,7 +168,7 @@ export default function Profile() {
             </div>
           </div>
 
-          <div className="mt-16 p-6 text-center bg-gray-900 sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0 flex flex-col justify-between w-[275px] sm:w-full h-[285px]">
+          <div className="mt-16 p-6 text-center bg-gray-900 sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0 flex flex-col justify-between w-[275px] w-full h-[285px]">
             <LoadingSpinner show={isLoading} />
 
             <div>
@@ -185,7 +184,7 @@ export default function Profile() {
                 className="relative inline-flex px-6 py-4 w-1/2 text-lg font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#f08700] hover:text-black shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50 items-center justify-center text-center"
               >
                 <div className="text-left rtl:text-right">
-                  <div className="-mt-1 font-sans text-lg font-semibold">
+                  <div className="-mt-1 font-sans text-lg font-semibold text-center">
                     View Settings
                   </div>
                 </div>
@@ -193,7 +192,7 @@ export default function Profile() {
             </div>
           </div>
 
-          <div className="mt-16 p-6 text-center bg-gray-900 sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0 flex flex-col justify-between w-[275px] sm:w-full h-[285px]">
+          <div className="mt-16 p-6 text-center bg-gray-900 sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0 flex flex-col justify-between w-[275px] w-full h-[285px]">
             <div>
               <h3 className="mb-4 text-3xl font-bold text-white">
                 Make a new website!
@@ -207,7 +206,7 @@ export default function Profile() {
                 className="relative inline-flex px-6 py-4 w-1/2 text-lg font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#f08700] hover:text-black shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50 items-center justify-center text-center"
               >
                 <div className="text-left rtl:text-right">
-                  <div className="-mt-1 font-sans text-lg font-semibold">
+                  <div className="-mt-1 font-sans text-lg font-semibold text-center">
                     Create My Site
                   </div>
                 </div>
@@ -215,7 +214,7 @@ export default function Profile() {
             </div>
           </div>
 
-          <div className="mt-16 p-6 text-center bg-gray-900 sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0 flex flex-col justify-between w-[275px] sm:w-full h-[285px]">
+          <div className="mt-16 p-6 text-center bg-gray-900 sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0 flex flex-col justify-between w-[275px] w-full h-[285px]">
             <LoadingSpinner show={isLoading} />
             <div className="mb-4 text-5xl font-bold text-white">{views}</div>
 
