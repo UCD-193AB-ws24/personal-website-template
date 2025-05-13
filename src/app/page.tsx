@@ -2,7 +2,6 @@
 
 import "./homePage.css";
 import { useAuthState } from "react-firebase-hooks/auth";
-// import { auth } from "@lib/firebase/firebaseApp";
 import { getFirebaseAuth } from "@lib/firebase/firebaseApp";
 const auth = getFirebaseAuth();
 
@@ -77,7 +76,7 @@ export default function Home() {
       </header>
 
       <main className="mx-auto max-w-screen-xl p-4">
-        <div className="grid grid-cols-1 gap-y-16 sm:gap-y-32 justify-items-center md:items-end md:grid-cols-3 md:gap-x-8 pb-64">
+        <div className="grid grid-cols-1 gap-y-16 sm:gap-y-32 justify-items-center md:items-end md:grid-cols-3 md:gap-x-8 md:pb-64">
           <div className="perspective-text justify-self-start mt-48 mr-16">
             <div className="perspective-line">
               <p className="text-3xl sm:text-6xl">Your</p>
