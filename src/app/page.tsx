@@ -116,17 +116,15 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="mt-16 p-6 text-center bg-gray-900 border border-[#00f2ff] sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0">
+        <div className="mt-16 p-6 text-center bg-gray-900 border border-[#00f2ff] sm:p-10 rounded-lg relative overflow-hidden">
           <h3 className="mb-2 text-3xl font-bold text-white">Why Profesite?</h3>
-          <div className="flex justify-center">
-            <div
-              className="grid justify-start pl-16 pr-16 gap-x-8"
-              style={{ gridTemplateColumns: "auto minmax(0, 1fr)" }}
-            >
+          <div className="flex justify-center mt-2">
+            <div className="grid justify-start grid-cols-2 px-2 text-left gap-y-2 md:grid-cols-[auto_minmax(0,1fr)] md:px-16 gap-x-8">
               <p className="justify-self-start text-white">Stand Out</p>
               <p className="justify-self-start text-white">
                 Go beyond a resume with a polished personal site
               </p>
+
               <p className="justify-self-start text-white">
                 Effortless Customization
               </p>
@@ -143,13 +141,10 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="mt-16 p-6 text-center bg-gray-900 border border-[#00f2ff] sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0">
+        <div className="mt-16 p-6 text-center bg-gray-900 border border-[#00f2ff] sm:p-10 rounded-lg relative overflow-hidden">
           <h3 className="mb-2 text-3xl font-bold text-white">How It Works</h3>
-          <div className="flex justify-center">
-            <div
-              className="grid justify-start pl-16 pr-16 gap-x-8"
-              style={{ gridTemplateColumns: "auto minmax(0, 1fr)" }}
-            >
+          <div className="flex justify-center mt-2">
+            <div className="grid justify-start grid-cols-2 px-2 text-left gap-y-2 md:grid-cols-[auto_minmax(0,1fr)] md:px-16 gap-x-8">
               <p className="justify-self-start text-white">Pick a template</p>
               <p className="justify-self-start text-white">
                 Choose a design that fits your style
@@ -166,15 +161,12 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="mt-16 p-6 text-center bg-gray-900 border border-[#00f2ff] sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0">
+        <div className="mt-16 p-6 text-center bg-gray-900 border border-[#00f2ff] sm:p-10 rounded-lg relative overflow-hidden">
           <h3 className="mb-2 text-3xl font-bold text-white">
             Who&apos;s It For?
           </h3>
-          <div className="flex justify-center">
-            <div
-              className="grid justify-start pl-16 pr-16 gap-x-8"
-              style={{ gridTemplateColumns: "auto minmax(0, 1fr)" }}
-            >
+          <div className="flex justify-center mt-2">
+            <div className="grid justify-start grid-cols-2 px-2 text-left gap-y-2 md:grid-cols-[auto_minmax(0,1fr)] md:px-16 gap-x-8">
               <p className="justify-self-start text-white">Job seekers</p>
               <p className="justify-self-start text-white">
                 Make a powerful first impression
@@ -197,7 +189,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="mt-16 p-6 text-center bg-gray-900 border border-[#00f2ff] sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0">
+        <div className="mt-16 p-6 text-center bg-gray-900 border border-[#00f2ff] sm:p-10 rounded-lg relative overflow-hidden">
           <h3 className="mb-4 text-3xl font-bold text-white">
             Start Your Website Today
           </h3>

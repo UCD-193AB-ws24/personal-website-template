@@ -56,7 +56,7 @@ export default function Navbar({
 
         {/* Hamburger menu for mobile */}
         {isMobile ? (
-          <Menu as="div">
+          <Menu as="div" className="flex items-center">
             <MenuButton>
               <MenuIcon size={24} color="#f08700" />
             </MenuButton>
