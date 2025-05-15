@@ -264,8 +264,8 @@ export default function NavigationBar({
               <button
                 className={`px-4 py-2 mx-1 rounded-md transition-all duration-200 ${
                   activePageIndex === index
-                    ? "bg-blue-500"
-                    : "bg-gray-700 hover:bg-gray-600"
+                    ? "text-blue-500"
+                    : "text-white hover:text-gray-600"
                 }`}
               >
                 {page.pageName}
@@ -293,7 +293,11 @@ export default function NavigationBar({
           <div key={index} className="flex items-center space-x-2">
             <button
               onClick={() => switchPage(index)}
-              className={`px-4 py-2 mx-1 rounded-md transition-all duration-200 ${activePageIndex === index ? "bg-blue-500" : "bg-gray-700 hover:bg-gray-600"}`}
+              className={`px-4 py-2 mx-1 rounded-md transition-all duration-200 ${
+                activePageIndex === index
+                  ? "text-blue-500"
+                  : "text-white hover:text-gray-600"
+              }`}
             >
               {page.pageName}
             </button>
