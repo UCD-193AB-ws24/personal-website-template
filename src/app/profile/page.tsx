@@ -133,8 +133,10 @@ export default function Profile() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 justify-evenly gap-7 mt-20">
-          <div className="mt-16 p-6 text-center bg-gray-900 sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0 flex flex-col justify-between w-[275px] w-full h-[285px]">
-            <div className="flex justify-center mt-5 mb-4 text-3xl sm:text-1xl md:text-2xl lg:text-3xl xl:text-3xl font-bold text-white">
+          <div
+            className={`flex flex-col ${publishedDraftNumber === 0 ? "justify-center" : "justify-between"} mt-16 p-6 text-center bg-gray-900 sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0 w-[275px] w-full h-[285px]`}
+          >
+            <div className="flex justify-center text-1xl md:text-2xl lg:text-3xl font-bold text-white">
               <h2>
                 Your website is:{" "}
                 {publishedDraftNumber === 0 ? (
@@ -149,30 +151,21 @@ export default function Profile() {
               </h2>
             </div>
 
-            <div>
-              {publishedDraftNumber === 0 ? (
-                <button
-                  disabled
-                  className="relative inline-flex px-6 py-4 w-1/2 text-lg font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all shadow-[0_0_10px_rgba(240,135,0,0.4)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 items-center justify-center text-center"
-                >
-                  My Website
-                </button>
-              ) : (
+            {publishedDraftNumber !== 0 && (
+              <div>
                 <button
                   onClick={handleOpenWebsite}
-                  className="relative inline-flex px-6 py-4 w-1/2 text-lg font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#f08700] hover:text-black shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50 items-center justify-center text-center"
+                  className="w-full lg:w-2/3 relative inline-flex px-6 py-4 text-lg font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#f08700] hover:text-black shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50 items-center justify-center text-center"
                 >
                   My Website
                 </button>
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
           <div className="mt-16 p-6 text-center bg-gray-900 sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0 flex flex-col justify-between w-[275px] w-full h-[285px]">
-            <LoadingSpinner show={isLoading} />
-
             <div>
-              <h3 className="mb-4 text-3xl text-center font-bold text-white bg-gray-900">
+              <h3 className="mb-4 text-1xl md:text-2xl lg:text-3xl text-center font-bold text-white bg-gray-900">
                 Settings
               </h3>
             </div>
@@ -181,7 +174,7 @@ export default function Profile() {
               <button
                 data-testid="setting-btn"
                 onClick={() => router.push("/profile/settings")}
-                className="relative inline-flex px-6 py-4 w-1/2 text-lg font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#f08700] hover:text-black shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50 items-center justify-center text-center"
+                className="relative inline-flex px-6 py-4 w-full lg:w-2/3 text-lg font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#f08700] hover:text-black shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50 items-center justify-center text-center"
               >
                 <div className="text-left rtl:text-right">
                   <div className="-mt-1 font-sans text-lg font-semibold text-center">
@@ -194,7 +187,7 @@ export default function Profile() {
 
           <div className="mt-16 p-6 text-center bg-gray-900 sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0 flex flex-col justify-between w-[275px] w-full h-[285px]">
             <div>
-              <h3 className="mb-4 text-3xl font-bold text-white">
+              <h3 className="mb-4 text-1xl md:text-2xl lg:text-3xl font-bold text-white">
                 Make a new website!
               </h3>
             </div>
@@ -203,7 +196,7 @@ export default function Profile() {
               <button
                 data-testid="new-draft-button"
                 onClick={() => router.push("/setupdraft")}
-                className="relative inline-flex px-6 py-4 w-1/2 text-lg font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#f08700] hover:text-black shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50 items-center justify-center text-center"
+                className="relative inline-flex px-6 py-4 w-full lg:w-2/3 text-lg font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#f08700] hover:text-black shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50 items-center justify-center text-center"
               >
                 <div className="text-left rtl:text-right">
                   <div className="-mt-1 font-sans text-lg font-semibold text-center">
@@ -215,16 +208,15 @@ export default function Profile() {
           </div>
 
           <div className="mt-16 p-6 text-center bg-gray-900 sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0 flex flex-col justify-between w-[275px] w-full h-[285px]">
-            <LoadingSpinner show={isLoading} />
             <div className="mb-4 text-5xl font-bold text-white">{views}</div>
-
             <div>
-              <h3 className="mb-4 text-3xl text-center font-bold text-white bg-gray-900">
+              <h3 className="mb-4 text-1xl md:text-2xl lg:text-3xl text-center font-bold text-white bg-gray-900">
                 Views on your published draft!
               </h3>
             </div>
           </div>
         </div>
+        <LoadingSpinner show={isLoading} />
       </main>
 
       <footer></footer>
