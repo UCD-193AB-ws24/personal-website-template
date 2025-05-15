@@ -76,22 +76,26 @@ export default function Home() {
       </header>
 
       <main className="mx-auto max-w-screen-xl p-4">
-        <div className="grid grid-cols-1 gap-y-16 sm:gap-y-32 justify-items-center md:items-end md:grid-cols-3 md:gap-x-8 md:pb-64">
-          <div className="perspective-text justify-self-start mt-48 mr-16">
-            <div className="perspective-line">
-              <p className="text-3xl sm:text-6xl">Your</p>
+        <div className="grid grid-cols-1 gap-y-16 md:gap-y-32 justify-items-center md:items-end md:grid-cols-3 md:gap-x-8 md:pb-64">
+          <div className="perspective-text justify-self-start mt-16 md:mt-48 md:mr-16">
+            <div className="perspective-line left-[1rem] h-[2.25rem] md:h-[3.5rem]">
+              <p className="text-4xl/[2.25rem] md:text-6xl/[3.5rem]">Your</p>
             </div>
-            <div className="perspective-line">
-              <p className="text-2xl sm:text-5xl">Professional</p>
+            <div className="perspective-line left-[2.25rem] md:left-[3rem] h-[1.875rem] md:h-[3.5rem]">
+              <p className="text-3xl/[1.875rem] md:text-5xl/[3.5rem]">
+                Professional
+              </p>
             </div>
-            <div className="perspective-line">
-              <p className="text-2xl sm:text-5xl">Website,</p>
+            <div className="perspective-line left-[3.33rem] md:left-[5rem] h-[1.875rem] md:h-[3.5rem]">
+              <p className="text-3xl/[1.875rem] md:text-5xl/[3.5rem]">
+                Website,
+              </p>
             </div>
-            <div className="perspective-line">
-              <p className="text-2xl sm:text-5xl">Your</p>
+            <div className="perspective-line left-[4.45rem] md:left-[7rem] h-[1.875rem] md:h-[3.5rem]">
+              <p className="text-3xl/[1.875rem] md:text-5xl/[3.5rem]">Your</p>
             </div>
-            <div className="perspective-line">
-              <p className="text-3xl sm:text-6xl">Way</p>
+            <div className="perspective-line left-[5.55rem] md:left-[9rem] h-[1.875rem] md:h-[3.5rem]">
+              <p className="text-4xl/[2.25rem] md:text-6xl/[3.5rem]">Way</p>
             </div>
           </div>
           <div className="md:grid md:grid-cols-subgrid md:col-span-2 md:justify-end">
