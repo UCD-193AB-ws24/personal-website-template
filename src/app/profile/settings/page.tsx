@@ -132,7 +132,7 @@ export default function Settings() {
                     updateUsername(usernameInput);
                   }}
                 >
-                  <Check size={16} color="white" strokeWidth={3} />
+                  <Check size="0.8rem" color="white" strokeWidth={3} />
                 </button>
               </div>
             </div>
