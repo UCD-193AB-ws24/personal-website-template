@@ -101,7 +101,7 @@ export default function LogInForm() {
         {/* Horizontal Divider & Text */}
         <div className="relative flex items-center my-6">
           <hr className="w-full border-gray-600" />
-          <span className="absolute left-1/2 -translate-x-1/2 bg-gray-900 px-4 py-1 text-gray-400 text-sm">
+          <span className="absolute left-1/2 -translate-x-1/2 bg-gray-900 px-4 py-1 text-gray-400 text-sm text-center">
             Don&apos;t have an account?
           </span>
         </div>

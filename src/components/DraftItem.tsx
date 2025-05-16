@@ -42,6 +42,9 @@ export default function DraftItem({
       )}
       <button
         onClick={() => loadEditor(id.toString())}
+        onAuxClick={() => {
+          window.open(`/editor?draftNumber=${id}`, "_blank")?.focus();
+        }}
         className="h-full border-none truncate"
       >
         {name}

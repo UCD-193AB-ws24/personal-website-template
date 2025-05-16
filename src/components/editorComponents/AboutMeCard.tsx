@@ -18,7 +18,6 @@ import type {
 import { handleDragStop, handleResizeStop } from "@utils/dragResizeUtils";
 import { GRID_SIZE, MAX_FILE_SIZE } from "@utils/constants";
 
-// import { auth, storage } from "@lib/firebase/firebaseApp";
 import { getFirebaseAuth, getFirebaseStorage } from "@lib/firebase/firebaseApp";
 const auth = getFirebaseAuth();
 const storage = getFirebaseStorage();
@@ -176,17 +175,19 @@ export default function AboutMeCard({
     content?.image ?? null,
   );
   const [previewSrc, setPreviewSrc] = useState<string | null>(null);
-  const [imageWidthPercent, setImageWidthPercent] = useState<number>(
-    content?.imageLayout?.widthPercent ?? 40,
-  );
-  const [imagePositionPercent, setImagePositionPercent] = useState<{
+  const [imageSizePx, setImageSizePx] = useState<{
+    width: number;
+    height: number;
+  }>(content?.imageLayout?.sizePx ?? { width: 200, height: 200 });
+
+  const [imagePositionPx, setImagePositionPx] = useState<{
     x: number;
     y: number;
-  }>(content?.imageLayout?.positionPercent ?? { x: 0, y: 0 });
+  }>(content?.imageLayout?.positionPx ?? { x: 0, y: 0 });
   const [showOverlay, setShowOverlay] = useState(false);
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const [parentSize, setParentSize] = useState({ width: 1, height: 1 });
-  const imgRef = useRef(null);
+  const imgRef = useRef<HTMLDivElement>(null);
 
   const draftNumber = useSearchParams().get("draftNumber");
 
@@ -208,9 +209,9 @@ export default function AboutMeCard({
       }
 
       if (parsedContent?.imageLayout) {
-        setImageWidthPercent(parsedContent.imageLayout.widthPercent ?? 40);
-        setImagePositionPercent(
-          parsedContent.imageLayout.positionPercent ?? { x: 0, y: 0 },
+        setImageSizePx(parsedContent.imageLayout.sizePx ?? 200);
+        setImagePositionPx(
+          parsedContent.imageLayout.positionPx ?? { x: 0, y: 0 },
         );
       }
     } catch (err) {
@@ -233,8 +234,8 @@ export default function AboutMeCard({
         : "transparent",
       image: imageUrl,
       imageLayout: {
-        widthPercent: imageWidthPercent,
-        positionPercent: imagePositionPercent,
+        sizePx: imageSizePx,
+        positionPx: imagePositionPx,
       },
       textboxState: newState,
     };
@@ -251,8 +252,8 @@ export default function AboutMeCard({
       textboxState: isObject ? (data.textboxState ?? "") : data,
       image: imageUrl,
       imageLayout: {
-        widthPercent: imageWidthPercent,
-        positionPercent: imagePositionPercent,
+        sizePx: imageSizePx,
+        positionPx: imagePositionPx,
       },
     };
 
@@ -276,76 +277,73 @@ export default function AboutMeCard({
     const localPreview = URL.createObjectURL(file);
     setPreviewSrc(localPreview);
 
-    uploadTask.on(
-      "state_changed",
-      null,
-      (error) => {
-        console.error("Upload failed:", error);
-        setPreviewSrc(null);
-      },
-      async () => {
-        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-        setImageUrl(downloadURL);
-        setPreviewSrc(null);
+    const img = new Image();
+    img.src = localPreview;
+    img.onload = async () => {
+      const aspectRatio = img.height / img.width;
+      const targetWidth = parentSize.width * 0.4;
+      const targetHeight = targetWidth * aspectRatio;
+      const targetSize = { width: targetWidth, height: targetHeight };
+      setImageSizePx(targetSize);
 
-        updateComponent(id, position, size, {
-          ...data,
-          image: downloadURL,
-          imageLayout: {
-            widthPercent: imageWidthPercent,
-            positionPercent: imagePositionPercent,
-          },
-        });
-      },
-    );
+      uploadTask.on(
+        "state_changed",
+        null,
+        (error) => {
+          console.error("Upload failed:", error);
+          setPreviewSrc(null);
+        },
+        async () => {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          setImageUrl(downloadURL);
+          setPreviewSrc(null);
+
+          updateComponent(id, position, size, {
+            ...data,
+            image: downloadURL,
+            imageLayout: {
+              sizePx: targetSize,
+              positionPx: imagePositionPx,
+            },
+          });
+        },
+      );
+    };
   };
 
-  const updateImagePercents = () => {
-    const imgContainer = imageContainerRef.current! as HTMLElement;
-    const imgContainerRect = imgContainer.getBoundingClientRect();
+  const updateImageSizeAndPositionPx = () => {
+    const imgContainer = imageContainerRef.current;
+    const img = imgRef.current;
 
-    const img = imgRef.current! as HTMLElement;
+    if (!imgContainer || !img) return;
+
+    const containerRect = imgContainer.getBoundingClientRect();
     const imgRect = img.getBoundingClientRect();
 
-    const imgOffsetXFromParent = imgRect.left - imgContainerRect.left;
-    const imgOffsetYFromParent = imgRect.top - imgContainerRect.top;
+    const width = imgRect.width;
+    const height = imgRect.height;
+    const x = imgRect.left - containerRect.left;
+    const y = imgRect.top - containerRect.top;
 
-    const distToContainerRightEdge =
-      imgContainerRect.width - imgOffsetXFromParent;
+    const clampedX = Math.max(0, Math.min(x, containerRect.width - width));
+    const clampedY = Math.max(0, Math.min(y, containerRect.height - height));
 
-    // Max %width image can be before it overflows horizontally
-    const maxPercentWidthForHoriz =
-      distToContainerRightEdge / imgContainerRect.width;
+    const newSize = { width, height };
+    const newPos = { x: clampedX, y: clampedY };
 
-    // Max %width image can be before it overflows vertically
-    const maxPercentWidthForVert =
-      (imgRect.width * (imgContainerRect.height - imgOffsetYFromParent)) /
-      (imgContainerRect.width * imgRect.height);
+    setImageSizePx(newSize);
+    setImagePositionPx(newPos);
 
-    // Multiplied by 100 for unit conversion, i.e. 10% ==> 10.0
-    const maxPercentWidth =
-      Math.min(maxPercentWidthForHoriz, maxPercentWidthForVert) * 100;
-
-    // Min width is 100px
-    // Multiplied by 100 for unit conversion, i.e. 10% ==> 10.0
-    const minPercentWidth = (100 / imgContainerRect.width) * 100;
-
-    // New width is bounded between [minPercentWidth, maxPercentWidth]
-    const newWidthPercent = Math.max(
-      minPercentWidth,
-      Math.min(imageWidthPercent, maxPercentWidth),
-    );
-    setImageWidthPercent(newWidthPercent);
-
-    // Overflow right
-    if (distToContainerRightEdge < imgRect.width) {
-      const newWidth = (newWidthPercent / 100) * imgContainerRect.width;
-      const newOffsetXFromParent = imgContainerRect.width - newWidth;
-      const newPosXPercent = newOffsetXFromParent / imgContainerRect.width;
-      setImagePositionPercent((prev) => {
-        return { ...prev, x: newPosXPercent * 100 };
-      });
-    }
+    updateComponent(id, position, size, {
+      ...data,
+      image: imageUrl,
+      imageLayout: {
+        sizePx: newSize,
+        positionPx: newPos,
+      },
+      textboxState: data.textboxState ?? "",
+      backgroundColor: data.backgroundColor ?? "transparent",
+    });
   };
 
   return isPreview ? (
@@ -371,9 +369,10 @@ export default function AboutMeCard({
               <div
                 style={{
                   position: "relative",
-                  width: `${imageWidthPercent}%`,
-                  left: `${imagePositionPercent.x}%`,
-                  top: `${imagePositionPercent.y}%`,
+                  width: `${imageSizePx.width}px`,
+                  height: `${imageSizePx.height}px`,
+                  left: `${imagePositionPx.x}px`,
+                  top: `${imagePositionPx.y}px`,
                 }}
               >
                 {previewSrc ? (
@@ -436,7 +435,7 @@ export default function AboutMeCard({
           const rect = ref.getBoundingClientRect();
           setSize({ width: rect.width, height: rect.height });
 
-          updateImagePercents();
+          updateImageSizeAndPositionPx();
         }}
         onResizeStart={() => {
           setIsDragging(true);
@@ -451,8 +450,8 @@ export default function AboutMeCard({
             setPosition,
           )(e, d, ref, delta, newPosition);
         }}
-        minHeight={215}
-        minWidth={630}
+        minHeight={Math.max(215, imageSizePx.height + 20 || 215)}
+        minWidth={Math.max(630, imageSizePx.width + 300 || 630)}
         bounds="parent"
         onMouseDown={handleMouseDown}
         style={{ pointerEvents: "auto" }}
@@ -484,29 +483,27 @@ export default function AboutMeCard({
                 <div
                   ref={imageContainerRef}
                   className="relative w-full h-full border border-gray-300"
+                  style={{
+                    width: "100%",
+                    minWidth: `${imageSizePx.width}px`,
+                  }}
                 >
                   {previewSrc || imageUrl ? (
                     <Rnd
                       bounds="parent"
-                      size={{ width: `${imageWidthPercent}%`, height: "auto" }}
-                      position={{
-                        x: (imagePositionPercent.x / 100) * parentSize.width,
-                        y: (imagePositionPercent.y / 100) * parentSize.height,
-                      }}
+                      size={imageSizePx}
+                      position={imagePositionPx}
                       minWidth={100}
                       minHeight={100}
                       onDragStop={(_, d) => {
-                        const newPos = {
-                          x: (d.x / parentSize.width) * 100,
-                          y: (d.y / parentSize.height) * 100,
-                        };
-                        setImagePositionPercent(newPos);
+                        const newPos = { x: d.x, y: d.y };
+                        setImagePositionPx(newPos);
                         updateComponent(id, position, size, {
                           ...data,
                           image: imageUrl,
                           imageLayout: {
-                            widthPercent: imageWidthPercent,
-                            positionPercent: newPos,
+                            sizePx: imageSizePx,
+                            positionPx: newPos,
                           },
                           textboxState: data.textboxState ?? "",
                           backgroundColor:
@@ -514,21 +511,18 @@ export default function AboutMeCard({
                         });
                       }}
                       onResizeStop={(_, __, ref, ____, newPosition) => {
-                        const newWidth = Number(
-                          ref.style.width.replace("%", ""),
-                        );
-                        const newPos = {
-                          x: (newPosition.x / parentSize.width) * 100,
-                          y: (newPosition.y / parentSize.height) * 100,
-                        };
-                        setImageWidthPercent(newWidth);
-                        setImagePositionPercent(newPos);
+                        const newWidth = ref.offsetWidth;
+                        const newHeight = ref.offsetHeight;
+                        const newSize = { width: newWidth, height: newHeight };
+                        const newPos = { x: newPosition.x, y: newPosition.y };
+                        setImageSizePx(newSize);
+                        setImagePositionPx(newPos);
                         updateComponent(id, position, size, {
                           ...data,
                           image: imageUrl,
                           imageLayout: {
-                            widthPercent: newWidth,
-                            positionPercent: newPos,
+                            sizePx: newSize,
+                            positionPx: newPos,
                           },
                           textboxState: data.textboxState ?? "",
                           backgroundColor:

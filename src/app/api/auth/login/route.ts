@@ -17,10 +17,12 @@ export async function POST(req: NextRequest) {
 
     const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
 
+    // expiresIn is measured in milliseconds
     const sessionCookie = await createSessionCookie(idToken, { expiresIn });
 
+    // maxAge is measured in seconds
     (await cookies()).set("__session", sessionCookie, {
-      maxAge: expiresIn,
+      maxAge: expiresIn / 1000,
       httpOnly: true,
       secure: true,
     });
