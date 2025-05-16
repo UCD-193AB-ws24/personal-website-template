@@ -152,7 +152,6 @@ export default function SetupDraft() {
             navLinks={[
               { label: "Home", href: "/" },
               { label: "Profile", href: "/profile" },
-              { label: "Drafts", href: "/saveddrafts" },
             ]}
           />
         ) : (
@@ -191,7 +190,7 @@ export default function SetupDraft() {
                       router.push("/templates");
                     }
                   }}
-                  className="relative inline-flex px-6 py-4 w-1/2 text-md font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#f08700] hover:text-black shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50 items-center justify-center text-center"
+                  className="relative inline-flex px-6 py-4 w-2/3 text-md font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#f08700] hover:text-black shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50 items-center justify-center text-center"
                 >
                   Templates
                 </button>
@@ -221,7 +220,7 @@ export default function SetupDraft() {
                     setIsModalHidden(false);
                     handleNewDraft();
                   }}
-                  className="relative inline-flex px-6 py-4 w-1/2 text-md font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#f08700] hover:text-black shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50 items-center justify-center text-center"
+                  className="relative inline-flex px-6 py-4 w-2/3 text-md font-semibold text-[#f08700] border border-[#f08700] rounded-md transition-all duration-300 hover:bg-[#f08700] hover:text-black shadow-[0_0_10px_rgba(240,135,0,0.4)] hover:shadow-[0_0_15px_rgba(240,135,0,0.6)] before:absolute before:inset-0 before:border-2 before:border-[#f08700] before:rounded-md before:opacity-10 before:scale-95 hover:before:scale-100 hover:before:opacity-50 items-center justify-center text-center"
                 >
                   Create
                 </button>
