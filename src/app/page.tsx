@@ -2,7 +2,6 @@
 
 import "./homePage.css";
 import { useAuthState } from "react-firebase-hooks/auth";
-// import { auth } from "@lib/firebase/firebaseApp";
 import { getFirebaseAuth } from "@lib/firebase/firebaseApp";
 const auth = getFirebaseAuth();
 
@@ -77,22 +76,26 @@ export default function Home() {
       </header>
 
       <main className="mx-auto max-w-screen-xl p-4">
-        <div className="grid grid-cols-1 gap-y-16 sm:gap-y-32 justify-items-center md:items-end md:grid-cols-3 md:gap-x-8 pb-64">
-          <div className="perspective-text justify-self-start mt-48 mr-16">
-            <div className="perspective-line">
-              <p className="text-3xl sm:text-6xl">Your</p>
+        <div className="grid grid-cols-1 gap-y-16 md:gap-y-32 justify-items-center md:items-end md:grid-cols-3 md:gap-x-8 md:pb-64">
+          <div className="perspective-text justify-self-start mt-16 md:mt-48 md:mr-16">
+            <div className="perspective-line left-[1rem] h-[2.25rem] md:h-[3.5rem]">
+              <p className="text-4xl/[2.25rem] md:text-6xl/[3.5rem]">Your</p>
             </div>
-            <div className="perspective-line">
-              <p className="text-2xl sm:text-5xl">Professional</p>
+            <div className="perspective-line left-[2.25rem] md:left-[3rem] h-[1.875rem] md:h-[3.5rem]">
+              <p className="text-3xl/[1.875rem] md:text-5xl/[3.5rem]">
+                Professional
+              </p>
             </div>
-            <div className="perspective-line">
-              <p className="text-2xl sm:text-5xl">Website,</p>
+            <div className="perspective-line left-[3.33rem] md:left-[5rem] h-[1.875rem] md:h-[3.5rem]">
+              <p className="text-3xl/[1.875rem] md:text-5xl/[3.5rem]">
+                Website,
+              </p>
             </div>
-            <div className="perspective-line">
-              <p className="text-2xl sm:text-5xl">Your</p>
+            <div className="perspective-line left-[4.45rem] md:left-[7rem] h-[1.875rem] md:h-[3.5rem]">
+              <p className="text-3xl/[1.875rem] md:text-5xl/[3.5rem]">Your</p>
             </div>
-            <div className="perspective-line">
-              <p className="text-3xl sm:text-6xl">Way</p>
+            <div className="perspective-line left-[5.55rem] md:left-[9rem] h-[1.875rem] md:h-[3.5rem]">
+              <p className="text-4xl/[2.25rem] md:text-6xl/[3.5rem]">Way</p>
             </div>
           </div>
           <div className="md:grid md:grid-cols-subgrid md:col-span-2 md:justify-end">
@@ -117,17 +120,15 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="mt-16 p-6 text-center bg-gray-900 border border-[#00f2ff] sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0">
+        <div className="mt-16 p-6 text-center bg-gray-900 border border-[#00f2ff] sm:p-10 rounded-lg relative overflow-hidden">
           <h3 className="mb-2 text-3xl font-bold text-white">Why Profesite?</h3>
-          <div className="flex justify-center">
-            <div
-              className="grid justify-start pl-16 pr-16 gap-x-8"
-              style={{ gridTemplateColumns: "auto minmax(0, 1fr)" }}
-            >
+          <div className="flex justify-center mt-2">
+            <div className="grid justify-start grid-cols-2 px-2 text-left gap-y-2 md:grid-cols-[auto_minmax(0,1fr)] md:px-16 gap-x-8">
               <p className="justify-self-start text-white">Stand Out</p>
               <p className="justify-self-start text-white">
                 Go beyond a resume with a polished personal site
               </p>
+
               <p className="justify-self-start text-white">
                 Effortless Customization
               </p>
@@ -144,13 +145,10 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="mt-16 p-6 text-center bg-gray-900 border border-[#00f2ff] sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0">
+        <div className="mt-16 p-6 text-center bg-gray-900 border border-[#00f2ff] sm:p-10 rounded-lg relative overflow-hidden">
           <h3 className="mb-2 text-3xl font-bold text-white">How It Works</h3>
-          <div className="flex justify-center">
-            <div
-              className="grid justify-start pl-16 pr-16 gap-x-8"
-              style={{ gridTemplateColumns: "auto minmax(0, 1fr)" }}
-            >
+          <div className="flex justify-center mt-2">
+            <div className="grid justify-start grid-cols-2 px-2 text-left gap-y-2 md:grid-cols-[auto_minmax(0,1fr)] md:px-16 gap-x-8">
               <p className="justify-self-start text-white">Pick a template</p>
               <p className="justify-self-start text-white">
                 Choose a design that fits your style
@@ -167,15 +165,12 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="mt-16 p-6 text-center bg-gray-900 border border-[#00f2ff] sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0">
+        <div className="mt-16 p-6 text-center bg-gray-900 border border-[#00f2ff] sm:p-10 rounded-lg relative overflow-hidden">
           <h3 className="mb-2 text-3xl font-bold text-white">
             Who&apos;s It For?
           </h3>
-          <div className="flex justify-center">
-            <div
-              className="grid justify-start pl-16 pr-16 gap-x-8"
-              style={{ gridTemplateColumns: "auto minmax(0, 1fr)" }}
-            >
+          <div className="flex justify-center mt-2">
+            <div className="grid justify-start grid-cols-2 px-2 text-left gap-y-2 md:grid-cols-[auto_minmax(0,1fr)] md:px-16 gap-x-8">
               <p className="justify-self-start text-white">Job seekers</p>
               <p className="justify-self-start text-white">
                 Make a powerful first impression
@@ -198,7 +193,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="mt-16 p-6 text-center bg-gray-900 border border-[#00f2ff] sm:p-10 rounded-lg relative overflow-hidden before:absolute before:inset-0">
+        <div className="mt-16 p-6 text-center bg-gray-900 border border-[#00f2ff] sm:p-10 rounded-lg relative overflow-hidden">
           <h3 className="mb-4 text-3xl font-bold text-white">
             Start Your Website Today
           </h3>

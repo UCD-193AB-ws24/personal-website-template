@@ -13,6 +13,9 @@ export async function middleware(request: NextRequest) {
     pathname !== "/help" &&
     session === undefined
   ) {
+    request.cookies.getAll().forEach(({ name }) => {
+      request.cookies.delete(name);
+    });
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
