@@ -63,9 +63,9 @@ export default function Help() {
           />
         )}
       </header>
-      <div className="w-screen h-screen overflow-hidden flex justify-center items-center">
+      <div className="h-screen overflow-hidden flex justify-center items-center border">
         <iframe
-          className="w-[80vw] max-w-[816px] h-[90vh]"
+          className="w-full md:w-[90vw] max-w-[816px] h-[90vh] overflow-x-hidden border rounded-lg bg-white"
           src="https://docs.google.com/document/d/e/2PACX-1vS0GWDSRMe_pjCnsHMh9RHMAyX_LFmUVtr4Y4YBu7g3acB555zxMAM_lNCTMJtiwGGFWuU4Xw6ol0gM/pub?embedded=true"
         ></iframe>
       </div>
