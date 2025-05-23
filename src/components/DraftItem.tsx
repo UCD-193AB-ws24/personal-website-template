@@ -34,9 +34,9 @@ export default function DraftItem({
   publishAsTemplate,
 }: DraftItemProps) {
   return (
-    <div className="flex flex-col justify-between justify-self-center w-[250px] sm:w-full h-[350px] border-2 border-black shadow-lg hover:bg-[#111827] hover:text-[#f08700] transition duration-300">
+    <div className="relative flex flex-col justify-between justify-self-center w-[250px] sm:w-full h-[350px] border-2 border-black shadow-lg hover:bg-[#111827] hover:text-[#f08700] transition duration-300">
       {isPublished && (
-        <div className="flex justify-end">
+        <div className="absolute top-0 right-0">
           <Star size={24} fill="#ffff00" color="#000000" strokeWidth={1.5} />
         </div>
       )}
