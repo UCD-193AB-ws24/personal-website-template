@@ -111,6 +111,7 @@ export default function SavedDrafts() {
   };
 
   const loadEditor = async (draftNumber: string) => {
+    setIsLoading(true);
     router.push("/editor?draftNumber=" + draftNumber);
   };
 
