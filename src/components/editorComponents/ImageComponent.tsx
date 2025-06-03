@@ -368,14 +368,15 @@ export default function ImageComponent({
                 <button
                   className="text-sm text-blue-500 font-bold ml-2"
                   onClick={() => {
-                    if (linkInputField && isValidURL(linkInputField)) {
-                      setLink(linkInputField);
+                    const validURL = isValidURL(linkInputField);
+                    if (validURL) {
+                      setLink(validURL);
                       setIsLinkEditing(false);
                       setIsEditingExistingLink(false);
                       setPrevLink("");
                       updateComponent(id, position, size, {
                         image: imageSrc,
-                        link: linkInputField,
+                        link: validURL,
                       });
                     }
                   }}
