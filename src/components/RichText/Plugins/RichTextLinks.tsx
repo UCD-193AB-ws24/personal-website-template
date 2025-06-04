@@ -243,30 +243,37 @@ export default function RichTextLinks({
   };
 
   const updateLink = () => {
-    const validatedURL = isValidURL(linkEditorURLField);
-    if (getPageIdx(linkEditorURLField) !== -1 || validatedURL) {
-      setIsLinkEditorVisible(false);
-      setEscapePressed(true);
-
-      editor.update(() => {
-        const selection = $getSelection();
-        if ($isRangeSelection(selection)) {
-          const node = getSelectedNode(selection);
-          const linkParent = $findMatchingParent(node, $isLinkNode);
-
-          if (linkParent) {
-            setLastActiveLinkNodeKey(linkParent.getKey());
-
-            // Replace the old link with a new link node containing the entered fields
-            const newLink = $createLinkNode(validatedURL);
-            newLink.append($createTextNode(linkEditorTextField));
-
-            linkParent.replace(newLink);
-            newLink.select(0);
-          }
-        }
-      });
+    let validatedURL = "";
+    if (getPageIdx(linkEditorURLField) !== -1) {
+      validatedURL = linkEditorURLField;
+    } else {
+      validatedURL = isValidURL(linkEditorURLField);
+      if (validatedURL === "") {
+        return;
+      }
     }
+
+    setIsLinkEditorVisible(false);
+    setEscapePressed(true);
+
+    editor.update(() => {
+      const selection = $getSelection();
+      if ($isRangeSelection(selection)) {
+        const node = getSelectedNode(selection);
+        const linkParent = $findMatchingParent(node, $isLinkNode);
+
+        if (linkParent) {
+          setLastActiveLinkNodeKey(linkParent.getKey());
+
+          // Replace the old link with a new link node containing the entered fields
+          const newLink = $createLinkNode(validatedURL);
+          newLink.append($createTextNode(linkEditorTextField));
+
+          linkParent.replace(newLink);
+          newLink.select(0);
+        }
+      }
+    });
   };
 
   return (
