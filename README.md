@@ -241,3 +241,7 @@ All routes are under `/api/`. Auth state is managed via session cookies set at l
 | Christopher Phan | [@chris-phan](https://github.com/chris-phan) |
 | Hanson Lau | [@HansonKLau](https://github.com/HansonKLau) |
 | Lauren Mandell | [@laurenmandell](https://github.com/laurenmandell) |
+
+## Developer Guide
+For more information on development, go to
+[Profesite Developer Manual](https://docs.google.com/document/d/e/2PACX-1vSXbv8RhSqenaoEVkk7OnE0GO8JKqSuQWFR8Ob52rTLY-ufCzdhbc-gD9-dii0fban-L7y_6WoXEVUW/pub?embedded=true)
